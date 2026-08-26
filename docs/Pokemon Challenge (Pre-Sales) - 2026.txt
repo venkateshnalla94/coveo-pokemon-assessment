@@ -1,0 +1,46 @@
+﻿THE 
+POKEMON 
+CHALLENGE
+
+
+Your mission, should you choose to accept it, will be to create a solution propelled by the Coveo Cloud Platform using either Atomic or Headless framework. Due to resource availability, we highly encourage you work with our recruiting team to schedule your presentation as soon as possible.
+GOALS
+The main goal will be to index pokemondb.net and customize your search page to include certain features.
+ESSENTIAL
+* Open your email and accept the invitation to your Cloud Organization
+* Install Atomic or Headless locally. 
+   * Atomic is an HTML markup style UI, with limited customization. Good if you are not a skilled front-end developer
+   * Headless is the state management behind it. Let you go crazy in React or Angular, and still get the connection with our APIs
+*  Index (A.K.A Crawl) pokemondb.net using your Cloud Platform Organization.
+   *  Include only the actual Pokemon pages in the crawler and exclude everything else (Moves, Types, etc.)
+   * You can either use our Webcrawler, or push content yourself using a Push source.
+* Connect your local search page to the cloud endpoint to get results when searching
+* Create a facet to filter search results by Pokemon Type.
+* Create a facet to filter search results by Pokemon Generation.
+* Display the Pokemon’s picture directly in their search result..
+INTERMEDIATE
+* Host your code on GitHub and share the link
+* Host your search app to make it accessible to us
+ADVANCED
+* Deploy Coveo RGA to get a generative experience
+* Preload a Query Suggest model to get type ahead
+* Add a Pokemon Detail Page to show the details of a single pokemon
+* Prepare a presentation covering 2 topics:
+   * Deep dive on your solution with a technical audience. What did you build? What is your Coveo configuration? Presentation format is your decision. It can be demo, slides, docs, a combination, or other.
+   * Identify an enterprise customer from your past or present who could benefit from a similar Coveo solution. Prepare a short presentation introducing them to both the solution and its value proposition for them.
+
+BONUS
+*  You’ve done everything above and feel like there’s more you can do? Build something interesting on top of the Coveo Passage Retrieval API! At a minimum, you should understand the Passage Retrieval API and have a point of view on how you would use it in future use cases.
+   * Please email us with the OrgID so that the Passage Retrieval can be enabled
+
+
+
+
+DOCUMENTATION
+It’s dangerous to go alone, take a few of these links to help you figure out some of the tougher aspects of the challenge.
+docs.coveo.com: our documentation site. It has GenAI enabled, so it should be able to answer most of your questions.
+Web Scraping Configuration: use a web scraping configuration to extract important information from the web pages. Use it to also exclude irrelevant parts of the pages.
+TIPS & TRICKS
+* Save yourself a lot of development time by creating a separate source which only indexes a single pokemon. That way you’ll be able to make tests without having to wait for the entire website to be crawled again!
+* Coveo extracts information automatically by default and associates it to certain ‘fields’. To get a specific bit of data, you’ll have to extract the right metadata.
+* The Coveo Cloud Platform has a built-in search page editor which you can use for testing. Make sure to transfer the code to your local installation to complete the challenge.

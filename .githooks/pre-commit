@@ -1,0 +1,13 @@
+#!/bin/sh
+# Fast gate before a commit: lint + typecheck + test-coverage guard (see
+# docs/standards-adoption.md #1). No commit-msg/pre-push tiers —
+# single-contributor take-home, not worth the process.
+set -e
+
+cd "$(git rev-parse --show-toplevel)"
+echo "pre-commit: lint"
+npm run --silent lint -- --max-warnings=0
+echo "pre-commit: typecheck"
+npx tsc --noEmit
+echo "pre-commit: test coverage guard"
+node scripts/check-test-coverage.mjs
