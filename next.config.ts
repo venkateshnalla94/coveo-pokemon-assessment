@@ -20,9 +20,17 @@ const COVEO_CONNECT_SRC = organizationId
   ? `https://${organizationId}.org.coveo.com https://${organizationId}.analytics.org.coveo.com`
   : "https://*.coveo.com https://*.cloud.coveo.com";
 
+// React/Turbopack use eval() in dev mode for debugging features (e.g.
+// reconstructing callstacks) — never in production, per React's own docs.
+// 'unsafe-eval' is scoped to development only so production stays strict.
+const SCRIPT_SRC =
+  process.env.NODE_ENV === "production"
+    ? "script-src 'self' 'unsafe-inline'"
+    : "script-src 'self' 'unsafe-inline' 'unsafe-eval'";
+
 const CONTENT_SECURITY_POLICY = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline'",
+  SCRIPT_SRC,
   "style-src 'self' 'unsafe-inline'",
   // Pokemon images only ever come from img.pokemondb.net (see the crawled
   // pokemonimageurl field in mapPokemonResult.ts and the remotePatterns
