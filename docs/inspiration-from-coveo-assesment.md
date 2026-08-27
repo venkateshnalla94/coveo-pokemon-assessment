@@ -36,7 +36,7 @@ No `rehype-raw` plugin — raw HTML from indexed/generated content is never rend
 
 Sibling repo's CSP (`next.config.mjs`) adds `base-uri 'self'` and `form-action 'self'` on top of a header set otherwise already matching this repo's — confirmed directly: `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`, and `Permissions-Policy: geolocation=(), camera=(), microphone=()` are already present in this repo's `next.config.ts`, byte-identical in intent. Not a gap — just two directives short.
 
-**Next step:** add `base-uri 'self'` and `form-action 'self'` to `CONTENT_SECURITY_POLICY` in `next.config.ts` when D11 (already tracked in `plan101.md` — tightening the wildcard `connect-src` to the real org hostname) gets done. Same file, same pass, no reason to split it into two edits.
+**Done** — both directives added to `CONTENT_SECURITY_POLICY` in `next.config.ts` alongside D11's `connect-src` tightening, same pass as planned.
 
 ## Tier 2 — worth an explicit decision, not a blind port
 
