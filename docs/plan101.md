@@ -69,7 +69,7 @@ New traps discovered that the original plan didn't anticipate:
 
 ## Stage C — Full source
 
-**Status: build launched — mid-crawl, awaiting results.**
+**Status: ✅ Done — full crawl verified clean.**
 
 | Step | Action | Why | Status |
 |---|---|---|---|
@@ -78,10 +78,10 @@ New traps discovered that the original plan didn't anticipate:
 | C3 | Set exclusion pattern `^https://pokemondb\.net/pokedex/(national\|all\|shiny)$\|^https://pokemondb\.net/(move\|type\|ability\|item)/.*$`, plus `ExpandBeforeFiltering: true` | Removes the three index/list pages, plus explicitly names Moves/Types/Abilities/Items per the challenge doc's wording. `ExpandBeforeFiltering` is required because the exclusion pattern also matches the crawl's own start URL (`/pokedex/national`) — without it, the crawler may never expand that page to discover the individual Pokemon links. | ✅ Done — confirmed via Coveo docs (`docs.coveo.com/en/mc1f0219`) that this is a JSON-only setting (`configuration.parameters.ExpandBeforeFiltering`), not exposed in the Inclusions/Exclusions UI; set via Source → More → Edit configuration with JSON |
 | C4 | Set crawl delay | pokemondb.net's `robots.txt` specifies `Crawl-delay: 2`; `RespectRobotsDotTxt: true` already enforces this regardless of the configured minimum. | ✅ Done (via RespectRobotsDotTxt) |
 | C4a | Set `MaxCrawlDepth` to `1` | Matches the documented depth-1 design; the inclusion allowlist is the real gate, but bounding depth explicitly is cheaper and more defensible. | ✅ Done |
-| C5 | Rebuild and monitor (~35–45 min expected) | This is the one long-latency step in Stage C — no action needed during the wait, but don't start it near end-of-day if you need to react to a bad result. | 🔄 In progress — build launched |
-| C6 | Verify final item count ≈ 1025, no `/moves/`, `/type/`, `/all`, `/shiny` items in the index | Confirms C2/C3 actually excluded what they were meant to at full scale, not just in the 3-page test source. | ⏸️ Pending build completion |
-| C7 | Verify facet lists show 18 types and 9 generations with **no compound values** | Final check that B2 (multi-value facet) held at scale — a compound value like `Fire;Flying` appearing here means it needs to be fixed before Stage D, not discovered during a demo. | ⏸️ Pending build completion |
-| C8 | Fallback if count is materially off or crawl exceeds ~90 min: switch to a Sitemap source with identical filters (~20 min) | Scraping config, fields, mappings, and the IPE are all source-type-independent, so this swap is cheap if the Web crawler underperforms. | ⏸️ Not needed unless C6/C7 fail |
+| C5 | Rebuild and monitor (~35–45 min expected) | This is the one long-latency step in Stage C — no action needed during the wait, but don't start it near end-of-day if you need to react to a bad result. | ✅ Done |
+| C6 | Verify final item count ≈ 1025, no `/moves/`, `/type/`, `/all`, `/shiny` items in the index | Confirms C2/C3 actually excluded what they were meant to at full scale, not just in the 3-page test source. | ✅ Done — Content Browser shows exactly **1025** items under `Pokedex - Full` (1028 total across both sources including the 3-item Test source). Zero-result searches confirmed for `pokemondb.net/move`, `/type`, `/ability`, `/item`, and `/pokedex/national`, `/all`, `/shiny` |
+| C7 | Verify facet lists show 18 types and 9 generations with **no compound values** | Final check that B2 (multi-value facet) held at scale — a compound value like `Fire;Flying` appearing here means it needs to be fixed before Stage D, not discovered during a demo. | ✅ Done — Content Browser facets confirmed exactly 18 `pokemontype` values and 9 `pokemongeneration` values, each a clean single value |
+| C8 | Fallback if count is materially off or crawl exceeds ~90 min: switch to a Sitemap source with identical filters (~20 min) | Scraping config, fields, mappings, and the IPE are all source-type-independent, so this swap is cheap if the Web crawler underperforms. | Not needed — C6/C7 passed clean |
 
 ## Stage D — Connect the app and build ML models
 
