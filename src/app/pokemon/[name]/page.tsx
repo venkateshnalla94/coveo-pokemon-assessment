@@ -10,6 +10,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { AskAboutPokemon } from "@/components/AskAboutPokemon";
 import { CoveoConfigBanner } from "@/components/CoveoConfigBanner";
 import { isCoveoConfigured } from "@/coveo/config";
 import { getSearchEngine } from "@/coveo/engine";
@@ -124,6 +125,7 @@ export default function PokemonDetailPage() {
             <dt className="font-semibold">Generation</dt>
             <dd>{item.generation ?? "—"}</dd>
           </dl>
+          <AskAboutPokemon pokemonName={item.name} />
         </div>
       )}
     </div>

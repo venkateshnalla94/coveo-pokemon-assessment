@@ -110,12 +110,17 @@ export interface ServerCoveoConfig {
  * docs/adr/0005-server-token-and-passage-routes.md.
  *
  * `apiKey` (COVEO_API_KEY, "Anonymous search" purpose): Execute queries +
- * Analytics-Push. Used by /api/token — RGA rides on the same search request
- * via the pipeline association, so it needs no separate key.
+ * Analytics-Push. Used by /api/token, and by /api/passages for Passage
+ * Retrieval — direct testing against the live org found `POST /rest/search/
+ * v3/passages/retrieve` requires EXECUTE_QUERY, not content preview; see
+ * docs/adr/0008-passage-retrieval-needs-execute-query-not-content-preview.md.
  *
  * `mlApiKey` (COVEO_ML_API_KEY, Custom purpose, ML - Allow content preview
- * only): used by /api/passages for Passage Retrieval. Kept separate so the
- * broader/less-scoped key isn't the one making the ML-privileged call.
+ * only): unused by any route, confirmed dead. ADR-0008's follow-up test
+ * against a live, Active CPR model got a full 200 with real passage content
+ * using `apiKey` alone — content-preview isn't needed anywhere in this app.
+ * Not deleted this session (inert, not urgent), but there's no reason to
+ * keep it or the underlying Coveo key around beyond convenience.
  */
 export function resolveServerCoveoConfig({
   environment = process.env,

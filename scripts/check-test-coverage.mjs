@@ -3,16 +3,22 @@ import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
 
 /**
- * Pre-commit guard: every staged file under a testable root (currently just
- * src/coveo/, minus a small exempt list) must have a matching test under
- * tests/unit/, mirroring src/'s directory structure — src/coveo/x.ts pairs
- * with tests/unit/coveo/x.test.ts. Add a new root here (e.g. "src/lib/") as
- * the codebase grows; this keeps the mirror rule generic rather than
- * hardcoding "coveo" anywhere below.
+ * Pre-commit guard: every staged file under a testable root (currently
+ * src/coveo/ and src/app/api/, minus a small exempt list) must have a
+ * matching test under tests/unit/, mirroring src/'s directory structure —
+ * src/coveo/x.ts pairs with tests/unit/coveo/x.test.ts, src/app/api/x/
+ * route.ts pairs with tests/unit/app/api/x/route.test.ts. Add a new root
+ * here (e.g. "src/lib/") as the codebase grows; this keeps the mirror rule
+ * generic rather than hardcoding "coveo" anywhere below.
  *
- * Scope is deliberately narrow — UI components/routes are covered by the
- * Playwright e2e smoke suite (tests/e2e/) instead of a unit-test
- * requirement. See docs/standards-adoption.md #12.
+ * Scope is deliberately narrower than "everything" — React components stay
+ * out (covered by the Playwright e2e suite, tests/e2e/, instead of a
+ * unit-test requirement; most are thin controller wrappers or tightly
+ * coupled to the Headless engine, and would need a jsdom/testing-library
+ * harness this repo doesn't otherwise need). Server-side logic — src/coveo/
+ * plus src/app/api/ route handlers — is unit-tested instead, since it's
+ * plain functions with real branching and no rendering involved. See
+ * docs/standards-adoption.md #1 and #12.
  *
  * Match isn't mirrored-path-only: if the mirrored path doesn't exist, this
  * also greps the whole tests/ tree for a reference to the module, so a
@@ -21,6 +27,7 @@ import path from "node:path";
 
 const TESTABLE_ROOTS = [
   "src/coveo/", // pure logic: mappers, error normalization, render-state, config
+  "src/app/api/", // Next.js route handlers: validation, rate limiting, upstream-call branching
 ];
 // Files under a testable root that are intentionally not unit-tested, with why:
 const EXEMPT = new Set([

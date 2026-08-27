@@ -20,6 +20,8 @@ export default defineConfig({
         "src/coveo/searchRenderState.ts",
         "src/coveo/config.ts",
         "src/coveo/typeColors.ts",
+        "src/app/api/token/route.ts",
+        "src/app/api/passages/route.ts",
       ],
       thresholds: {
         statements: 80,

@@ -1,6 +1,6 @@
 # 0005: Server-only token minting and Passage Retrieval routes
 
-Status: Accepted; the single-`COVEO_API_KEY` design in "Consequences" is superseded by ADR-0006, which splits it into `COVEO_API_KEY` + `COVEO_ML_API_KEY`. Separately, ADR-0007 found this org's console can't issue a key `/api/token`'s minting call will accept at all, so the `/api/token` route built here is currently dormant, kept for a future "server" auth mode — see ADR-0007 for the live default.
+Status: Accepted; the single-`COVEO_API_KEY` design in "Consequences" is superseded by ADR-0006, which splits it into `COVEO_API_KEY` + `COVEO_ML_API_KEY`. Separately, ADR-0007 found this org's console can't issue a key `/api/token`'s minting call will accept at all, so the `/api/token` route built here is currently dormant, kept for a future "server" auth mode — see ADR-0007 for the live default. Also superseded: this doc's claim that Passage Retrieval requires the *Allow content preview* privilege was disproven by direct testing — it actually requires `EXECUTE_QUERY`, see ADR-0008.
 
 Status: Accepted
 

@@ -1,0 +1,8 @@
+Read docs/HANDOFF.md first — it's the current-state source of truth, written end of the fourth session (2026-08-27). Quick orientation: Stage D (org config, all 4 ML models — Query Suggest, Semantic Encoder, RGA, Passage Retrieval) is done and verified live end-to-end, including a new "Ask about this Pokemon" UI. Only two real items are open before this project is feature-complete:
+
+1. **E4** — write the Passage Retrieval vs. RGA point-of-view doc. No research needed, the material's already gathered this session (see HANDOFF's Stage E section) — RGA synthesizes a clean answer, CPR hands back raw retrieved passages for a downstream LLM/app to interpret; that contrast, tested live on Eevee (RGA) vs. Pikachu (CPR), is what to write up.
+2. **D11** — tighten `next.config.ts`'s CSP `connect-src` off its current wildcard to the real org hostname, and add `base-uri 'self'`/`form-action 'self'` (from `docs/inspiration-from-coveo-assesment.md` item 3) in the same pass.
+
+Also still outstanding, zero-dependency, sitting idle across four sessions now: replying to the Phase 0 email with the Org ID, and booking the presentation slot (deadline 2026-09-06 — getting close).
+
+Two things worth a decision, not urgent: `docs/inspiration-from-coveo-assesment.md` (new this session) has a prioritized list of patterns worth pulling from a sibling Coveo project — item 4 specifically (whether `GeneratedAnswer.tsx` should regenerate on facet clicks) was investigated but left as a live-behavior check, not resolved. And `COVEO_ML_API_KEY` is confirmed dead code (ADR-0008) — no urgency to remove it, but don't build anything new assuming it's load-bearing.

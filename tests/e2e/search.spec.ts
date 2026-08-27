@@ -43,6 +43,9 @@ test.describe("search results route (configured)", () => {
   }) => {
     await page.goto("/pokemon/pikachu");
 
-    await expect(page.getByRole("heading", { name: /pikachu/i })).toBeVisible();
+    // level: 1 — AskAboutPokemon.tsx also renders an "Ask about Pikachu" h2
+    // below the main heading, which a level-unscoped /pikachu/i match would
+    // also hit.
+    await expect(page.getByRole("heading", { level: 1, name: /pikachu/i })).toBeVisible();
   });
 });

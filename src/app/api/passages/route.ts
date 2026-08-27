@@ -1,22 +1,31 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { resolveServerCoveoConfig } from "@/coveo/config";
-import { PIPELINE, SEARCH_HUB } from "@/coveo/searchConfig";
+import { SEARCH_HUB } from "@/coveo/searchConfig";
 
 const MAX_QUERY_LENGTH = 500;
+const MAX_PASSAGES = 3;
 
 /**
- * Groundwork for the Phase 5 (Bonus) "Ask about this Pokemon" UI — this
- * route exists so that call can happen without ever shipping the
- * ML-privileged `COVEO_ML_API_KEY` to the browser (Passage Retrieval
- * requires the "Allow content preview" privilege, which is unsafe in client
- * JS — see docs/adr/0005-server-token-and-passage-routes.md). Deliberately a
- * separate key from `COVEO_API_KEY` (used by /api/token) — see
- * src/coveo/config.ts for why one key can no longer cover both. No UI
- * consumes this route yet.
+ * Backs the Phase 5 (Bonus) "Ask about this Pokemon" UI (AskAboutPokemon.tsx)
+ * — this route exists so the call can happen without shipping a privileged
+ * key to the browser. Uses `COVEO_API_KEY`, not `COVEO_ML_API_KEY`: direct
+ * testing against the live org found `POST /rest/search/v3/passages/retrieve`
+ * needs `EXECUTE_QUERY` (the same privilege ordinary search uses), not
+ * `ALLOW_CONTENT_PREVIEW` — a key with only content-preview got a 403 before
+ * the request even resolved the pipeline, while a key with EXECUTE_QUERY got
+ * past auth to a real "no CPR model" business error. This reverses ADR-0005's
+ * original assumption; see docs/adr/0008-passage-retrieval-needs-execute-query-not-content-preview.md.
+ *
+ * The request body's real schema (confirmed by testing — `pipeline` isn't a
+ * real field despite the rest of this app's search calls taking one;
+ * scoping to a source/document uses `filter`, not `aq`/`cq`, both of which
+ * are silently ignored) came from docs.coveo.com/en/o86c8334, not from
+ * guessing against the Search API v2 shape used elsewhere in this repo.
  */
 
 interface PassagesRequestBody {
   query?: unknown;
+  pokemonName?: unknown;
 }
 
 /**
@@ -52,9 +61,9 @@ export async function POST(request: NextRequest) {
   }
 
   const config = resolveServerCoveoConfig();
-  if (!config.configured || !config.organizationId || !config.mlApiKey) {
+  if (!config.configured || !config.organizationId || !config.apiKey) {
     return NextResponse.json(
-      { error: "Coveo is not configured on the server (missing COVEO_ML_API_KEY or org ID)." },
+      { error: "Coveo is not configured on the server (missing COVEO_API_KEY or org ID)." },
       { status: 503 },
     );
   }
@@ -69,21 +78,31 @@ export async function POST(request: NextRequest) {
   if (typeof body.query !== "string" || body.query.trim().length === 0) {
     return NextResponse.json({ error: "`query` must be a non-empty string." }, { status: 400 });
   }
+  if (body.pokemonName !== undefined && typeof body.pokemonName !== "string") {
+    return NextResponse.json({ error: "`pokemonName` must be a string when provided." }, { status: 400 });
+  }
 
   const query = body.query.slice(0, MAX_QUERY_LENGTH);
+  // Same exact-match escaping as the detail page's `aq` filter — see the
+  // comment on the `escapedName` line in src/app/pokemon/[name]/page.tsx.
+  const filter = body.pokemonName
+    ? `@pokemonname=="${body.pokemonName.replace(/"/g, '\\"')}"`
+    : undefined;
 
   const upstream = await fetch(
     `https://platform.cloud.coveo.com/rest/search/v3/passages/retrieve?organizationId=${encodeURIComponent(config.organizationId)}`,
     {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${config.mlApiKey}`,
+        Authorization: `Bearer ${config.apiKey}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
         query,
         searchHub: SEARCH_HUB,
-        pipeline: PIPELINE,
+        maxPassages: MAX_PASSAGES,
+        localization: { locale: "en-US", timezone: "America/New_York" },
+        ...(filter ? { filter } : {}),
       }),
     },
   );

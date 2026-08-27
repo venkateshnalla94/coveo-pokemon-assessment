@@ -21,7 +21,7 @@ npm run start        # serve a production build
 npm run lint         # eslint
 npm run typecheck    # tsc --noEmit
 npm test             # vitest unit tests
-npm run test:coverage # vitest with coverage (src/coveo/* only — see docs/standards-adoption.md #12)
+npm run test:coverage # vitest with coverage (src/coveo/* + src/app/api/*/route.ts — see docs/standards-adoption.md #12)
 npm run test:e2e     # playwright e2e suite
 ```
 
@@ -37,7 +37,7 @@ npm run test:e2e     # playwright e2e suite
 - `src/coveo/applicationError.ts` — normalized error type for Coveo-side failures
 - `src/coveo/searchRenderState.ts` — discriminated-union render state (`loading`/`error`/`empty`/`success`)
 - `src/app/api/token/route.ts` — server-side search token minting ("server" auth mode only)
-- `src/app/api/passages/route.ts` — Passage Retrieval proxy, uses `COVEO_ML_API_KEY`
+- `src/app/api/passages/route.ts` — Passage Retrieval proxy, uses `COVEO_API_KEY` (not `COVEO_ML_API_KEY` — see `docs/adr/0008-passage-retrieval-needs-execute-query-not-content-preview.md`)
 - `src/components/SearchBox.tsx` — search input + typeahead (single controller covers both; see `.claude/skills/headless-search-page`)
 - `src/components/FacetType.tsx`, `FacetGeneration.tsx` — facet controllers
 - `src/components/ResultList.tsx` — result grid with images and type chips
