@@ -11,3 +11,5 @@ echo "pre-commit: typecheck"
 npx tsc --noEmit
 echo "pre-commit: test coverage guard"
 node scripts/check-test-coverage.mjs
+echo "pre-commit: unit tests + 80% coverage threshold"
+npm run --silent test:coverage
