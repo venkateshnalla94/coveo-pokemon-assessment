@@ -4,7 +4,7 @@ Take-home assessment for a Coveo Forward Deployed Engineer role. Next.js + [`@co
 
 ## Status
 
-Coveo Cloud org access is pending. Everything not requiring a live org (frontend scaffold, crawler spec, presentation outlines) is in place; indexing and cloud-endpoint integration start once access arrives.
+Connected to a live Coveo org: search, Type/Generation facets, and Pokemon images all return real results end to end. Query Suggest typeahead, RGA, GitHub/Vercel hosting, and Passage Retrieval are not built yet. Current state and next steps: `docs/HANDOFF.md`.
 
 ## Structure
 
@@ -19,26 +19,13 @@ Coveo Cloud org access is pending. Everything not requiring a live org (frontend
 
 ```bash
 npm install
-cp .env.example .env.local   # fill in once org access is granted
+cp .env.example .env.local   # fill in from the Coveo admin console
 npm run dev
 ```
 
-Fill in `.env.local` from the Coveo admin console once org access is granted (Organization > API Keys for a search-only key, org ID from the org switcher). See `docs/coveo-source-spec.md` for the source/field configuration this frontend expects.
+`.env.example` documents each variable, including the dual client auth mode (`NEXT_PUBLIC_COVEO_AUTH_MODE`, `NEXT_PUBLIC_COVEO_ACCESS_TOKEN`) and the two server-only keys (`COVEO_API_KEY`, `COVEO_ML_API_KEY`) — see `docs/adr/0006-split-api-key-for-content-preview.md` and `docs/adr/0007-dual-auth-mode-direct-vs-server-token.md` for why there are two of each. See `docs/coveo-source-spec.md` for the source/field configuration this frontend expects.
 
-Without those env vars, the app builds and runs fine but shows a "Coveo isn't configured" banner instead of the search UI — that's expected until org access lands, and is required so `npm run build` / Vercel deploys succeed with no env vars set.
-
-## Source structure
-
-- `src/coveo/engine.ts` — Headless search engine singleton (client-only)
-- `src/coveo/config.ts` — `resolveCoveoConfig()`, single source of Coveo env config
-- `src/coveo/fields.ts` — field names shared with the Coveo source config
-- `src/coveo/mapPokemonResult.ts` — mapper boundary from a Headless `Result` to the local `PokemonItem` model
-- `src/coveo/applicationError.ts` — normalized error type for Coveo-side failures
-- `src/coveo/searchRenderState.ts` — discriminated-union render state (`loading`/`error`/`empty`/`success`)
-- `src/components/SearchBox.tsx` — search input + typeahead (a single `SearchBox` controller covers both; see `.claude/skills/headless-search-page`)
-- `src/components/Facet.tsx`, `FacetType.tsx`, `FacetGeneration.tsx` — facet controllers
-- `src/components/ResultList.tsx` — result grid with images
-- `src/app/pokemon/[name]/page.tsx` — Advanced-tier Pokemon detail page
+Without those env vars, the app builds and runs fine but shows a "Coveo isn't configured" banner instead of the search UI — required so `npm run build` / Vercel deploys succeed with no env vars set. For the detailed `src/` file map, see `AGENTS.md`.
 
 ## Testing
 

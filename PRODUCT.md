@@ -22,14 +22,14 @@ Not a commercial product — a working proof of a Coveo-powered search integrati
 
 - Presented live to a Coveo panel (25 min incl. Q&A) as part of a two-topic presentation: a technical deep dive and an "Escalation & Recovery" operational scenario (unrelated to this app's UI).
 - Also publicly hosted (Vercel) so reviewers can use it outside the live session.
-- Currently blocked on Coveo Cloud Organization access (trial org invite pending) — the app today runs in an "unconfigured" state; there is no live indexed data or real search results yet. All current screens should be judged against that state, not a live-org state.
+- Connected to a live Coveo org: search, Type/Generation facets, and Pokemon images all return real results end to end. Current state and open items: `docs/HANDOFF.md`.
 - Home page (`/`) hosts only the search box + Query Suggest typeahead; the actual results (facets, results grid, pagination, RGA) render on `/search?q=<term>` after a query is submitted or a suggestion is clicked. See `src/app/page.tsx` and `src/app/search/page.tsx`.
 - A Pokemon detail page exists at `/pokemon/[name]`.
 
 ## Capabilities and Constraints
 
-- Essential: index pokemondb.net (Pokemon pages only), Type facet, Generation facet, Pokemon image in each result.
-- Advanced (in progress / gated on org access): Coveo RGA (generative answer) on the results page, Query Suggest-powered typeahead on the home page, the Pokemon detail page (built).
+- Essential: index pokemondb.net (Pokemon pages only), Type facet, Generation facet, Pokemon image in each result — all verified working end to end against the live org.
+- Advanced: the Pokemon detail page is built and verified. Coveo RGA (generative answer) and Query Suggest-powered typeahead are not built yet (sequencing, not an access blocker — see `docs/HANDOFF.md`).
 - No server-side proxy or rate-limiting layer exists by design — Headless calls the Coveo Search API directly from the browser with a public, privilege-scoped search token (see docs/adr/0004-no-server-layer.md).
 - Images: only `img.pokemondb.net` is allow-listed in CSP/`next.config.ts` `images.remotePatterns` — any other image source needs that allow-list extended.
 - `strict: true` TypeScript; a type error is a build failure.
@@ -43,7 +43,7 @@ Not a commercial product — a working proof of a Coveo-powered search integrati
 
 - `docs/Pokemon Challenge (Pre-Sales) - 2026.txt` — the assessment's actual requirements.
 - pokemondb.net itself — the crawl target and the implicit visual/content reference for what's being indexed.
-- No live Coveo search results, facet values, or RGA output exist yet (org access pending) — future design and content work must not fabricate example results, Pokemon data, or generated-answer text; treat the unconfigured/empty states as first-class, real states to design for.
+- Live Coveo search results, facet values, and Pokemon images exist and are verified — use real observed data (e.g. screenshots in `docs/temp/`) as the reference, never fabricate example results, Pokemon data, or generated-answer text. RGA output doesn't exist yet (not built) — don't design against invented sample answers for it either. The unconfigured/empty states remain first-class, real states to design for (a visitor without env vars set still hits them).
 
 ## Product Principles
 
