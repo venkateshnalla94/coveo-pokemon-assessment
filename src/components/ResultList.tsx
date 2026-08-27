@@ -40,7 +40,7 @@ export function ResultList() {
       );
     case "success":
       return (
-        <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+        <ul aria-label="Search results" className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
           {/* deriveSearchRenderState maps state.results 1:1, in order, into
               renderState.items — zipping by index here to recover the raw
               Result (needed for buildInteractiveResult) without changing the

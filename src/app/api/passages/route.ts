@@ -7,10 +7,12 @@ const MAX_QUERY_LENGTH = 500;
 /**
  * Groundwork for the Phase 5 (Bonus) "Ask about this Pokemon" UI — this
  * route exists so that call can happen without ever shipping the
- * ML-privileged `COVEO_API_KEY` to the browser (Passage Retrieval requires
- * the "Allow content preview" privilege, which is unsafe in client JS — see
- * docs/adr/0005-server-token-and-passage-routes.md). No UI consumes this
- * route yet.
+ * ML-privileged `COVEO_ML_API_KEY` to the browser (Passage Retrieval
+ * requires the "Allow content preview" privilege, which is unsafe in client
+ * JS — see docs/adr/0005-server-token-and-passage-routes.md). Deliberately a
+ * separate key from `COVEO_API_KEY` (used by /api/token) — see
+ * src/coveo/config.ts for why one key can no longer cover both. No UI
+ * consumes this route yet.
  */
 
 interface PassagesRequestBody {
@@ -50,9 +52,9 @@ export async function POST(request: NextRequest) {
   }
 
   const config = resolveServerCoveoConfig();
-  if (!config.configured || !config.organizationId || !config.apiKey) {
+  if (!config.configured || !config.organizationId || !config.mlApiKey) {
     return NextResponse.json(
-      { error: "Coveo is not configured on the server (missing COVEO_API_KEY or org ID)." },
+      { error: "Coveo is not configured on the server (missing COVEO_ML_API_KEY or org ID)." },
       { status: 503 },
     );
   }
@@ -75,7 +77,7 @@ export async function POST(request: NextRequest) {
     {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${config.apiKey}`,
+        Authorization: `Bearer ${config.mlApiKey}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({

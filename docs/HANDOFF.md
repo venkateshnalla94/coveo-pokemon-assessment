@@ -1,110 +1,106 @@
 # Session handoff — Coveo org build status
 
-Written 2026-08-26, end of the second org-configuration session (Stage B close-out + Stage C full crawl setup). Read this first in a new chat before touching the Coveo admin console — it has the state and gotchas that aren't obvious from the plan docs alone. The prior session's handoff content is now folded into this one; treat this file as the current snapshot, not an addendum.
+Written 2026-08-27, end of the third org-configuration session (Stage D: API keys, pipeline, auth wiring, and the first real end-to-end verification against live data). Read this first in a new chat before touching the Coveo admin console or the app's auth code — it has state and gotchas that aren't obvious from the plan docs alone. The prior sessions' handoff content is now folded into this one; treat this file as the current snapshot, not an addendum.
 
 ## Org details
 
 - Org name: `venkatesh-pokemon-challenge`, Org ID: `venkateshpokemonchallenges0qp5rpy`
-- Created **2026-08-25** — 14-day trial deletion clock runs from this date, not from today. Book the presentation by **2026-09-06** (creation + 12 days).
-- License: Enterprise, Demo type, expires 2026-11-24. RGA and Passage Retrieval both listed as available extensions.
-- Project: `Pokemon Search` (type "Corporate website / blog", point of contact `venkateshnalla94@gmail.com`)
-- Two sources now exist:
-  - **`Pokedex - Test`** — `resourceId` ending `...ubnz3efi7azirsb2hwpsrhkini`. 3 start URLs (pikachu, garchomp, sprigatito), depth 0. Fast-iteration sandbox — keep it untouched.
-  - **`Pokedex - Full`** (or whatever it's named in-console) — `resourceId` ending `...romeudhx44e76uszrvtsyysjeu`. Start URL `/pokedex/national`, depth 1. This is the real crawl.
-
-**Still not done, independent of the build work:** reply to the Phase 0 recruiting/enablement email thread with the Org ID (for RGA/Semantic Encoder/Passage Retrieval enablement); presentation slot not booked. Both are zero-dependency and have now sat untouched across two sessions — do these first in the next session before more console work.
+- Created **2026-08-25** — 14-day trial deletion clock runs from this date. Book the presentation by **2026-09-06** (creation + 12 days). **Still not booked, and the Phase 0 email reply with the Org ID still hasn't been sent — both zero-dependency, now idle across three sessions.**
+- License: Enterprise, Demo type, expires 2026-11-24.
+- Two sources: `Pokedex - Test` (3 items, sandbox, untouched) and `Pokedex - Full` (1025 items, the real crawl). Both fully verified in prior sessions.
+- `Pokedex` query pipeline: condition `Search Hub is PokedexSearch`, plus a filter rule `filter cq @source==("Pokedex - Full")` added this session (see below).
+- Two API keys now exist (see ADR-0006 for why it's two, not one):
+  - `COVEO_API_KEY` — "Anonymous search" purpose. Privileges (confirmed via Coveo's own privilege-introspection endpoint): `EXECUTE_QUERY`/`SEARCH_API`, `ANALYTICS_DATA` (edit)/`USAGE_ANALYTICS`, `IMPERSONATE`/`USAGE_ANALYTICS`.
+  - `COVEO_ML_API_KEY` — Custom purpose, named `Pokedex - Content Preview`. `Allow content preview` only.
 
 ## What's done
 
-**Stage A — test source.** Complete, unchanged from before. 3 start URLs, depth 0, extraction verified clean for all 3 test Pokemon.
+**Stages A, B, C** (test source, fields/mappings/IPE, full crawl) — complete and verified, unchanged from prior sessions. See `docs/plan101.md` for full history if needed; not re-summarized here.
 
-**Stage B — fields, mappings, generation IPE. Fully done and verified this session.**
+**Stage D — this session.**
 
-- The `Derive Pokemon Generation` Python extension (org-level resource, `extensionId` ending `...vgoamtj2n3wsduyhdgis4pccsq`) was created, hardened (index-`[0]` instead of `[-1]`, `.strip()` before `int()`), and attached to `Pokedex - Test` at **Post-conversion**, action-on-error **Skip extension**.
-- The `%[pokemongeneration]` mapping rule — missing from the original Stage B pass — was added.
-- Verified via Content Browser Item JSON: Pikachu = Generation 1, Garchomp = Generation 4, Sprigatito = Generation 9. All 5 custom fields populated correctly for all 3 test Pokemon.
-
-**Stage C — full source. Built and configured this session; rebuild launched, results not yet checked.**
-
-- Created as a genuinely separate source from Test (confirmed via distinct `resourceId`s — see "Traps hit this session" below for why this needed double-checking).
-- Start URL `https://pokemondb.net/pokedex/national`, `MaxCrawlDepth: 1`.
-- Inclusion: `^https://pokemondb\.net/pokedex/[a-z0-9%.-]+$`, via **"Include non-excluded pages that match at least one rule"** (not the default "include all non-excluded pages" — see traps below for why this matters).
-- Exclusion: `^https://pokemondb\.net/pokedex/(national|all|shiny)$|^https://pokemondb\.net/(move|type|ability|item)/.*$` — explicitly names Moves/Types/Abilities/Items per the challenge doc's own wording, not just the 3 pokedex-level list pages.
-- `ExpandBeforeFiltering: true` set via raw JSON (see traps below — this is not a UI toggle).
-- Full parity with the Test source confirmed by diffing raw JSON: `ScrapingConfiguration` (default + `Pokemon page fields` with all 4 XPath rules), all 6 custom mappings (`pokemonname`×2 into `pokemonname`/`title`, `pokemondexnumber`, `pokemontype`, `pokemonimageurl`, `pokemongeneration`), and the `Derive Pokemon Generation` extension attachment.
-- **Build was launched at end of session. Not yet verified.**
+- **D1 (API keys).** Originally planned as one key with three privileges. Not buildable: this org's console can no longer grant Execute queries or Analytics-Push via the Custom key purpose — those are now locked to predefined templates (confirmed directly in the Custom wizard's Privileges step, not inferred). Built as two keys instead — see ADR-0006. The "Anonymous search" template's bundled `Impersonate` privilege was initially flagged as an unwanted-but-inert security overreach; that assessment was later corrected (see D2's finding below) — it's not the powerful cross-user impersonation privilege at all.
+- **D2 (env wiring) — revised into a dual auth-mode design, ADR-0007.** `/api/token`'s token-minting call (`POST /rest/search/token`) 403s unconditionally, on every request including an empty body. Root-caused via Coveo's privilege-introspection endpoint: minting requires `Impersonate` under owner `SEARCH_API`, and this org's Anonymous-search key's `Impersonate` is scoped to owner `USAGE_ANALYTICS` instead — a different, unrelated privilege. No key obtainable from this console (template or Custom) carries the right one. Rather than deleting the server-minting work, added `NEXT_PUBLIC_COVEO_AUTH_MODE` (`"direct"` | `"server"`, default `"direct"`): `direct` mode uses `NEXT_PUBLIC_COVEO_ACCESS_TOKEN` as a static client-side credential (exactly what an "Anonymous search" key is documented to be for), `server` mode is ADR-0005's original minted-token design, fully intact and switchable via one env var the day a compatible key exists. Live now: `direct` mode, `NEXT_PUBLIC_COVEO_ACCESS_TOKEN` = same value as `COVEO_API_KEY`.
+- **D3 (pipeline).** Done — `Pokedex` pipeline, condition `Search Hub is PokedexSearch`.
+- **D3.5, unplanned.** Added a `filter cq @source==("Pokedex - Full")` rule to the pipeline. `Pokedex - Test` and `Pokedex - Full` are both live sources with nothing scoping the pipeline to one of them — without this, a query could return the same Pokemon twice (once per source). Verified via pipeline → More → Open in Content Browser: 2 results per query before the filter, 1 after.
+- **D4 (searchHub alignment).** Confirmed working two ways: the pipeline screenshot, and — more conclusively — the e2e suite actually returning correctly-routed, correctly-faceted live results end to end.
+- **D5 (e2e suite).** 3/3 passing against live org data. Two real app bugs found and fixed along the way, **neither of which was an org-config issue**:
+  1. `src/coveo/config.ts`'s `resolveCoveoConfig()` had `environment = process.env` as a parameter default. That indirection isn't a literal `process.env.NEXT_PUBLIC_X` expression, which is the only pattern Next.js's build-time inlining (webpack's `DefinePlugin`) can see — so in every production client bundle, `NEXT_PUBLIC_COVEO_ORGANIZATION_ID` read back `undefined` regardless of `.env.local`, and the app always showed "Coveo isn't configured yet." Fixed by writing the literal expression into the default value itself. Any *new* `NEXT_PUBLIC_*` field added to this resolver must repeat that same pattern or the bug comes back.
+  2. `src/coveo/engine.ts` never called Headless's `registerFieldsToInclude`. Coveo's Search API only returns a default field set (`title`, `uri`, etc.) per result unless custom fields are explicitly requested — facets still worked (a separate, server-computed aggregation), but every individual result's `pokemontype`/`pokemongeneration`/`pokemonimageurl` came back empty, so **no Pokemon images or per-result type/generation were rendering anywhere** — not on `/search`, not on the PDP — despite the source/mapping/IPE work all being correct. This is the kind of thing that would have been caught live during the panel demo. Fixed by dispatching `loadFieldActions(engine).registerFieldsToInclude(Object.values(POKEMON_FIELDS))` once at engine construction. Verified visually (screenshots) and via the e2e suite: images, type chips, and generation all render correctly now.
 
 ## What's next (in priority order)
 
-1. **Check the Stage C build results.** Verify:
-   - Item count ≈ 1025
-   - No `/move/`, `/type/`, `/ability/`, `/item/`, or `/pokedex/(national|all|shiny)` items leaked in
-   - Facets show 18 types and 9 generations, **no compound values** (e.g. no `Fire;Flying`)
-   - If count is materially off or crawl exceeds ~90 min: Stage C8 fallback is a Sitemap source with identical filters (~20 min), since scraping config/mappings/extension are all source-type-independent.
-2. **Send the two zero-dependency items that have now been idle across two sessions:** the Phase 0 email reply with the Org ID, and booking the presentation slot (deadline 2026-09-06, i.e. in a few days from this handoff's date).
-3. **Then Stage D onward** (API key, `.env` config, `Pokedex` pipeline, Query Suggest model + preload, Semantic Encoder, RGA, Passage Retrieval) — none of this started yet. Full detail in `docs/plan101.md`.
+1. **Send the two zero-dependency items that have now sat idle across three sessions:** the Phase 0 email reply with the Org ID, and booking the presentation slot (deadline 2026-09-06 — a handful of days out from this handoff's date).
+2. **D6/D7 — Query Suggest model.** Not started. This is why there's no typeahead yet in the running app — `SearchBox`'s suggestion-rendering code is already complete and correct (verified by reading it), it simply has no model to draw from. Create the model, associate to `Pokedex`, enable Test Configuration Mode, then preload via the `DEFAULT_QUERIES` CSV endpoint (1025 names + ~40 intent phrases). Screenshot the 2xx.
+3. **D9/D10 — Semantic Encoder + RGA model,** associated to `Pokedex`. Not started.
+4. **Vercel env vars** for deploy (Intermediate tier) — `.env.local` is set locally; nothing pushed to Vercel yet.
+5. Once ready to deploy: tighten `next.config.ts`'s CSP `connect-src` to the real org hostname (currently a wildcard).
 
 ## Documentation findings from this session — don't re-derive these
 
-These are things that took real back-and-forth (including web searches against docs.coveo.com) to pin down. Full detail also in `docs/plan101.md` under "Live build findings" and mirrored in `docs/EXECUTION-PLAN.md` Phase 3.
+Full detail in ADR-0006, ADR-0007, and `docs/plan101.md`'s Stage D table.
 
-1. **`ExpandBeforeFiltering` is a JSON-only setting, not a UI checkbox.** It doesn't appear anywhere in the Inclusions/Exclusions form. Access it via the source's action bar → **More → Edit configuration with JSON**, then add/edit `configuration.parameters.ExpandBeforeFiltering` as `{"sensitive": false, "value": "true"}`. Documented at [docs.coveo.com/en/mc1f0219](https://docs.coveo.com/en/mc1f0219/) (Web source JSON modification) and the navigation path at [docs.coveo.com/en/1685](https://docs.coveo.com/en/1685/) (Edit a source JSON configuration).
-2. **Why `ExpandBeforeFiltering` was needed at all:** the exclusion regex correctly targets `/pokedex/national` (a list page, not a Pokemon) — but that page is also the crawl's own start URL. Coveo's console proactively surfaces a warning ("Excluded starting URL(s) detected") when this happens, because by default the crawler applies exclusion filters *before* expanding a page's outbound links — meaning the start page could get excluded before its links to individual Pokemon pages are ever discovered, yielding a near-empty crawl. Setting `ExpandBeforeFiltering: true` splits "expand this page's links" from "index this page as a result," which is exactly what's needed here.
-3. **"Include all non-excluded pages" (the default inclusion mode) is a weaker filter design than an explicit allowlist.** Relying purely on an exclusion blocklist means any site section the blocklist doesn't specifically name (forums, tools, help pages, etc.) would get crawled if linked from the depth-1 start page. Switching to **"Include non-excluded pages that match at least one rule"** plus the `/pokedex/[a-z0-9%.-]+$` regex closes that gap. This is also the stronger, more defensible answer for the Essential tier's filter-design grading criterion — worth a line in the Topic 1 deck.
-4. **Mapping `id` fields are auto-generated by Coveo on save — they are not required input.** Confirmed via [docs.coveo.com/en/29](https://docs.coveo.com/en/29/) ("Manage the mapping configuration of a source"), which states: *"A unique alphanumeric id is automatically assigned to each mapping and type."* Its documented request-payload examples omit `id` entirely; only the response includes it. Practical upshot: to replicate a working source's full mapping configuration onto a new source, you can copy the entire `mappings` JSON array wholesale and strip every `id` field — no need to hand-splice individual entries. Verified in practice too: after pasting the Test source's mappings (IDs stripped) into the Full source and saving, re-reading the Full source's JSON showed fresh IDs scoped to the Full source's own `resourceId`.
-5. **Always check `resourceId` before trusting a pasted JSON dump.** Two sources' raw JSON can look superficially similar (same field names, same general shape), and mid-session it briefly looked like two pasted JSON blobs might have been the *same* source shown twice rather than two different ones — which would have meant the Test source had been overwritten. Cross-checking `resourceId` immediately confirmed they were genuinely separate. Worth doing this check reflexively whenever comparing two sources' configs, not just when something looks wrong.
-6. **The challenge doc's exact wording ("exclude everything else (Moves, Types, etc.)") names only two categories as examples, not an exhaustive list.** Abilities and Items are the same kind of encyclopedia page on pokemondb.net and were added to the exclusion regex on that reasoning, even though not literally named in the challenge text.
+1. **A Coveo Custom-purpose API key can no longer be granted Execute queries or Analytics-Push in this org's console.** Confirmed directly by inspecting the Custom wizard's full Privileges list (Search domain: no "Execute queries" row at all; Analytics data domain: dropdown offers only `View`/`no access`, no `Push`) — not inferred from generic docs, which still describe these as ordinary assignable privileges. The console's own banner explains why: *"certain privileges are now limited to predefined templates."* Treat this as true for this org/console build as of 2026-08-26–27, not necessarily a durable platform fact — worth a caveat if it comes up in the Topic 1 deck.
+2. **Minting a search token requires `Impersonate` under owner `SEARCH_API` specifically**, confirmed via Coveo's privilege-introspection endpoint (`POST /rest/organizations/<org>/privileges/token?accessToken=<key>`, docs.coveo.com/en/109) and a documented example payload showing that exact owner/domain pair. A same-named `Impersonate` privilege under a *different* owner (`USAGE_ANALYTICS`, what the Anonymous search template actually grants) does not satisfy this — the privilege model isn't just "does the key have X," it's "does the key have X under the right owner."
+3. **Search hub restriction on an API key is populated from usage-analytics history, not free text.** The "Select a search hub" dropdown when creating a key only lists hub values that have actually appeared in real traffic (e.g. `AdminConsole`) — `PokedexSearch` won't appear until the app has sent at least one real query with that hub, which is exactly what creating the key is a prerequisite for. Chicken-and-egg; the field is optional, leave it unset. Also: whatever you pick (including unset) is locked in permanently on save — there is no "add it later" for an existing key.
+4. **Next.js's `NEXT_PUBLIC_*` build-time inlining only recognizes the literal syntactic expression `process.env.NEXT_PUBLIC_X` wherever it appears verbatim in source.** A variable that merely *defaults to* `process.env` (`function f({ environment = process.env } = {})`) and is then indexed dynamically (`environment.NEXT_PUBLIC_X`) does not get inlined — in the browser, `process.env` is a stub object containing only the keys Next's static scanner found via that literal pattern, so the dynamic access silently reads `undefined` forever, independent of what's actually set in `.env.local`. This is easy to reintroduce by adding a new env-driven field to `resolveCoveoConfig` without preserving the literal-expression form in its default value — see the comment block in `src/coveo/config.ts` before touching it.
+5. **Coveo's Search API does not return custom fields in a result's `raw` object by default** — only a small standard set (title, uri, etc.). Custom fields need `loadFieldActions(engine).registerFieldsToInclude([...])` dispatched once against the engine. Facet value counts are unaffected either way, since facet aggregation is computed server-side independent of what's echoed back per result — which is exactly why this bug was invisible in the facet sidebar while breaking every result card and the PDP.
 
-## Traps carried over from the previous session (still relevant, unchanged)
+## Traps carried over from prior sessions (Stage A–C, still relevant, unchanged)
 
-1. Element-level selectors index raw HTML, not text — every selector must end in `text()`, `//text()`, or `/@attr`.
-2. The `№` (U+2116) character selector worked in the Web Scraper Helper Chrome extension but silently failed in Coveo's real crawl/extraction — matching on plain-ASCII `"National"` fixed it.
-3. The vitals table has two rows matching `contains(text(),"№")` ("National №" and "Local №") — needed content-scoping plus positional `[1]` truncation.
-4. `fetchpriority="high"` is not unique to the hero artwork image — combined with a `/artwork/` path filter and positional first-match to fix.
-5. Unmapped extracted metadata is invisible in Content Browser until a Field exists *and* a source mapping wires it up.
-6. Source mappings live under a separate "Mappings" action on the source, not under Configuration.
-7. Mapping rules for the same target field are first-match-wins, evaluated top-to-bottom.
-8. The Web Scraper Helper extension's UI lives inside Chrome DevTools, under a "Web Scraping" tab.
+Full list in `docs/plan101.md`; the short version: selectors must end in `text()`/`@attr`; the `№` character selector works in the Chrome extension but not in Coveo's actual crawler (match on `"National"` instead); the vitals table has two `№` rows needing positional truncation; `fetchpriority="high"` isn't unique to hero artwork; unmapped metadata is invisible in Content Browser until a Field + mapping both exist; mapping rules are first-match-wins, top-to-bottom.
 
-## Final web scraping config (unchanged, now live on both sources)
+## External docs.coveo.com pages read this session (log, so the next session doesn't re-derive them)
 
-```json
-{
-  "pokemonname": { "type": "XPATH", "path": "//h1/text()" },
-  "pokemondexnumber": { "type": "XPATH", "path": "((//table[@class=\"vitals-table\"])[1]//tr[th[contains(text(),\"National\")]]/td[1])[1]//text()" },
-  "pokemontype": { "type": "XPATH", "path": "(//table[@class=\"vitals-table\"])[1]//tr[th[contains(.,\"Type\")]]/td//a/text()" },
-  "pokemonimageurl": { "type": "XPATH", "path": "(//img[@fetchpriority=\"high\" and contains(@src,\"/artwork/\")])[1]/@src" }
-}
-```
+Grouped by what they were read to resolve. Where a page's actual rendered content didn't match what the search snippet promised (docs.coveo.com is JS-rendered and the fetch tool available in this session got inconsistent results), that's noted — don't assume a page is useless just because it's listed as "unhelpful," it just means the same URL might render differently in a real browser and could be re-checked manually.
 
-## Generation IPE (final, hardened, live on both sources)
+**Query pipeline filters (for the D3.5 source-scoping fix):**
+- [docs.coveo.com/en/3410](https://docs.coveo.com/en/3410/) — Manage filter rules. Gave the actual navigation path and `filter cq @source==(...)` syntax used.
+- [docs.coveo.com/en/1449](https://docs.coveo.com/en/1449/) — Query pipeline language (QPL) reference.
+- [docs.coveo.com/en/1440](https://docs.coveo.com/en/1440/), [docs.coveo.com/en/1959](https://docs.coveo.com/en/1959/) — Filter feature overview, and managing query pipeline conditions. Background reading, not directly quoted.
 
-```python
-try:
-    boundaries = [151, 251, 386, 493, 649, 721, 809, 905, 1025]
-    dex_values = document.get_meta_data_value('pokemondexnumber')
-    if dex_values:
-        dex_raw = dex_values[0] if isinstance(dex_values, list) else dex_values
-        dex_number = int(str(dex_raw).strip())
-        generation = next(i + 1 for i, upper in enumerate(boundaries) if dex_number <= upper)
-        document.add_meta_data({'pokemongeneration': f'Generation {generation}'})
-except Exception:
-    pass
-```
+**Testing a pipeline without a Search Page (for verifying the D3.5 filter):**
+- [docs.coveo.com/en/1791](https://docs.coveo.com/en/1791/) — Manage query pipelines. Gave the "pipeline → More → Open in Content Browser" method actually used to verify the filter.
+- [docs.coveo.com/en/2088](https://docs.coveo.com/en/2088/), [docs.coveo.com/en/mc2g0358](https://docs.coveo.com/en/mc2g0358/) — Troubleshoot/inspect query pipeline rules (`executionReport`). Background reading, not directly used.
+- [docs.coveo.com/en/89](https://docs.coveo.com/en/89/), [docs.coveo.com/en/las95231](https://docs.coveo.com/en/las95231/) — Determine which pipeline a search page uses; enforcing searchHub in auth. Background reading.
 
-## Decisions made (carried over + this session's additions)
+**API keys and privileges (for D1, and diagnosing why Custom couldn't grant Execute queries/Push):**
+- [docs.coveo.com/en/1718](https://docs.coveo.com/en/1718/) — Manage API keys. Gave the Add-key wizard's step names (Key Purpose → Identification → Configuration → Access → Review → Confirmation) and the list of Key Purpose templates (Anonymous search, Authenticated search, Usage analytics, Search pages, Anonymous Case Assist, Push API, Crawling Module administration, View all content, Custom).
+- [docs.coveo.com/en/60](https://docs.coveo.com/en/60/) — Get the privileges you can assign to an API key.
+- [docs.coveo.com/en/1707](https://docs.coveo.com/en/1707/) — Privilege reference. Confirmed domain/access-level names (Execute queries, Analytics data → Push, Allow content preview) — useful for what *should* exist generically, though the live Custom wizard (verified by screenshot, not docs) turned out not to expose all of them.
+- [docs.coveo.com/en/82](https://docs.coveo.com/en/82/) — Manage API keys programmatically. Background reading, confirmed the owner/targetDomain privilege model shape.
+- [docs.coveo.com/en/105](https://docs.coveo.com/en/105/build-a-search-ui/api-key-authentication) — Use API key authentication with the Search API. Fetch attempts returned mostly nav-shell content, not much usable detail extracted.
 
-- **Web source (cloud-hosted crawler), not Push API or Crawling Module.** Unchanged reasoning from before.
-- **Web source over Sitemap source**, kept as documented fallback.
-- **Facet Generator left unchecked on `pokemontype`.**
-- **Two separate sources (Test, Full), not one reused source.** Keeps the fast-iteration sandbox intact independent of what happens to the full crawl.
-- **Explicit inclusion allowlist over "include all non-excluded pages."** See documentation findings above.
-- **Exclusion list explicitly names Moves/Types/Abilities/Items**, not just the 3 pokedex-level list pages, even though the allowlist regex alone would have implicitly blocked those categories — explicit is a stronger presentation story than "it happened to work out."
+**Search token minting and the SEARCH_API/IMPERSONATE finding (ADR-0007, the session's most consequential investigation):**
+- [docs.coveo.com/en/56](https://docs.coveo.com/56) — Use search token authentication. Confirmed the "Authenticated Search" template pattern; didn't directly state the Impersonate/owner requirement.
+- [docs.coveo.com/en/109](https://docs.coveo.com/en/109) — Get the privileges of an access token. **This is the key one** — gave the exact `POST /rest/organizations/<org>/privileges/token?accessToken=<key>` introspection call used to directly see what privileges a key actually carries (owner + targetDomain pairs), which is what surfaced that the Anonymous-search key's `Impersonate` was scoped to `USAGE_ANALYTICS` instead of `SEARCH_API`. Re-run this call on any new key before assuming its privileges match what the console UI implies.
+- A general web search (not a specific docs.coveo.com page) surfaced the documented example payload showing `SEARCH_API`/`IMPERSONATE` is what token minting actually requires — worth trying to find the specific source page directly next time rather than relying on a search-engine summary of it.
+
+## What the next session should read first, by task
+
+- **D6/D7 (Query Suggest model + preload) — not started, do this first:**
+  - [docs.coveo.com/en/3398](https://docs.coveo.com/en/3398/) — Create and manage a Query Suggestions (QS) model.
+  - [docs.coveo.com/en/l1mf0321](https://docs.coveo.com/en/l1mf0321/) — Associate a QS model with a query pipeline.
+  - [docs.coveo.com/en/1902](https://docs.coveo.com/en/1902/) — Enable query suggestions in a Coveo search box (relevant since `SearchBox` in this app already implements the Headless side — worth confirming nothing else is needed app-side).
+  - [docs.coveo.com/en/l3od9093](https://docs.coveo.com/en/l3od9093/) — Advanced Model Configurations API. Has the actual `DEFAULT_QUERIES` CSV format (`query,weight`, UTF-8, no header) that plan101 D7 references.
+- **D9 (Semantic Encoder):**
+  - [docs.coveo.com/en/nb890247](https://docs.coveo.com/en/nb890247/) — Create and manage Semantic Encoder (SE) models.
+  - [docs.coveo.com/en/nb8b0088](https://docs.coveo.com/en/nb8b0088/) — Associate an SE model with a query pipeline.
+- **D10 (RGA):**
+  - [docs.coveo.com/en/nb6a0085](https://docs.coveo.com/en/nb6a0085/) — Create and manage RGA models.
+  - [docs.coveo.com/en/nb6a0104](https://docs.coveo.com/en/nb6a0104/) — Associate an RGA model with a query pipeline.
+  - [docs.coveo.com/en/nb6a0008](https://docs.coveo.com/en/nb6a0008/) — RGA content requirements and best practices — relevant given plan101's already-noted concern that RGA embeds only `body` in 250-word chunks and pokemondb is heavily tabular.
+- **Stage E, conditional on Passage Retrieval enablement landing:**
+  - [docs.coveo.com/en/oaoe7068](https://docs.coveo.com/en/oaoe7068/) — Passage Retrieval (CPR) implementation overview.
+- **General caveat for all of the above:** this session found that docs.coveo.com's generic documentation and this org's actual live console behavior disagreed twice (Custom key privileges; search-hub-key dropdown behavior). Treat every doc page above as a starting hypothesis to verify against the real console/API, not as ground truth — the privilege-introspection endpoint (`docs.coveo.com/en/109`) is the reliable way to verify what a key can actually do, and Content Browser (`docs.coveo.com/en/1791`) is the reliable way to verify what a pipeline actually returns, independent of what any docs page claims either should do.
 
 ## Reference docs
 
-- `docs/plan101.md` — the full step-by-step org build plan with status per step and the live-findings appendix, now updated through end of Stage C setup.
-- `docs/EXECUTION-PLAN.md` — the overall assessment plan across all phases (0–6), Phase 3 section kept in sync with plan101.
-- `docs/coveo-source-spec.md` — original field/mapping spec (predates the org; field *names* still correct, selectors superseded).
-- `docs/final_config.json` — the Full source's complete, saved JSON configuration as of end of session (post-parity-fix, `MaxCrawlDepth: 1` applied). Useful as a reference if the source config ever needs to be reconstructed.
-- `docs/temp/` — screenshots from both sessions.
+- `docs/plan101.md` — full step-by-step build plan, status per step, live-findings appendix, now current through Stage D5.
+- `docs/EXECUTION-PLAN.md` — overall plan across Phases 0–6, Phase 4 section kept in sync with plan101's Stage D.
+- `docs/adr/0005-server-token-and-passage-routes.md` — original server-minting design (now partially superseded, see below).
+- `docs/adr/0006-split-api-key-for-content-preview.md` — why two keys instead of one.
+- `docs/adr/0007-dual-auth-mode-direct-vs-server-token.md` — why `/api/token` can't work on this org, and the `direct`/`server` auth-mode split that replaces it.
+- `docs/coveo-source-spec.md` — original field/mapping spec (predates the org; field *names* still correct).
+- `docs/final_config.json` — the Full source's complete saved JSON configuration, from the end of the previous session.
+- `docs/temp/` — screenshots across all three sessions.

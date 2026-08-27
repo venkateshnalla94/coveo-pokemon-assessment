@@ -22,7 +22,7 @@ test.describe("search results route (configured)", () => {
     await page.goto("/search?q=pikachu");
 
     await expect(page.getByText("Coveo isn't configured yet")).not.toBeVisible();
-    await expect(page.getByRole("list")).toBeVisible();
+    await expect(page.getByRole("list", { name: "Search results" })).toBeVisible();
     // Facet: filter by Pokemon Type / Generation (Essential tier).
     await expect(page.getByText(/type/i).first()).toBeVisible();
     await expect(page.getByText(/generation/i).first()).toBeVisible();

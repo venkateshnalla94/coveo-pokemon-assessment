@@ -57,3 +57,7 @@ If any optional section is skipped, be ready to justify why in the presentation.
 ## Blocked on
 
 Coveo Cloud Organization access (trial org invite) is pending. Code-level setup (repo scaffolding, framework choice, local dev environment) can proceed without it; indexing/crawling and cloud-endpoint integration cannot start until org access is granted.
+
+## Working style
+
+When the user proposes an approach, don't just implement it. Say whether it's a good idea and why, or name the tradeoff/risk if it isn't, before making the change. Then implement — this isn't a request for more confirmation round-trips, just for the reasoning to be on the table before code changes.
