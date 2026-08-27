@@ -15,7 +15,7 @@ Current state: a substantial Next.js 16 + React 19 + `@coveo/headless` v3 fronte
 
 Written 2026-08-26. This file is the working checklist for the whole assessment.
 
-**Status as of 2026-08-26:** Phase 1's doc/CI fixes and all of Phase 2 are done (see the phase sections below). Phase 1's hosting steps (initial commit, GitHub repo, Vercel deploy) are deliberately parked — not started, pending explicit go-ahead. Phase 0 and Phases 3–6 are unstarted, still blocked on the org invite.
+**Status as of 2026-08-26 (end of day):** Phase 1's doc/CI fixes and all of Phase 2 are done. Phase 1's hosting steps (initial commit, GitHub repo, Vercel deploy) are deliberately parked — not started, pending explicit go-ahead. Phase 3 is well underway: Stage A/B (test source, fields, mappings, generation IPE) are fully done and verified; Stage C (full crawl) has its source built and configured, with the rebuild launched and its results not yet checked. Phase 0's email replies and presentation-slot booking are still not sent — zero-dependency, should not keep sitting idle. Phases 4–6 remain blocked on Phase 3's exit criteria.
 
 ---
 
@@ -102,24 +102,36 @@ Also draft, in parallel, both Topic 2 variants and the Passage Retrieval point o
 
 **Reached, independently verified 2026-08-26:** `npm run lint`, `npm run typecheck`, `npm run test:coverage` (33/33 tests, all files ≥80%), and `npx playwright test` (5 passed / 3 skipped) all green.
 
-## Phase 3 — Org setup (blocked on invite; 4h active + ~45 min crawl)
+## Phase 3 — Org setup (in progress; started 2026-08-26)
 
 **First action on login: record the org's creation date and count 14 days from it, not from today.** If the org is already >7 days old, escalate to recruiting the same day.
 
-1. Reply to the Phase 0.3 thread with the Org ID.
-2. Create the **test source**: Web, start URLs `bulbasaur` + `garchomp` + `sprigatito`, **depth 0**. Three URLs, not one: they cover single-form, the multi-form duplicate trap, and the Gen-9 boundary. Rebuilds in seconds.
-3. Write the scraping config JSON: index-scoped `(//table[...])[1]`, `№` via `contains()`, image from `og:image`, name from `h1`.
-4. **Trap check** via Source → More → View and map metadata: Garchomp shows exactly 2 types (not 5); Sprigatito shows dex 906.
-5. Create the 5 fields (Content → Fields). `pokemontype` **must** be Multi-value facet.
-6. Create mappings (`%[pokemonname]` etc.), **including the Title override**.
-7. Write and attach the generation IPE, **post-conversion**. Wrap the whole body in try/except or a failure drops the item from the index entirely.
-8. Rebuild the test source; verify all 5 fields on all 3 Pokemon in Content Browser.
-9. Create the **full source**: same config, start `/pokedex/national`, depth 1, delay 2000ms (robots.txt says `Crawl-delay: 2`), inclusion `^https://pokemondb\.net/pokedex/[a-z0-9%.-]+$`, exclusion `^https://pokemondb\.net/pokedex/(all|national|shiny)$`.
-10. Rebuild and monitor. Expect ~35–45 min.
+**Org received 2026-08-25.** Org ID `venkateshpokemonchallenges0qp5rpy`. Enterprise/Demo license, RGA + Passage Retrieval extensions both listed. Presentation slot not yet booked — target by 2026-09-06 (creation date + 12 days).
+
+1. Reply to the Phase 0.3 thread with the Org ID. — ⏸️ Not yet sent.
+2. Create the **test source**: Web, start URLs `pikachu` + `garchomp` + `sprigatito`, **depth 0**. Three URLs, not one: they cover single-form, the multi-form duplicate trap, and the Gen-9 boundary. Rebuilds in seconds. — ✅ Done (source `Pokedex - Test`, project `Pokemon Search`, delay 2000ms).
+3. Write the scraping config JSON: index-scoped `(//table[...])[1]`, name from `h1`. — ✅ Done, but **not** as originally planned — `№` via `contains()` and image via `og:image` both failed for reasons unrelated to selector logic (see below); real selectors are in `docs/plan101.md`'s "Live build findings" section.
+4. **Trap check** via Content Browser: Garchomp shows exactly 2 types (not 5); Sprigatito shows dex 906. — ✅ Done, confirmed clean across all 3 test Pokemon.
+5. Create the 5 fields (Content → Fields). `pokemontype` **must** be Multi-value facet. — ✅ Done.
+6. Create mappings (`%[pokemonname]` etc.), **including the Title override**. — ✅ Done. Mappings live under a separate source "Mappings" action, not the Configuration tab. The Title override rule had to be placed *above* the default `%[title:crawler]` rule — same-field mapping rules are first-match-wins, not last-match-wins as assumed.
+7. Write and attach the generation IPE, **post-conversion**. Wrap the whole body in try/except or a failure drops the item from the index entirely. — ✅ Done.
+8. Rebuild the test source; verify all 5 fields on all 3 Pokemon in Content Browser. — ✅ Done — Pikachu = Generation 1, Garchomp = Generation 4, Sprigatito = Generation 9. Needed the `%[pokemongeneration]` mapping rule added, which Stage B's original pass had missed.
+9. Create the **full source** (separate `resourceId`, not a reuse of the Test source), same config, start `/pokedex/national`, depth 1, inclusion `^https://pokemondb\.net/pokedex/[a-z0-9%.-]+$` (via "Include non-excluded pages that match at least one rule", not the default "include all non-excluded pages"), exclusion `^https://pokemondb\.net/pokedex/(national|all|shiny)$|^https://pokemondb\.net/(move|type|ability|item)/.*$`, `ExpandBeforeFiltering: true`, `MaxCrawlDepth: 1`. — ✅ Done. Full parity with the Test source (scraping config, all 6 mappings, the generation extension) confirmed by diffing the two sources' raw JSON via Source → More → Edit configuration with JSON.
+10. Rebuild and monitor. Expect ~35–45 min. — 🔄 In progress — build launched, not yet verified.
 
 The inclusion regex's trailing `$` with no `/` in the character class is what excludes 5,391 `/moves/<gen>` subpages. That detail is worth 90 seconds in the Topic 1 deck.
 
 **Exit:** ~1025 items; all 5 fields populated; facet lists show 18 types and 9 generations with **no compound values**. If the count is materially off or the crawl exceeds 90 min, swap to a Sitemap source with identical filters (~20 min, since scraping config, fields, mappings, and IPE are all source-type-independent).
+
+**Findings from the live build, not anticipated in the original plan (full detail in `docs/plan101.md`):**
+- Selectors must end in `text()`/`@attr` — an element-level selector (CSS `h1`, or an XPath stopping at the element) indexes raw HTML tags as the field value, not the visible text.
+- The `№` character selector worked in the Web Scraper Helper Chrome extension but silently failed in Coveo's actual crawl/extraction repeatedly — matching on plain-ASCII `"National"` instead resolved it. Extension results are not a perfect proxy for production extraction, especially for non-ASCII characters.
+- `og:image` doesn't exist on these pages; the real artwork selector uses `fetchpriority="high"` combined with a `/artwork/` path filter and a positional first-match, since some Pokemon pages carry multiple `fetchpriority="high"` images (header logo, Mega/regional-form art).
+- Unmapped extracted metadata is invisible in Content Browser (Fields view and Item JSON) until a Field + mapping exist — don't mistake that for extraction failure.
+- **Excluding a crawl's own start URL requires `ExpandBeforeFiltering: true`.** `/pokedex/national` needed excluding (it's the crawl entry point but not itself a Pokemon page), which triggered a console warning ("Excluded starting URL(s) detected") — without this flag the crawler may filter the page before ever expanding its links, yielding a near-empty index. This setting is JSON-only (`configuration.parameters.ExpandBeforeFiltering`), not exposed anywhere in the Inclusions/Exclusions UI. Access via source → **More → Edit configuration with JSON** ([docs.coveo.com/en/1685](https://docs.coveo.com/en/1685/)); the setting itself is documented at [docs.coveo.com/en/mc1f0219](https://docs.coveo.com/en/mc1f0219/).
+- **"Include all non-excluded pages" (the default) is a weaker filter design than an explicit inclusion allowlist.** With only an exclusion blocklist, any site section the blocklist doesn't name (forums, tools pages, help pages, etc.) would be crawled if linked from the depth-1 start page. Switching to "Include non-excluded pages that match at least one rule" plus the `/pokedex/[a-z0-9%.-]+$` regex closes that gap and is also the stronger story for the Essential-tier filter-design grading criterion.
+- **Mapping `id` fields are auto-generated by Coveo on save, not required input.** Confirmed via [docs.coveo.com/en/29](https://docs.coveo.com/en/29/): "A unique alphanumeric id is automatically assigned to each mapping and type." This meant the Test source's entire `mappings` array (53 entries) could be copied wholesale into the Full source's JSON with all `id` fields stripped, rather than hand-splicing 6 new entries — Coveo assigned fresh IDs scoped to the Full source's own `resourceId` on save, verified by re-reading the JSON afterward.
+- **Two sources can look confusingly similar in raw JSON.** Always check `resourceId` before trusting what a JSON dump shows — an early exchange this session nearly proceeded on the assumption two pasted JSON blobs were different sources when they were briefly the same one; cross-checking `resourceId` caught it immediately when it mattered.
 
 ## Phase 4 — Connect and ML (blocked on Phase 3; 4–5h + model build waits)
 
