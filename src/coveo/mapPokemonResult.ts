@@ -12,9 +12,36 @@ export interface PokemonItem {
   imageUrl: string | undefined;
   types: string[];
   generation: string | undefined;
+  species: string | undefined;
+  height: string | undefined;
+  weight: string | undefined;
+  abilities: string[];
+  hp: number | undefined;
+  attack: number | undefined;
+  defense: number | undefined;
+  spAtk: number | undefined;
+  spDef: number | undefined;
+  speed: number | undefined;
+  statTotal: number | undefined;
+  evYield: string | undefined;
+  catchRate: string | undefined;
+  baseFriendship: string | undefined;
+  baseExp: string | undefined;
+  growthRate: string | undefined;
+  eggGroups: string[];
+  genderRatio: string[];
+  eggCycles: string | undefined;
+  weaknesses: string[];
+  resistances: string[];
+  evolvesFrom: string | undefined;
+  evolvesTo: string | undefined;
+  /** True when `evolvesFrom` is absent, meaning this is a base-stage Pokemon with no pre-evolution — not an extraction failure, see docs/coveo-source-spec.md's evolution-chart section. */
+  isBaseStage: boolean;
 }
 
 export function mapPokemonResult(result: Result): PokemonItem {
+  const evolvesFrom = asString(result.raw[POKEMON_FIELDS.evolvesFrom]);
+
   return {
     id: result.uniqueId,
     // `pokemonname` is the h1-extracted name (see C2). `?? result.title`
@@ -27,11 +54,39 @@ export function mapPokemonResult(result: Result): PokemonItem {
     imageUrl: asString(result.raw[POKEMON_FIELDS.image]),
     types: toStringArray(result.raw[POKEMON_FIELDS.type]),
     generation: asString(result.raw[POKEMON_FIELDS.generation]),
+    species: asString(result.raw[POKEMON_FIELDS.species]),
+    height: asString(result.raw[POKEMON_FIELDS.height]),
+    weight: asString(result.raw[POKEMON_FIELDS.weight]),
+    abilities: toStringArray(result.raw[POKEMON_FIELDS.abilities]),
+    hp: asNumber(result.raw[POKEMON_FIELDS.hp]),
+    attack: asNumber(result.raw[POKEMON_FIELDS.attack]),
+    defense: asNumber(result.raw[POKEMON_FIELDS.defense]),
+    spAtk: asNumber(result.raw[POKEMON_FIELDS.spAtk]),
+    spDef: asNumber(result.raw[POKEMON_FIELDS.spDef]),
+    speed: asNumber(result.raw[POKEMON_FIELDS.speed]),
+    statTotal: asNumber(result.raw[POKEMON_FIELDS.statTotal]),
+    evYield: asString(result.raw[POKEMON_FIELDS.evYield]),
+    catchRate: asString(result.raw[POKEMON_FIELDS.catchRate]),
+    baseFriendship: asString(result.raw[POKEMON_FIELDS.baseFriendship]),
+    baseExp: asString(result.raw[POKEMON_FIELDS.baseExp]),
+    growthRate: asString(result.raw[POKEMON_FIELDS.growthRate]),
+    eggGroups: toStringArray(result.raw[POKEMON_FIELDS.eggGroups]),
+    genderRatio: toStringArray(result.raw[POKEMON_FIELDS.genderRatio]),
+    eggCycles: asString(result.raw[POKEMON_FIELDS.eggCycles]),
+    weaknesses: toStringArray(result.raw[POKEMON_FIELDS.weaknesses]),
+    resistances: toStringArray(result.raw[POKEMON_FIELDS.resistances]),
+    evolvesFrom,
+    evolvesTo: asString(result.raw[POKEMON_FIELDS.evolvesTo]),
+    isBaseStage: evolvesFrom === undefined,
   };
 }
 
 function asString(value: unknown): string | undefined {
   return typeof value === "string" ? value : undefined;
+}
+
+function asNumber(value: unknown): number | undefined {
+  return typeof value === "number" ? value : undefined;
 }
 
 /**

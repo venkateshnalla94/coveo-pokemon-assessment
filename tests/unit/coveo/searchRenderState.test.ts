@@ -69,7 +69,37 @@ describe("deriveSearchRenderState", () => {
     expect(result.status).toBe("success");
     if (result.status === "success") {
       expect(result.items).toEqual([
-        { id: "1", name: "Pikachu", imageUrl: undefined, types: ["Electric"], generation: undefined },
+        {
+          id: "1",
+          name: "Pikachu",
+          imageUrl: undefined,
+          types: ["Electric"],
+          generation: undefined,
+          species: undefined,
+          height: undefined,
+          weight: undefined,
+          abilities: [],
+          hp: undefined,
+          attack: undefined,
+          defense: undefined,
+          spAtk: undefined,
+          spDef: undefined,
+          speed: undefined,
+          statTotal: undefined,
+          evYield: undefined,
+          catchRate: undefined,
+          baseFriendship: undefined,
+          baseExp: undefined,
+          growthRate: undefined,
+          eggGroups: [],
+          genderRatio: [],
+          eggCycles: undefined,
+          weaknesses: [],
+          resistances: [],
+          evolvesFrom: undefined,
+          evolvesTo: undefined,
+          isBaseStage: true,
+        },
       ]);
     }
   });
