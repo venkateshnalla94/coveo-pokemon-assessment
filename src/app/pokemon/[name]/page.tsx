@@ -9,7 +9,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AskAboutPokemon } from "@/components/AskAboutPokemon";
 import { CoveoConfigBanner } from "@/components/CoveoConfigBanner";
 import { isCoveoConfigured } from "@/coveo/config";
@@ -43,6 +43,8 @@ export default function PokemonDetailPage() {
   const [resultList] = useState(() => (engine ? buildResultList(engine) : undefined));
   const [state, setState] = useState<ResultListState>(resultList?.state ?? EMPTY_STATE);
 
+  const lastSubmittedName = useRef<string | undefined>(undefined);
+
   useEffect(() => {
     if (!engine || !searchBox || !resultList) {
       return;
@@ -52,11 +54,19 @@ export default function PokemonDetailPage() {
     // "Bulbasaur Pokédex: stats, moves..." not "Bulbasaur", so a free-text
     // `.find()` against `result.title` would (and did) always miss. Escape
     // any literal double quotes in the route param before interpolating.
-    const escapedName = name.replace(/"/g, '\\"');
-    const { updateAdvancedSearchQueries } = loadAdvancedSearchQueryActions(engine);
-    engine.dispatch(updateAdvancedSearchQueries({ aq: `@pokemonname=="${escapedName}"` }));
-    searchBox.updateText("");
-    searchBox.submit();
+    if (lastSubmittedName.current !== name) {
+      lastSubmittedName.current = name;
+      const escapedName = name.replace(/"/g, '\\"');
+      const { updateAdvancedSearchQueries } = loadAdvancedSearchQueryActions(engine);
+      engine.dispatch(updateAdvancedSearchQueries({ aq: `@pokemonname=="${escapedName}"` }));
+      searchBox.updateText("");
+      searchBox.submit();
+      // Dev-mode Strict Mode double-invokes this effect on mount with the
+      // same name; without this guard that fires two submit()s back to
+      // back, and Headless cancels the first (correct — a newer query
+      // supersedes a stale one), which its own logger reports as an
+      // "Action dispatch error ... rejected" even though nothing is broken.
+    }
     return resultList.subscribe(() => setState(resultList.state));
   }, [name, engine, searchBox, resultList]);
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { buildSearchBox, type SearchBoxState } from "@coveo/headless";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ConfigRequiredDialog } from "@/components/ConfigRequiredDialog";
 import { isCoveoConfigured } from "@/coveo/config";
 import { getSearchEngine } from "@/coveo/engine";
@@ -54,10 +54,23 @@ export function SearchBox({ onNavigate, initialQuery }: SearchBoxProps) {
     return searchBox.subscribe(() => setState(searchBox.state));
   }, [searchBox]);
 
+  const lastSubmittedQuery = useRef<string | undefined>(undefined);
+
   useEffect(() => {
     if (!searchBox || !initialQuery) {
       return;
     }
+    // React's dev-mode Strict Mode double-invokes this effect on mount with
+    // the same initialQuery; without this guard that fires two submit()s
+    // back to back, and Headless cancels the first (correct behavior — a
+    // newer query supersedes a stale one), which its own logger reports as
+    // an "Action dispatch error ... rejected" even though nothing is
+    // actually broken. Only resubmit when initialQuery has genuinely
+    // changed since the last real submission.
+    if (lastSubmittedQuery.current === initialQuery) {
+      return;
+    }
+    lastSubmittedQuery.current = initialQuery;
     searchBox.updateText(initialQuery);
     searchBox.submit();
     // Only re-run when initialQuery itself changes (e.g. the URL's `q` param
