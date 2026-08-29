@@ -35,3 +35,31 @@ const TYPE_COLORS: Record<string, string> = {
 export function getTypeColor(typeName: string): string | undefined {
   return TYPE_COLORS[typeName.trim().toLowerCase()];
 }
+
+/**
+ * The 18 real Pokemon types, capitalized to match the casing the indexed
+ * `pokemontype` field actually returns (e.g. "Fire", not "fire"). A fixed,
+ * closed, real taxonomy — not fabricated Pokemon data — so it's safe to
+ * hardcode for static navigation (e.g. the home page's Browse-by-type
+ * pills), unlike any actual Pokemon fact (name/stat/generation/etc.).
+ */
+export const POKEMON_TYPES: string[] = [
+  "Normal",
+  "Fire",
+  "Water",
+  "Electric",
+  "Grass",
+  "Ice",
+  "Fighting",
+  "Poison",
+  "Ground",
+  "Flying",
+  "Psychic",
+  "Bug",
+  "Rock",
+  "Ghost",
+  "Dragon",
+  "Dark",
+  "Steel",
+  "Fairy",
+];

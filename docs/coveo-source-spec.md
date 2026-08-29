@@ -94,6 +94,10 @@ Both selectors were verified against all three real shapes: Pikachu (mid-chain, 
 
 Field names must match `POKEMON_FIELDS` in `src/coveo/fields.ts` exactly. If a field is renamed here, update that file in the same change.
 
+## Facet Generator (field-level, admin console)
+
+As of the tenth session's facet-architecture change (`docs/adr/0011-automatic-facet-generation-on-search-page.md`), five fields have the **Facet Generator** field option enabled in the admin console (Fields page, per-field toggle — same location as "Sortable"), feeding `/search`'s `AutomaticFacets.tsx` (`buildAutomaticFacetGenerator`) instead of a hand-built `Facet` component: `pokemontype`, `pokemongeneration`, `pokemonegggroups`, `pokemonweaknesses`, `pokemonresistances`. All five were already Facet/Multi-value facet-enabled per the rows above, which is the only prerequisite. `pokemonabilities` (kept manual/searchable — hundreds of values, Automatic Facet Generation has no facet-search API) and `pokemonspeed` (Integer, Facet Generator is STRING-only) deliberately do not have this enabled.
+
 ## Validation
 
 After indexing the test source, use the admin console's content browser to confirm extracted values for Pikachu match expectations (type = Electric, generation = I) before switching to the full crawl.

@@ -2,20 +2,20 @@ import { describe, expect, it } from "vitest";
 import { buildTypeSearchHref } from "@/coveo/browseByTypeUrl";
 
 describe("buildTypeSearchHref", () => {
-  it("uses Headless's real f-<facetId>=<value> fragment shape, keyed on the pokemontype field", () => {
-    expect(buildTypeSearchHref("Fire")).toBe("/search?f-pokemontype=Fire");
+  it("uses an aq exact-match expression, not a facet-scoped f-<id> param", () => {
+    expect(buildTypeSearchHref("Fire")).toBe('/search?aq=%40pokemontype%3D%3D%22Fire%22');
   });
 
-  it("URL-encodes a type value that needs it", () => {
-    expect(buildTypeSearchHref("Fire Type")).toBe("/search?f-pokemontype=Fire%20Type");
+  it("escapes a double quote inside the type value so the query expression stays well-formed", () => {
+    const href = buildTypeSearchHref('Fire"Type');
+    const decoded = decodeURIComponent(href.split("aq=")[1]);
+    expect(decoded).toBe('@pokemontype=="Fire\\"Type"');
   });
 
-  it("round-trips through the same regex Headless's deserializer uses to parse facet params", () => {
+  it("round-trips through SearchUrlSync's aq param, which is a real restorable basic key", () => {
     const href = buildTypeSearchHref("Fire");
     const query = href.split("?")[1];
     const [key] = query.split("=");
-    // Mirrors facetSearchParamRegex from
-    // features/search-parameters/search-parameter-serializer.js.
-    expect(/^(f|fExcluded|cf|nf|df|sf|af|mnf)-(.+)$/.test(key)).toBe(true);
+    expect(key).toBe("aq");
   });
 });

@@ -102,6 +102,9 @@ function ResultCard({
             </span>
           )}
         </p>
+        {item.generation && (
+          <p className="mt-1 text-xs text-black/50 dark:text-white/50">{item.generation}</p>
+        )}
         {item.types.length > 0 && (
           <p className="mt-1 flex flex-wrap items-center gap-1.5">
             {item.types.map((type) => (
@@ -112,6 +115,11 @@ function ResultCard({
         {item.statTotal !== undefined && (
           <p className="mt-1 text-xs text-black/50 dark:text-white/50">
             Base stat total: {item.statTotal}
+          </p>
+        )}
+        {item.abilities.length > 0 && (
+          <p className="mt-1 truncate text-xs text-black/50 dark:text-white/50">
+            {item.abilities.join(", ")}
           </p>
         )}
       </Link>

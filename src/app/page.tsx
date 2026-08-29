@@ -64,11 +64,9 @@ export default function Home() {
         )}
       </p>
       <SearchBox onNavigate={(query) => router.push(`/search?q=${encodeURIComponent(query)}`)} />
-      {configured && (
-        <div className="mt-12 w-full">
-          <BrowseByType />
-        </div>
-      )}
+      <div className="mt-12 w-full">
+        <BrowseByType />
+      </div>
     </div>
   );
 }

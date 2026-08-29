@@ -20,6 +20,13 @@ export function FacetSpeed() {
     buildNumericFacet(getSearchEngine(), {
       options: {
         field: POKEMON_FIELDS.speed,
+        // Explicit, stable facetId — see Facet.tsx's doc comment for why:
+        // without it, remounting this component after the persistent
+        // engine singleton already has `pokemonspeed` registered (e.g.
+        // navigating away from /search and back) accumulates a new
+        // suffixed facetId (`pokemonspeed_2`, ...) every time instead of
+        // reusing the existing registration.
+        facetId: POKEMON_FIELDS.speed,
         generateAutomaticRanges: false,
         currentValues: SPEED_RANGES.map((r) => r.range),
       },

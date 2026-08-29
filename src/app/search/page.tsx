@@ -1,13 +1,12 @@
 "use client";
 
 import { Suspense } from "react";
+import { AutomaticFacets } from "@/components/AutomaticFacets";
 import { CoveoConfigBanner } from "@/components/CoveoConfigBanner";
 import { DidYouMean } from "@/components/DidYouMean";
 import { FacetAbilities } from "@/components/FacetAbilities";
-import { FacetGeneration } from "@/components/FacetGeneration";
 import { FacetRail } from "@/components/FacetRail";
 import { FacetSpeed } from "@/components/FacetSpeed";
-import { FacetType } from "@/components/FacetType";
 import { GeneratedAnswer } from "@/components/GeneratedAnswer";
 import { Pager } from "@/components/Pager";
 import { ResultList } from "@/components/ResultList";
@@ -48,10 +47,9 @@ function SearchPageContent() {
       ) : (
         <div className="grid grid-cols-1 gap-8 md:grid-cols-[200px_1fr]">
           <FacetRail>
-            <FacetType />
-            <FacetGeneration />
-            <FacetAbilities />
             <FacetSpeed />
+            <FacetAbilities />
+            <AutomaticFacets />
           </FacetRail>
           <main>
             <SearchSummaryBar />

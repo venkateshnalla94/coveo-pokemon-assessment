@@ -31,7 +31,19 @@ interface FacetProps {
 }
 
 export function Facet({ field, label, renderValue, searchable }: FacetProps) {
-  const [facet] = useState(() => buildFacet(getSearchEngine(), { options: { field } }));
+  // Explicit `id: field` (matching what Headless would default to anyway)
+  // instead of leaving `id` unset. The shared `engine` singleton persists
+  // for the whole SPA session, so a Facet component unmounting (e.g.
+  // navigating /search -> a Pokemon detail page -> back) never
+  // deregisters its facet from the engine's facetSet — remounting later
+  // with no explicit id makes Headless generate a fresh suffixed one
+  // (`pokemontype_2`, `_3`, ...) every time, since it can't tell this is
+  // "the same" facet, not a new one, and warns "already exists" each time.
+  // `registerFacet`'s own reducer is a no-op when the id already exists
+  // (`facet-set-slice.js`: `if (facetId in state) return;`), so pinning the
+  // id here makes a remount silently reuse the existing registration
+  // instead of accumulating duplicates.
+  const [facet] = useState(() => buildFacet(getSearchEngine(), { options: { field, facetId: field } }));
   const state = useControllerState(facet) ?? facet.state;
 
   const isSearching = searchable && state.facetSearch.query.trim().length > 0;
