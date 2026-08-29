@@ -28,12 +28,21 @@ export function deriveSearchRenderState(
 
   if (state.hasError) {
     const rawError = engine.state.search.error as CoveoSearchApiError | null;
-    return {
-      status: "error",
-      error: rawError
-        ? toApplicationError(rawError)
-        : { code: "UNKNOWN", message: "Unknown Coveo error", userMessage: "Search is temporarily unavailable.", recoverable: true },
-    };
+    const error = rawError
+      ? toApplicationError(rawError)
+      : { code: "UNKNOWN" as const, message: "Unknown Coveo error", userMessage: "Search is temporarily unavailable.", recoverable: true };
+
+    // An invalid sort criterion clears state.results to [] (Headless's
+    // handleRejectedSearch), so there's nothing to fall back to render here.
+    // SearchSummaryBar.tsx owns the actual recovery: it detects this same
+    // error and re-dispatches a relevance sort. Reporting "loading" instead
+    // of "error" avoids flashing the whole grid to a red error message for
+    // what's a self-correcting, sub-second condition.
+    if (error.code === "INVALID_SORT") {
+      return { status: "loading" };
+    }
+
+    return { status: "error", error };
   }
 
   if (state.results.length === 0) {

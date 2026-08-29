@@ -3,6 +3,7 @@
 import { buildBreadcrumbManager, buildQuerySummary, buildSort } from "@coveo/headless";
 import { useState } from "react";
 import { Chip } from "@/components/ui/Chip";
+import type { CoveoSearchApiError } from "@/coveo/applicationError";
 import { getSearchEngine } from "@/coveo/engine";
 import { SORT_OPTIONS } from "@/coveo/sortOptions";
 import { useControllerState } from "@/coveo/useControllerState";
@@ -19,6 +20,7 @@ export function SearchSummaryBar() {
   const [querySummary] = useState(() => buildQuerySummary(engine));
   const [breadcrumbManager] = useState(() => buildBreadcrumbManager(engine));
   const [sort] = useState(() => buildSort(engine));
+  const [sortWarning, setSortWarning] = useState<string | null>(null);
 
   const summaryState = useControllerState(querySummary) ?? querySummary.state;
   const breadcrumbState = useControllerState(breadcrumbManager) ?? breadcrumbManager.state;
@@ -48,9 +50,30 @@ export function SearchSummaryBar() {
             value={activeSortOption.id}
             onChange={(e) => {
               const option = SORT_OPTIONS.find((o) => o.id === e.target.value);
-              if (option) {
-                sort.sortBy(option.criterion);
+              if (!option) {
+                return;
               }
+              setSortWarning(null);
+              sort.sortBy(option.criterion);
+
+              // Fields can lose "Sortable" in the admin console (or a new
+              // option can be added here before it's enabled) without a
+              // build-time signal — see docs/coveo/sortOptions.ts's header
+              // comment. Detect that live: wait for this dispatch's search
+              // to settle, and if it errored specifically on the sort
+              // criterion, fall back to relevance instead of leaving the
+              // grid on `deriveSearchRenderState`'s error path.
+              const unsubscribe = engine.subscribe(() => {
+                if (engine.state.search.isLoading) {
+                  return;
+                }
+                unsubscribe();
+                const error = engine.state.search.error as CoveoSearchApiError | null;
+                if (error?.type === "InvalidSortValueException") {
+                  sort.sortBy(SORT_OPTIONS[0].criterion);
+                  setSortWarning(`"${option.label}" sort isn't available right now — showing relevance instead.`);
+                }
+              });
             }}
             className="rounded-md border border-black/10 px-2 py-1 dark:border-white/15 dark:bg-transparent"
           >
@@ -63,11 +86,17 @@ export function SearchSummaryBar() {
         </label>
       </div>
 
+      {sortWarning && (
+        <p className="text-xs text-amber-700 dark:text-amber-400" role="status">
+          {sortWarning}
+        </p>
+      )}
+
       {breadcrumbState.hasBreadcrumbs && (
         <div className="flex flex-wrap items-center gap-1.5">
           {breadcrumbState.facetBreadcrumbs.flatMap((breadcrumb) =>
             breadcrumb.values.map((value) => (
-              <span key={`${breadcrumb.field}-${value.value.value}`} className="inline-flex items-center gap-1">
+              <span key={`${breadcrumb.facetId}-${value.value.value}`} className="inline-flex items-center gap-1">
                 <Chip label={`${value.value.value}`} variant="neutral" />
                 <button
                   type="button"
@@ -83,13 +112,28 @@ export function SearchSummaryBar() {
           {breadcrumbState.numericFacetBreadcrumbs.flatMap((breadcrumb) =>
             breadcrumb.values.map((value) => (
               <span
-                key={`${breadcrumb.field}-${value.value.start}-${value.value.end}`}
+                key={`${breadcrumb.facetId}-${value.value.start}-${value.value.end}`}
                 className="inline-flex items-center gap-1"
               >
                 <Chip label={`${value.value.start}-${value.value.end}`} variant="neutral" />
                 <button
                   type="button"
                   aria-label={`Remove filter ${value.value.start}-${value.value.end}`}
+                  onClick={() => value.deselect()}
+                  className="text-black/40 hover:text-black dark:text-white/40 dark:hover:text-white"
+                >
+                  &times;
+                </button>
+              </span>
+            )),
+          )}
+          {breadcrumbState.automaticFacetBreadcrumbs.flatMap((breadcrumb) =>
+            breadcrumb.values.map((value) => (
+              <span key={`${breadcrumb.facetId}-${value.value.value}`} className="inline-flex items-center gap-1">
+                <Chip label={`${value.value.value}`} variant="neutral" />
+                <button
+                  type="button"
+                  aria-label={`Remove filter ${value.value.value}`}
                   onClick={() => value.deselect()}
                   className="text-black/40 hover:text-black dark:text-white/40 dark:hover:text-white"
                 >

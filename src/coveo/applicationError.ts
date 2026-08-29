@@ -13,7 +13,12 @@ export interface CoveoSearchApiError {
  * Normalized error shape so the UI can branch on a closed set of codes
  * instead of inspecting a raw Coveo error. See docs/standards-adoption.md #8.
  */
-export type ApplicationErrorCode = "AUTHENTICATION" | "CONFIGURATION" | "PROVIDER" | "UNKNOWN";
+export type ApplicationErrorCode =
+  | "AUTHENTICATION"
+  | "CONFIGURATION"
+  | "INVALID_SORT"
+  | "PROVIDER"
+  | "UNKNOWN";
 
 export interface ApplicationError {
   code: ApplicationErrorCode;
@@ -29,6 +34,15 @@ export interface ApplicationError {
  * specific code/message must read this from the engine state directly.
  */
 export function toApplicationError(error: CoveoSearchApiError): ApplicationError {
+  if (error.type === "InvalidSortValueException") {
+    return {
+      code: "INVALID_SORT",
+      message: `Coveo returned ${error.statusCode} (${error.type}): ${error.message}`,
+      userMessage: "That sort option isn't available. Showing relevance instead.",
+      recoverable: true,
+    };
+  }
+
   if (error.statusCode === 401 || error.statusCode === 403) {
     return {
       code: "AUTHENTICATION",

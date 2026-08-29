@@ -8,24 +8,17 @@ import { POKEMON_FIELDS } from "@/coveo/fields";
  * #12: this is plain data/logic, not a component, so it stays unit-test-gated
  * under src/coveo/*).
  *
- * Every field used here must have "Use for sorting" enabled in the Coveo
- * admin console — confirmed for `pokemondexnumber` and `pokemonstattotal` in
- * docs/HANDOFF.md (both are typed Integer, which this org's console ties
- * sortability to as a side effect — see docs/coveo-source-spec.md). No
- * invented sort option exists here that isn't backed by a real indexed,
- * sortable field (PRODUCT.md Principle 4).
- *
- * "Name A-Z" (`pokemonname`) was tried and dropped this session: live
- * against the org, selecting it 400s the Search API with
- * `InvalidSortValueException: Invalid sort criteria: "@pokemonname+ascending"`
- * — `pokemonname` doesn't have "Use for sorting" enabled (unlike
- * `pokemondexnumber`/`pokemonstattotal`, confirmed already done). That 400
- * flows straight into `deriveSearchRenderState`'s error branch and replaces
- * the entire results grid with "Search is temporarily unavailable" —
- * a real, user-facing break, not a cosmetic one. Re-add it once "Use for
- * sorting" is enabled on `pokemonname` in the admin console; until then,
- * shipping it would be offering a sort option PRODUCT.md Principle 4 would
- * call broken, not just "not yet real".
+ * Every field used here must have "Sortable" enabled on the field in the
+ * Coveo admin console — confirmed for `pokemondexnumber`/`pokemonstattotal`
+ * (Integer fields, which this org's console ties sortability to as a side
+ * effect) and, as of Phase v3.1, `pokemonname` too. No invented sort option
+ * exists here that isn't backed by a real indexed, sortable field
+ * (PRODUCT.md Principle 4). If a field here ever loses that setting or a new
+ * option is added before the setting is enabled, `src/coveo/searchRenderState.ts`
+ * and `SearchSummaryBar.tsx` fall back to relevance and surface a small
+ * inline notice instead of blanking the whole results grid — see
+ * `docs/adr/` / `docs/EXECUTION-PLAN-v3.md` Phase v3.1 for why that
+ * resilience exists.
  */
 export interface SortOption {
   id: string;
@@ -36,6 +29,11 @@ export interface SortOption {
 export const SORT_OPTIONS: SortOption[] = [
   { id: "relevance", label: "Relevance", criterion: buildRelevanceSortCriterion() },
   {
+    id: "name-asc",
+    label: "Name A-Z",
+    criterion: buildFieldSortCriterion(POKEMON_FIELDS.name, SortOrder.Ascending),
+  },
+  {
     id: "dex-number-asc",
     label: "Dex number",
     criterion: buildFieldSortCriterion(POKEMON_FIELDS.dexNumber, SortOrder.Ascending),
@@ -44,5 +42,10 @@ export const SORT_OPTIONS: SortOption[] = [
     id: "stat-total-desc",
     label: "Base stat total",
     criterion: buildFieldSortCriterion(POKEMON_FIELDS.statTotal, SortOrder.Descending),
+  },
+  {
+    id: "speed-desc",
+    label: "Speed (fastest first)",
+    criterion: buildFieldSortCriterion(POKEMON_FIELDS.speed, SortOrder.Descending),
   },
 ];

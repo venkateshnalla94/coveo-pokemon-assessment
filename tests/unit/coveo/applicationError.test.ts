@@ -18,6 +18,17 @@ describe("toApplicationError", () => {
     expect(error.message).toContain("503");
     expect(error.message).toContain("ServiceUnavailable");
   });
+
+  it("maps an InvalidSortValueException to a recoverable INVALID_SORT error, not the generic PROVIDER catch-all", () => {
+    const error = toApplicationError({
+      statusCode: 400,
+      message: 'Invalid sort criteria: "@pokemonname+ascending"',
+      type: "InvalidSortValueException",
+    });
+    expect(error.code).toBe("INVALID_SORT");
+    expect(error.recoverable).toBe(true);
+    expect(error.userMessage).toBe("That sort option isn't available. Showing relevance instead.");
+  });
 });
 
 describe("configurationError", () => {

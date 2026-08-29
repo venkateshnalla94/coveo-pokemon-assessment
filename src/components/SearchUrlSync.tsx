@@ -1,9 +1,35 @@
 "use client";
 
-import { buildUrlManager, loadSearchActions, loadSearchAnalyticsActions } from "@coveo/headless";
+import {
+  buildUrlManager,
+  loadAdvancedSearchQueryActions,
+  loadSearchActions,
+  loadSearchAnalyticsActions,
+} from "@coveo/headless";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { getSearchEngine } from "@/coveo/engine";
+
+/**
+ * `URLSearchParams.toString()` serializes with `+` for spaces
+ * (`application/x-www-form-urlencoded`, per the WHATWG URL spec). Headless's
+ * `buildUrlManager` serializes/deserializes its own fragment with
+ * `encodeURIComponent`/`decodeURIComponent` (`%20` for spaces —
+ * `features/search-parameters/search-parameter-serializer.js`), which never
+ * un-escapes `+` back into a space. Feeding it a `+`-encoded fragment left a
+ * literal `+` embedded in any restored value that contains a space — e.g.
+ * `sortCriteria=@pokemonname+ascending`, which the Search API 400s on
+ * (`InvalidSortValueException`) since that's not a valid criterion string.
+ * This reproduced for every sort option, not just an unsortable field, and
+ * for any facet value containing a space (e.g. "Generation 9"). Re-encoding
+ * each value here with `encodeURIComponent` instead of calling
+ * `searchParams.toString()` matches Headless's own convention exactly.
+ */
+function toHeadlessFragment(searchParams: URLSearchParams): string {
+  return Array.from(searchParams.entries())
+    .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
+    .join("&");
+}
 
 /**
  * Owns URL <-> search-state sync on `/search` via Headless's real
@@ -15,6 +41,11 @@ import { getSearchEngine } from "@/coveo/engine";
  * to a `#hash` — this app already uses `?q=` on `/search` (see
  * src/app/page.tsx's onNavigate), so the fragment is reflected into the
  * actual query string via Next's router, not `location.hash`.
+ *
+ * Also restores `AutomaticFacets.tsx`'s selections via `af-<field>=<value>`
+ * (`SearchParameters.af`, `search-parameter-serializer.js`) — the same
+ * mechanism as manual facets' `f-<facetId>=<value>`, confirmed live —
+ * nothing special needed here for automatic facets specifically.
  *
  * Renders nothing; this is a controller-wiring component, not UI.
  *
@@ -40,11 +71,24 @@ export function SearchUrlSync() {
   const searchParams = useSearchParams();
   const [engine] = useState(() => getSearchEngine());
 
+  // `getAq()`/`getCq()` (search-parameter-manager.js) read from
+  // `state.advancedSearchQueries` and return `{}` if that slice doesn't
+  // exist — so an `aq` param in the URL (e.g. the home page's Browse-by-type
+  // pills, see browseByTypeUrl.ts) would silently never reach the actual
+  // Search API request unless this reducer is registered first. The detail
+  // and compare pages already call this loader before their own
+  // `updateAdvancedSearchQueries` dispatch; `/search` needs the same
+  // registration before `buildUrlManager`'s constructor (below) synchronously
+  // dispatches `restoreSearchParameters`, or `aq` gets silently dropped on
+  // the very first render — confirmed live: without this, an `?aq=...` URL
+  // round-tripped straight back to a bare `/search` with nothing filtered.
+  loadAdvancedSearchQueryActions(engine);
+
   // Built once; the constructor's own dispatch(restoreSearchParameters(...))
   // is what seeds query/facet/sort state from the URL this page was loaded
   // with — see the component doc comment above.
   const [urlManager] = useState(() =>
-    buildUrlManager(engine, { initialState: { fragment: searchParams.toString() } }),
+    buildUrlManager(engine, { initialState: { fragment: toHeadlessFragment(searchParams) } }),
   );
 
   // Tracks the last fragment this component itself reconciled (either
@@ -63,7 +107,7 @@ export function SearchUrlSync() {
   // instead of a `SearchBox` controller, since there's no per-instance
   // query-set state to worry about going stale here.
   useEffect(() => {
-    const fragment = searchParams.toString();
+    const fragment = toHeadlessFragment(searchParams);
     if (lastFragment.current === fragment) {
       return;
     }

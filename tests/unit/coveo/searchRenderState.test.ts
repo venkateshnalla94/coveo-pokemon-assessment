@@ -38,6 +38,17 @@ describe("deriveSearchRenderState", () => {
     }
   });
 
+  it("reports loading, not error, for an InvalidSortValueException — SearchSummaryBar owns the fallback-to-relevance recovery", () => {
+    const state = buildState({ hasError: true });
+    const engine = buildEngine({
+      statusCode: 400,
+      message: 'Invalid sort criteria: "@pokemonname+ascending"',
+      type: "InvalidSortValueException",
+    });
+
+    expect(deriveSearchRenderState(state, engine)).toEqual({ status: "loading" });
+  });
+
   it("falls back to an UNKNOWN error when hasError is set but no error detail exists", () => {
     const state = buildState({ hasError: true });
     const result = deriveSearchRenderState(state, buildEngine(null));

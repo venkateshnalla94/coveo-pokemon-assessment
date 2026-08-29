@@ -10,6 +10,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const {
   urlManagerMock,
   buildUrlManagerMock,
+  loadAdvancedSearchQueryActionsMock,
   dispatchMock,
   executeSearchAction,
   logInterfaceLoadAction,
@@ -29,6 +30,7 @@ const {
     synchronize: vi.fn(),
   };
   const buildUrlManagerMock = vi.fn(() => urlManagerMock);
+  const loadAdvancedSearchQueryActionsMock = vi.fn(() => ({ updateAdvancedSearchQueries: vi.fn() }));
   const dispatchMock = vi.fn();
   const executeSearchAction = { type: "executeSearch" };
   const logInterfaceLoadAction = { type: "logInterfaceLoad" };
@@ -36,6 +38,7 @@ const {
   return {
     urlManagerMock,
     buildUrlManagerMock,
+    loadAdvancedSearchQueryActionsMock,
     dispatchMock,
     executeSearchAction,
     logInterfaceLoadAction,
@@ -49,6 +52,7 @@ vi.mock("@/coveo/engine", () => ({
 
 vi.mock("@coveo/headless", () => ({
   buildUrlManager: buildUrlManagerMock,
+  loadAdvancedSearchQueryActions: loadAdvancedSearchQueryActionsMock,
   loadSearchActions: vi.fn(() => ({
     executeSearch: vi.fn((thunk: unknown) => ({ ...executeSearchAction, meta: thunk })),
   })),
@@ -72,6 +76,7 @@ describe("SearchUrlSync", () => {
     currentSearchParams = new URLSearchParams();
     urlManagerMock.state = { fragment: "" };
     buildUrlManagerMock.mockClear();
+    loadAdvancedSearchQueryActionsMock.mockClear();
     dispatchMock.mockClear();
     routerReplaceMock.mockClear();
     urlManagerMock.synchronize.mockClear();
@@ -80,6 +85,14 @@ describe("SearchUrlSync", () => {
   it("renders nothing", () => {
     const { container } = render(<SearchUrlSync />);
     expect(container).toBeEmptyDOMElement();
+  });
+
+  it("registers the advancedSearchQueries reducer before building the urlManager, so an aq URL param isn't silently dropped", () => {
+    render(<SearchUrlSync />);
+    expect(loadAdvancedSearchQueryActionsMock).toHaveBeenCalled();
+    const loadOrder = loadAdvancedSearchQueryActionsMock.mock.invocationCallOrder[0]!;
+    const buildOrder = buildUrlManagerMock.mock.invocationCallOrder[0]!;
+    expect(loadOrder).toBeLessThan(buildOrder);
   });
 
   it("builds the urlManager seeded from the current URL's search params", () => {
@@ -96,6 +109,20 @@ describe("SearchUrlSync", () => {
     render(<SearchUrlSync />);
     expect(urlManagerMock.synchronize).toHaveBeenCalledWith("q=eevee");
     expect(dispatchMock).toHaveBeenCalled();
+  });
+
+  it("percent-encodes a value containing a space with %20, not URLSearchParams.toString()'s '+' — Headless's own fragment format only decodes %20, never '+' (see toHeadlessFragment's doc comment)", () => {
+    currentSearchParams = new URLSearchParams([["sortCriteria", "@pokemonname ascending"]]);
+    render(<SearchUrlSync />);
+    expect(buildUrlManagerMock).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        initialState: { fragment: "sortCriteria=%40pokemonname%20ascending" },
+      }),
+    );
+    expect(urlManagerMock.synchronize).toHaveBeenCalledWith(
+      "sortCriteria=%40pokemonname%20ascending",
+    );
   });
 
   it("reflects a urlManager fragment change into the URL via router.replace, without touching browser history (scroll: false)", () => {
