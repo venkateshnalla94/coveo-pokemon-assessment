@@ -2,10 +2,11 @@
 
 import { buildGeneratedAnswer, buildInteractiveCitation, type GeneratedAnswerState } from "@coveo/headless";
 import type { SearchEngine } from "@coveo/headless";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { PokemonMarkdown } from "@/components/PokemonMarkdown";
 import { getSearchEngine } from "@/coveo/engine";
 import { deriveGeneratedAnswerRenderState } from "@/coveo/generatedAnswerRenderState";
+import { useControllerState } from "@/coveo/useControllerState";
 
 /**
  * Advanced-tier RGA surface. Built the same way the rest of the app treats
@@ -34,14 +35,7 @@ export function GeneratedAnswer() {
       return undefined;
     }
   });
-  const [state, setState] = useState<GeneratedAnswerState | undefined>(generatedAnswer?.state);
-
-  useEffect(() => {
-    if (!generatedAnswer) {
-      return;
-    }
-    return generatedAnswer.subscribe(() => setState(generatedAnswer.state));
-  }, [generatedAnswer]);
+  const state = useControllerState(generatedAnswer);
 
   const renderState = deriveGeneratedAnswerRenderState(state);
 

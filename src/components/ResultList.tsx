@@ -1,27 +1,22 @@
 "use client";
 
-import {
-  buildInteractiveResult,
-  buildResultList,
-  type Result,
-  type ResultListState,
-  type SearchEngine,
-} from "@coveo/headless";
+import { buildInteractiveResult, buildResultList, type Result, type SearchEngine } from "@coveo/headless";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useCompare } from "@/components/compare/CompareProvider";
 import { Chip } from "@/components/ui/Chip";
 import { getSearchEngine } from "@/coveo/engine";
 import type { PokemonItem } from "@/coveo/mapPokemonResult";
 import { deriveSearchRenderState } from "@/coveo/searchRenderState";
 import { getTypeColor } from "@/coveo/typeColors";
+import { useControllerState } from "@/coveo/useControllerState";
 
 export function ResultList() {
   const [engine] = useState(() => getSearchEngine());
   const [resultList] = useState(() => buildResultList(engine));
-  const [state, setState] = useState<ResultListState>(resultList.state);
+  const state = useControllerState(resultList) ?? resultList.state;
   const pathname = usePathname();
   const searchParams = useSearchParams();
   // The exact current search URL (path + query string, including facets/
@@ -30,8 +25,6 @@ export function ResultList() {
   // opened from a filtered/sorted/paginated view can return to that exact
   // view rather than a bare `/search`.
   const fromHref = `${pathname}${searchParams.toString() ? `?${searchParams.toString()}` : ""}`;
-
-  useEffect(() => resultList.subscribe(() => setState(resultList.state)), [resultList]);
 
   const renderState = deriveSearchRenderState(state, engine);
 

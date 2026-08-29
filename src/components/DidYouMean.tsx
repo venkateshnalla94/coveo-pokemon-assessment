@@ -1,15 +1,14 @@
 "use client";
 
-import { buildDidYouMean, type DidYouMeanState } from "@coveo/headless";
-import { useEffect, useState } from "react";
+import { buildDidYouMean } from "@coveo/headless";
+import { useState } from "react";
 import { getSearchEngine } from "@/coveo/engine";
+import { useControllerState } from "@/coveo/useControllerState";
 
 /** Headless's real `DidYouMean` controller — query corrections, org capability permitting. */
 export function DidYouMean() {
   const [didYouMean] = useState(() => buildDidYouMean(getSearchEngine()));
-  const [state, setState] = useState<DidYouMeanState>(didYouMean.state);
-
-  useEffect(() => didYouMean.subscribe(() => setState(didYouMean.state)), [didYouMean]);
+  const state = useControllerState(didYouMean) ?? didYouMean.state;
 
   if (state.wasAutomaticallyCorrected) {
     return (

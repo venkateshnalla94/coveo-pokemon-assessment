@@ -1,12 +1,13 @@
 "use client";
 
-import { buildQuerySummary, loadSearchActions, loadSearchAnalyticsActions, type QuerySummaryState } from "@coveo/headless";
+import { buildQuerySummary, loadSearchActions, loadSearchAnalyticsActions } from "@coveo/headless";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { BrowseByType } from "@/components/BrowseByType";
 import { SearchBox } from "@/components/SearchBox";
 import { isCoveoConfigured } from "@/coveo/config";
 import { getSearchEngine } from "@/coveo/engine";
+import { useControllerState } from "@/coveo/useControllerState";
 
 /**
  * Minimal home page: subhead + the search box (with Query Suggest
@@ -38,9 +39,7 @@ export default function Home() {
 
   const [engine] = useState(() => (configured ? getSearchEngine() : undefined));
   const [querySummary] = useState(() => (engine ? buildQuerySummary(engine) : undefined));
-  const [summaryState, setSummaryState] = useState<QuerySummaryState | undefined>(
-    querySummary?.state,
-  );
+  const summaryState = useControllerState(querySummary);
   const hasSearched = useRef(false);
 
   useEffect(() => {
@@ -51,7 +50,6 @@ export default function Home() {
     const { executeSearch } = loadSearchActions(engine);
     const { logInterfaceLoad } = loadSearchAnalyticsActions(engine);
     engine.dispatch(executeSearch(logInterfaceLoad()));
-    return querySummary.subscribe(() => setSummaryState(querySummary.state));
   }, [engine, querySummary]);
 
   return (

@@ -1,19 +1,11 @@
 "use client";
 
-import { buildSearchBox, type SearchBoxState } from "@coveo/headless";
-import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { buildSearchBox } from "@coveo/headless";
+import { useEffect, useRef, useState } from "react";
 import { ConfigRequiredDialog } from "@/components/ConfigRequiredDialog";
 import { isCoveoConfigured } from "@/coveo/config";
 import { getSearchEngine } from "@/coveo/engine";
-
-// getServerSnapshot: the engine (src/coveo/engine.ts) is explicitly
-// client-only, so there's no meaningful controller state to read during SSR
-// — returning a stable `undefined` here (instead of reaching into a
-// server-side engine instance that shouldn't exist) avoids a server/client
-// render mismatch.
-function getServerSnapshot() {
-  return undefined;
-}
+import { useControllerState } from "@/coveo/useControllerState";
 
 interface SearchBoxProps {
   /**
@@ -52,46 +44,16 @@ interface SearchBoxProps {
 export function SearchBox({ onNavigate, initialQuery }: SearchBoxProps) {
   const [configured] = useState(() => isCoveoConfigured());
   const [searchBox] = useState(() => (configured ? buildSearchBox(getSearchEngine()) : undefined));
-  // useSyncExternalStore, not subscribe()+setState in a useEffect: Headless
-  // controllers can dispatch synchronously from another component's render
-  // (e.g. SearchUrlSync's buildUrlManager constructor dispatches
-  // restoreSearchParameters while it renders), which would otherwise notify
-  // this already-mounted, already-subscribed SearchBox instance (the one in
-  // the persistent AppHeader) mid-render and trigger React's "Cannot update
-  // a component while rendering a different component" error. This hook is
-  // React's own concurrent-safe mechanism for exactly that class of external
-  // store, so it stays consistent instead of racing.
-  //
-  // `searchBox.state` is a getter that builds a fresh object on every read
-  // rather than a memoized selector, so it can't be handed to
-  // useSyncExternalStore's getSnapshot directly — two calls with no store
-  // change in between would return different references, which triggers
-  // React's "getSnapshot should be cached" loop-detection and an actual
-  // infinite re-render. Cache the last snapshot in a ref and only refresh it
-  // from inside the subscribe callback (i.e. only when the store actually
-  // notified a change).
-  const snapshotRef = useRef<SearchBoxState | undefined>(searchBox?.state);
-  // A stable identity matters here, not just style: an inline arrow function
-  // would recreate this on every render, so React unsubscribes/resubscribes
-  // every render — combined with Headless's subscribe() invoking the
-  // listener once synchronously on subscribe (to sync the new consumer), a
-  // fresh identity every render becomes an infinite render loop.
-  const subscribe = useCallback(
-    (callback: () => void) => {
-      if (!searchBox) {
-        return () => {};
-      }
-      // A bare `searchBox.subscribe` reference loses its `this` binding
-      // (it's a class method) once handed here directly — call it through
-      // the instance.
-      return searchBox.subscribe(() => {
-        snapshotRef.current = searchBox.state;
-        callback();
-      });
-    },
-    [searchBox],
-  );
-  const state = useSyncExternalStore(subscribe, () => snapshotRef.current, getServerSnapshot);
+  // useControllerState (useSyncExternalStore under the hood), not
+  // subscribe()+setState in a useEffect: Headless controllers can dispatch
+  // synchronously from another component's render (e.g. SearchUrlSync's
+  // buildUrlManager constructor dispatches restoreSearchParameters while it
+  // renders), which would otherwise notify this already-mounted,
+  // already-subscribed SearchBox instance (the one in the persistent
+  // AppHeader) mid-render and trigger React's "Cannot update a component
+  // while rendering a different component" error. See
+  // src/coveo/useControllerState.ts for the full mechanics.
+  const state = useControllerState(searchBox);
   const [localValue, setLocalValue] = useState("");
   const [showConfigDialog, setShowConfigDialog] = useState(false);
 

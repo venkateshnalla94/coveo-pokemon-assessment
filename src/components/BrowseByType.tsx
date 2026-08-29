@@ -1,13 +1,14 @@
 "use client";
 
-import { buildFacet, type FacetState } from "@coveo/headless";
+import { buildFacet } from "@coveo/headless";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Chip } from "@/components/ui/Chip";
 import { buildTypeSearchHref } from "@/coveo/browseByTypeUrl";
 import { getSearchEngine } from "@/coveo/engine";
 import { POKEMON_FIELDS } from "@/coveo/fields";
 import { getTypeColor } from "@/coveo/typeColors";
+import { useControllerState } from "@/coveo/useControllerState";
 
 /**
  * The Type facet's real values and counts (an empty-query `buildFacet`, not
@@ -30,9 +31,7 @@ export function BrowseByType() {
   const [facet] = useState(() =>
     buildFacet(getSearchEngine(), { options: { field: POKEMON_FIELDS.type, facetId: "browse-by-type" } }),
   );
-  const [state, setState] = useState<FacetState>(facet.state);
-
-  useEffect(() => facet.subscribe(() => setState(facet.state)), [facet]);
+  const state = useControllerState(facet) ?? facet.state;
 
   if (state.values.length === 0) {
     return null;

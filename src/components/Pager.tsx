@@ -1,14 +1,13 @@
 "use client";
 
-import { buildPager, type PagerState } from "@coveo/headless";
-import { useEffect, useState } from "react";
+import { buildPager } from "@coveo/headless";
+import { useState } from "react";
 import { getSearchEngine } from "@/coveo/engine";
+import { useControllerState } from "@/coveo/useControllerState";
 
 export function Pager() {
   const [pager] = useState(() => buildPager(getSearchEngine()));
-  const [state, setState] = useState<PagerState>(pager.state);
-
-  useEffect(() => pager.subscribe(() => setState(pager.state)), [pager]);
+  const state = useControllerState(pager) ?? pager.state;
 
   if (state.maxPage <= 1) {
     return null;

@@ -22,6 +22,7 @@ import { Tabs } from "@/components/ui/Tabs";
 import { isCoveoConfigured } from "@/coveo/config";
 import { getSearchEngine } from "@/coveo/engine";
 import { deriveSearchRenderState } from "@/coveo/searchRenderState";
+import { useControllerState } from "@/coveo/useControllerState";
 
 const EMPTY_STATE: ResultListState = {
   results: [],
@@ -53,7 +54,7 @@ export default function PokemonDetailPage() {
   const [engine] = useState(() => (configured ? getSearchEngine() : undefined));
   const [searchBox] = useState(() => (engine ? buildSearchBox(engine) : undefined));
   const [resultList] = useState(() => (engine ? buildResultList(engine) : undefined));
-  const [state, setState] = useState<ResultListState>(resultList?.state ?? EMPTY_STATE);
+  const state = useControllerState(resultList) ?? EMPTY_STATE;
 
   const lastSubmittedName = useRef<string | undefined>(undefined);
 
@@ -85,7 +86,6 @@ export default function PokemonDetailPage() {
       // supersedes a stale one), which its own logger reports as an
       // "Action dispatch error ... rejected" even though nothing is broken.
     }
-    return resultList.subscribe(() => setState(resultList.state));
   }, [name, engine, searchBox, resultList]);
 
   const renderState = engine ? deriveSearchRenderState(state, engine) : undefined;

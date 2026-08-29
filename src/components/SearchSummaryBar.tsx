@@ -1,17 +1,11 @@
 "use client";
 
-import {
-  buildBreadcrumbManager,
-  buildQuerySummary,
-  buildSort,
-  type BreadcrumbManagerState,
-  type QuerySummaryState,
-  type SortState,
-} from "@coveo/headless";
-import { useEffect, useState } from "react";
+import { buildBreadcrumbManager, buildQuerySummary, buildSort } from "@coveo/headless";
+import { useState } from "react";
 import { Chip } from "@/components/ui/Chip";
 import { getSearchEngine } from "@/coveo/engine";
 import { SORT_OPTIONS } from "@/coveo/sortOptions";
+import { useControllerState } from "@/coveo/useControllerState";
 
 /**
  * Result count (`buildQuerySummary`) + active-filter breadcrumbs
@@ -26,21 +20,12 @@ export function SearchSummaryBar() {
   const [breadcrumbManager] = useState(() => buildBreadcrumbManager(engine));
   const [sort] = useState(() => buildSort(engine));
 
-  const [summaryState, setSummaryState] = useState<QuerySummaryState>(querySummary.state);
-  const [breadcrumbState, setBreadcrumbState] = useState<BreadcrumbManagerState>(
-    breadcrumbManager.state,
-  );
-  // Only the setter is used — `sort.isSortedBy()` is called directly at
-  // render time below, this state's sole purpose is to force a re-render
-  // whenever the sort controller's state changes.
-  const [, setSortState] = useState<SortState>(sort.state);
-
-  useEffect(() => querySummary.subscribe(() => setSummaryState(querySummary.state)), [querySummary]);
-  useEffect(
-    () => breadcrumbManager.subscribe(() => setBreadcrumbState(breadcrumbManager.state)),
-    [breadcrumbManager],
-  );
-  useEffect(() => sort.subscribe(() => setSortState(sort.state)), [sort]);
+  const summaryState = useControllerState(querySummary) ?? querySummary.state;
+  const breadcrumbState = useControllerState(breadcrumbManager) ?? breadcrumbManager.state;
+  // Only subscribed for re-renders — `sort.isSortedBy()` is called directly
+  // at render time below, this state's sole purpose is to force a
+  // re-render whenever the sort controller's state changes.
+  useControllerState(sort);
 
   if (!summaryState.hasResults && !breadcrumbState.hasBreadcrumbs) {
     return null;

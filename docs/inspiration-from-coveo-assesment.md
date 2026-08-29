@@ -50,8 +50,10 @@ The user flagged this as something they'd worked on in the sibling repo. Investi
 
 ```tsx
 const [generatedAnswer] = useState(() => buildGeneratedAnswer(engine));
-useEffect(() => generatedAnswer?.subscribe(() => setState(generatedAnswer.state)), [generatedAnswer]);
+const state = useControllerState(generatedAnswer);
 ```
+
+(`useControllerState` — see `docs/adr/0010-shared-controller-state-hook.md` — replaced this session's inline `.subscribe()` + `useEffect`-driven `setState`; the subscription mechanism changed, the point below about what governs regeneration didn't.)
 
 Whether the answer regenerates on a facet click is governed by Coveo's own controller logic tied to the engine's search-execution cycle — which facet changes do trigger, since facets and RGA share the same engine/pipeline here (unlike the sibling's fully separate custom provider).
 

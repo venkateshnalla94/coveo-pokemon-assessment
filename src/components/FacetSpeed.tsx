@@ -1,10 +1,11 @@
 "use client";
 
-import { buildNumericFacet, type NumericFacetState } from "@coveo/headless";
-import { useEffect, useState } from "react";
+import { buildNumericFacet } from "@coveo/headless";
+import { useState } from "react";
 import { getSearchEngine } from "@/coveo/engine";
 import { POKEMON_FIELDS } from "@/coveo/fields";
 import { SPEED_RANGES } from "@/coveo/speedFacetRanges";
+import { useControllerState } from "@/coveo/useControllerState";
 
 /**
  * Headless's real `NumericFacet` controller (confirmed against
@@ -24,9 +25,7 @@ export function FacetSpeed() {
       },
     }),
   );
-  const [state, setState] = useState<NumericFacetState>(facet.state);
-
-  useEffect(() => facet.subscribe(() => setState(facet.state)), [facet]);
+  const state = useControllerState(facet) ?? facet.state;
 
   if (state.values.length === 0) {
     return null;

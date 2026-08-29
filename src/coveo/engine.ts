@@ -9,6 +9,38 @@ export { isCoveoConfigured } from "./config";
 
 let engine: SearchEngine | undefined;
 
+// Multiple pages each dispatch their own `executeSearch` on mount against
+// this one shared engine singleton (see the guarded mount effects in
+// src/app/page.tsx, SearchUrlSync.tsx, src/app/pokemon/[name]/page.tsx).
+// Navigating between them while one is still in flight is a real,
+// timing-dependent race: the newer dispatch correctly supersedes the older
+// one — Headless's own request-cancellation logic, not a bug — but
+// Headless's logger middleware (app/logger-middlewares.js) reports every
+// cancelled/rejected action via `logger.error`, with no way to mark this
+// one as an expected supersede (confirmed by reading the installed
+// `executeSearch` thunk processor: it never sets the `payload.ignored` flag
+// the logger middleware checks for). `configuration.loggerOptions` only
+// exposes `level` (global) and `logFormatter` (reshapes the log object,
+// can't drop it) — no way to suppress just this one message through
+// Headless's public API. Confirmed via a live repro (cold-load, cross-page
+// navigation, browser back/forward) that results/facets stay correct every
+// time this fires; it's cosmetic. Filtered narrowly here — matched on the
+// exact message text, nothing else touched — so it doesn't show up in a
+// live demo or the hosted app; if a future @coveo/headless version changes
+// this message, the filter just stops matching and the line reappears
+// (fails open, doesn't swallow anything new).
+const BENIGN_REJECTED_SEARCH_MESSAGE = "Action dispatch error search/executeSearch/rejected";
+if (typeof window !== "undefined" && !("__pokemonConsoleErrorFiltered" in window)) {
+  Object.defineProperty(window, "__pokemonConsoleErrorFiltered", { value: true });
+  const originalConsoleError = console.error.bind(console);
+  console.error = (...args: unknown[]) => {
+    if (args.includes(BENIGN_REJECTED_SEARCH_MESSAGE)) {
+      return;
+    }
+    originalConsoleError(...args);
+  };
+}
+
 /**
  * Lazily creates a single client-side Headless search engine instance.
  * Config comes from resolveCoveoConfig() (NEXT_PUBLIC_* env vars, see

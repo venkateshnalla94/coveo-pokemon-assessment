@@ -28,7 +28,11 @@ export default defineConfig({
         test: {
           name: "jsdom",
           environment: "jsdom",
-          include: ["tests/unit/components/**/*.test.tsx"],
+          // useControllerState.test.tsx lives under tests/unit/coveo/ (it's
+          // not a component) but needs the DOM environment renderHook
+          // requires, hence the explicit second glob entry rather than a
+          // component-only directory match.
+          include: ["tests/unit/components/**/*.test.tsx", "tests/unit/coveo/useControllerState.test.tsx"],
           setupFiles: ["./tests/unit/setup-jsdom.ts"],
         },
       },

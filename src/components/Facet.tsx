@@ -1,9 +1,10 @@
 "use client";
 
-import { buildFacet, type FacetState } from "@coveo/headless";
+import { buildFacet } from "@coveo/headless";
 import type { ReactNode } from "react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { getSearchEngine } from "@/coveo/engine";
+import { useControllerState } from "@/coveo/useControllerState";
 
 interface FacetProps {
   field: string;
@@ -31,9 +32,7 @@ interface FacetProps {
 
 export function Facet({ field, label, renderValue, searchable }: FacetProps) {
   const [facet] = useState(() => buildFacet(getSearchEngine(), { options: { field } }));
-  const [state, setState] = useState<FacetState>(facet.state);
-
-  useEffect(() => facet.subscribe(() => setState(facet.state)), [facet]);
+  const state = useControllerState(facet) ?? facet.state;
 
   const isSearching = searchable && state.facetSearch.query.trim().length > 0;
 

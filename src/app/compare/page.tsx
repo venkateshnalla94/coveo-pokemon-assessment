@@ -16,6 +16,7 @@ import { getSearchEngine } from "@/coveo/engine";
 import { STAT_ORDER } from "@/coveo/pokemonStats";
 import { deriveSearchRenderState } from "@/coveo/searchRenderState";
 import { getTypeColor } from "@/coveo/typeColors";
+import { useControllerState } from "@/coveo/useControllerState";
 
 const EMPTY_STATE: ResultListState = {
   results: [],
@@ -66,7 +67,7 @@ function ComparePageContent() {
   const [engine] = useState(() => (configured ? getSearchEngine() : undefined));
   const [searchBox] = useState(() => (engine ? buildSearchBox(engine) : undefined));
   const [resultList] = useState(() => (engine ? buildResultList(engine) : undefined));
-  const [state, setState] = useState<ResultListState>(resultList?.state ?? EMPTY_STATE);
+  const state = useControllerState(resultList) ?? EMPTY_STATE;
 
   const lastSubmittedKey = useRef<string | undefined>(undefined);
 
@@ -88,7 +89,6 @@ function ComparePageContent() {
       searchBox.updateText("");
       searchBox.submit();
     }
-    return resultList.subscribe(() => setState(resultList.state));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [namesParam, engine, searchBox, resultList]);
 
