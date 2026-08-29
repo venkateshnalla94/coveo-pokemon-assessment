@@ -1,6 +1,6 @@
 # Coveo source & field-mapping spec
 
-Paste-ready reference for the Coveo admin console once org access arrives. Keep this in sync with whatever is actually configured — this is the contract between the source and `src/coveo/fields.ts`.
+The live reference for what's actually configured in the Coveo admin console — org access arrived and both `Pokedex - Test` and `Pokedex - Full` are built and indexing (see `docs/HANDOFF.md`). Keep this in sync with whatever is actually configured — this is the contract between the source and `src/coveo/fields.ts`.
 
 See `docs/EXECUTION-PLAN.md` (Findings that change the build, Adjudicated rulings C1/C2/C3/C6) for the full reasoning behind the fields and rules below — not duplicated at length here.
 
@@ -100,4 +100,4 @@ After indexing the test source, use the admin console's content browser to confi
 
 ## Status
 
-Not yet created — blocked on Coveo Cloud org access.
+Both sources exist and are indexing: `Pokedex - Test` (the 3-document prototyping source referenced throughout this file) and `Pokedex - Full` (the real crawl, 24+ fields as of the Phase v2.1/v2.2 migration — see `docs/HANDOFF.md`'s sixth-session section for the live field count and any drift from this file). The `Pokedex` query pipeline's `filter cq @source==("Pokedex - Full")` rule means the app only ever sees `Pokedex - Full` at runtime; `Pokedex - Test` remains for prototyping new extraction rules before promoting them here.

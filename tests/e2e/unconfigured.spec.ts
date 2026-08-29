@@ -41,7 +41,10 @@ test.describe("search results route", () => {
     await page.goto("/search?q=pikachu");
 
     await expect(page).toHaveTitle(/Pokedex Search/);
-    await expect(page.getByRole("link", { name: /Back to home/i })).toBeVisible();
+    // Step 6 replaced this page's own "← Back to home" link with the
+    // persistent AppHeader wordmark (same href, same destination) mounted
+    // in layout.tsx above every route.
+    await expect(page.getByRole("banner").getByRole("link", { name: "Pokedex Search" })).toBeVisible();
     await expect(page.getByText("Coveo isn't configured yet")).toBeVisible();
   });
 
@@ -53,10 +56,15 @@ test.describe("search results route", () => {
 });
 
 test.describe("pokemon detail route", () => {
-  test("renders without crashing and links back to search", async ({ page }) => {
+  test("renders without crashing and shows a breadcrumb back to home", async ({ page }) => {
     await page.goto("/pokemon/pikachu");
 
-    await expect(page.getByRole("link", { name: /Back to search/i })).toBeVisible();
+    // Step 3 of docs/EXECUTION-PLAN-v2.3-frontend.md replaced the ad-hoc
+    // "← Back to search" link with a real Breadcrumb ("Home / <Name>",
+    // widening to "Home / Search results / <Name>" once Step 5 wires up
+    // `?from=` on ResultList's card links). Assert on the breadcrumb's
+    // "Home" link, which exists in both states.
+    await expect(page.getByRole("navigation", { name: "Breadcrumb" }).getByRole("link", { name: "Home" })).toBeVisible();
     await expect(page.getByText("Coveo isn't configured yet")).toBeVisible();
   });
 });

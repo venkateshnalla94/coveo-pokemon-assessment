@@ -8,7 +8,13 @@ Three AI-generated mockups in `mock-ups/` (a fictional "Monsterdex" app, not a r
 
 Principle 1 additionally favors *"a credible, restrained Coveo customer-style search implementation... not maximal Pokemon theming."* The mockups are a gamified consumer app: gradients, particle/glow effects, emoji-adjacent iconography, a purple "AI Discovery Assistant" chat persona. The recommendation below is to adopt the mockups' **information architecture and interaction patterns** — density, tabs, stat visualization, panel structure, richer AI-answer surfacing — while keeping the visual register closer to this project's current restrained styling than to the mockups' full gamified chrome. This is a judgment call for the next session to make concretely, not resolved here.
 
-## Screen 1: Home page (`A7D995E4...png`)
+## Screen 1: Home page (`BC25DEA1...png`)
+
+<!-- Filename correction, applied when docs/EXECUTION-PLAN-v2.3-frontend.md was
+     actioned: this doc originally had the three screens' filename hashes
+     wrong (each screen's content-type analysis below was correct, only the
+     hash attached to it wasn't). Real mapping, per that plan's opening note:
+     A7D995E4 = search results, 03D97A8B = detail page, BC25DEA1 = home. -->
 
 Hero banner with a search bar, quick-filter chips (Electric/Water/Fire/Grass/Rare/Beginner-friendly/Fast/Cute), a right-rail "AI Discovery Assistant" chat box that answers a typed question with a grounded creature list, a "Featured Creatures" row, and a "Browse by Element" icon grid, plus a "Why you'll love this search experience" feature-callout row (Semantic Search / Powerful Facets / Compare Creatures / AI Answers).
 
@@ -20,7 +26,7 @@ Hero banner with a search bar, quick-filter chips (Electric/Water/Fire/Grass/Rar
 | Featured Creatures row | Would need a "pick N Pokemon" curation mechanism — no real "featured" flag exists | Could default to "most recently viewed" or a fixed curated list; not a data-indexing task |
 | "1,284 Creatures. Infinite Discoveries." headline | Real count is 1025 (this project's actual indexed total) | Straightforward swap to a real, live count |
 
-## Screen 2: Explore / search results (`03D97A8B...png`)
+## Screen 2: Explore / search results (`A7D995E4...png`)
 
 Left sidebar with Type, Habitat, Abilities, a Speed Rating range slider, Rarity, and Evolution Stage facets; an "AI Discovery Assistant" summary bar above the grid; result cards showing Agility/Speed stats and quick-view/compare actions; a persistent comparison tray (up to 3–4 items) with a side-by-side stat table.
 
@@ -35,7 +41,7 @@ Left sidebar with Type, Habitat, Abilities, a Speed Rating range slider, Rarity,
 | Result-card Agility/Speed stats | Speed: yes, real, once indexed. Agility: no real stat by that name (Pokemon's six stats are HP/Attack/Defense/Sp.Atk/Sp.Def/Speed) | Drop "Agility," show real Speed only |
 | Comparison tray (side-by-side stat table) | Yes, entirely — once base stats are indexed, a side-by-side stat comparison across selected Pokemon is real, honest, and a nice reuse of existing data | Client-side feature (selection state, no new backend); good v2.3 candidate |
 
-## Screen 3: Detail page (`BC25DEA1...png`)
+## Screen 3: Detail page (`03D97A8B...png`)
 
 Hero image, breadcrumb, name + dex-style badge + Type/Rarity/Level chips, description, Habitat/Personality rows, action buttons (Add to team/Favorite/Compare), a stat-bar row (HP/Attack/Defense/Agility/Speed + "Special Ability"/"Synergy Score"), tabs (Overview/Abilities/Evolution/Habitat/Similar Creatures), an Evolution Chain visual, an "Abilities & Moves" panel (name/type/power/accuracy/description per move), a "Creature Profile" panel (Height/Weight/Category/Egg Group/Hatch Time/Catch Rate/Base XP/Release XP), a Related Creatures grid, and a right-rail "AI Insights" (RGA summary + citation count) plus an "Ask AI about X" chat box with suggested-question chips.
 

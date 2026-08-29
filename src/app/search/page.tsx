@@ -1,25 +1,30 @@
 "use client";
 
-import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { CoveoConfigBanner } from "@/components/CoveoConfigBanner";
+import { DidYouMean } from "@/components/DidYouMean";
+import { FacetAbilities } from "@/components/FacetAbilities";
 import { FacetGeneration } from "@/components/FacetGeneration";
+import { FacetRail } from "@/components/FacetRail";
+import { FacetSpeed } from "@/components/FacetSpeed";
 import { FacetType } from "@/components/FacetType";
 import { GeneratedAnswer } from "@/components/GeneratedAnswer";
 import { Pager } from "@/components/Pager";
 import { ResultList } from "@/components/ResultList";
 import { SearchBox } from "@/components/SearchBox";
+import { SearchSummaryBar } from "@/components/SearchSummaryBar";
+import { SearchUrlSync } from "@/components/SearchUrlSync";
 import { isCoveoConfigured } from "@/coveo/config";
 
 /**
- * `/search?q=<term>` — the full results experience (facets, results grid,
- * pagination, RGA). Renders the shared `<SearchBox>` as the single source of
- * truth for the query — it's seeded from the URL's `q` param via its
- * `initialQuery` prop (one submit on mount/param-change) and then owns
- * further typing itself, rather than this page privately building its own
- * second `buildSearchBox` controller pointed at the same engine.
- * `useSearchParams()` requires a Suspense boundary, hence the wrapper below.
+ * `/search` — the full results experience (facets, sort, breadcrumbs,
+ * results grid, pagination, RGA). `SearchUrlSync` (`buildUrlManager`) owns
+ * query/facet/sort state here, sourced from and reflected back into the URL
+ * — see SearchUrlSync.tsx's doc comment for why `<SearchBox>` is rendered
+ * WITHOUT `initialQuery` on this route (that prop stays reserved for the
+ * home page's redirect-then-seed flow). `useSearchParams()` (used by
+ * SearchUrlSync and ResultList) requires a Suspense boundary, hence the
+ * wrapper below.
  */
 export default function SearchPage() {
   return (
@@ -30,28 +35,27 @@ export default function SearchPage() {
 }
 
 function SearchPageContent() {
-  const searchParams = useSearchParams();
-  const q = searchParams.get("q") ?? "";
   const configured = isCoveoConfigured();
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-10">
-      <Link href="/" className="mb-6 inline-block text-sm text-black/60 hover:underline dark:text-white/60">
-        &larr; Back to home
-      </Link>
-      <h1 className="mb-4 text-3xl font-bold">Pokedex Search</h1>
+      {configured && <SearchUrlSync />}
       <div className="mb-6">
-        <SearchBox initialQuery={q} />
+        <SearchBox />
       </div>
       {!configured ? (
         <CoveoConfigBanner />
       ) : (
         <div className="grid grid-cols-1 gap-8 md:grid-cols-[200px_1fr]">
-          <aside>
+          <FacetRail>
             <FacetType />
             <FacetGeneration />
-          </aside>
+            <FacetAbilities />
+            <FacetSpeed />
+          </FacetRail>
           <main>
+            <SearchSummaryBar />
+            <DidYouMean />
             <GeneratedAnswer />
             <ResultList />
             <Pager />

@@ -6,16 +6,22 @@ import {
   loadAdvancedSearchQueryActions,
   type ResultListState,
 } from "@coveo/headless";
-import Image from "next/image";
-import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { AbilityList } from "@/components/AbilityList";
 import { AskAboutPokemon } from "@/components/AskAboutPokemon";
+import { Breadcrumb } from "@/components/Breadcrumb";
 import { CoveoConfigBanner } from "@/components/CoveoConfigBanner";
+import { EvolutionChain } from "@/components/EvolutionChain";
+import { PokemonHero } from "@/components/PokemonHero";
+import { PokemonProfilePanel } from "@/components/PokemonProfilePanel";
+import { PokemonStatPanel } from "@/components/PokemonStatPanel";
+import { TrainingPanel } from "@/components/TrainingPanel";
+import { TypeDefenses } from "@/components/TypeDefenses";
+import { Tabs } from "@/components/ui/Tabs";
 import { isCoveoConfigured } from "@/coveo/config";
 import { getSearchEngine } from "@/coveo/engine";
 import { deriveSearchRenderState } from "@/coveo/searchRenderState";
-import { getTypeColor } from "@/coveo/typeColors";
 
 const EMPTY_STATE: ResultListState = {
   results: [],
@@ -32,10 +38,16 @@ const EMPTY_STATE: ResultListState = {
  * rather than a dedicated "fetch by id" API — Headless doesn't expose one
  * outside a search context, and searching by exact name is how a user would
  * reach this page anyway (from a ResultList click).
+ *
+ * This is orchestration + render states only — see
+ * docs/EXECUTION-PLAN-v2.3-frontend.md §4. Presentation lives in the
+ * PokemonHero/PokemonStatPanel/Tabs/panel components it composes below.
  */
 export default function PokemonDetailPage() {
   const params = useParams<{ name: string }>();
   const name = decodeURIComponent(params.name);
+  const searchParams = useSearchParams();
+  const from = searchParams.get("from") ?? undefined;
   const configured = isCoveoConfigured();
 
   const [engine] = useState(() => (configured ? getSearchEngine() : undefined));
@@ -54,6 +66,12 @@ export default function PokemonDetailPage() {
     // "Bulbasaur Pokédex: stats, moves..." not "Bulbasaur", so a free-text
     // `.find()` against `result.title` would (and did) always miss. Escape
     // any literal double quotes in the route param before interpolating.
+    //
+    // The empty `searchBox.updateText("")` here is deliberate and NOT to be
+    // changed to send `name` as query text: doing so would fire RGA's
+    // "Query is not empty" condition on this page, but at the cost of the
+    // exact-match fix this effect exists to provide. This page's AI surface
+    // is Passage Retrieval (AskAboutPokemon), not RGA — see plan §1.3.
     if (lastSubmittedName.current !== name) {
       lastSubmittedName.current = name;
       const escapedName = name.replace(/"/g, '\\"');
@@ -82,9 +100,7 @@ export default function PokemonDetailPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-6 py-10">
-      <Link href="/" className="mb-6 inline-block text-sm text-black/60 hover:underline dark:text-white/60">
-        &larr; Back to search
-      </Link>
+      <Breadcrumb name={name} from={from} />
       {!configured && <CoveoConfigBanner />}
       {renderState?.status === "loading" && <p>Loading...</p>}
       {renderState?.status === "error" && (
@@ -104,38 +120,67 @@ export default function PokemonDetailPage() {
       )}
       {item && (
         <div>
-          <h1 className="mb-4 text-3xl font-bold">{item.name}</h1>
-          {item.imageUrl && (
-            <div className="relative mb-4 h-64 w-64">
-              <Image src={item.imageUrl} alt={item.name} fill className="object-contain" />
-            </div>
-          )}
-          <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
-            <dt className="font-semibold">Type</dt>
-            <dd>
-              {item.types.length > 0 ? (
-                <span className="flex flex-wrap items-center gap-2">
-                  {item.types.map((type) => (
-                    <span key={type} className="inline-flex items-center gap-1.5">
-                      {getTypeColor(type) && (
-                        <span
-                          aria-hidden="true"
-                          className="inline-block h-2 w-2 shrink-0 rounded-full"
-                          style={{ backgroundColor: getTypeColor(type) }}
-                        />
-                      )}
-                      {type}
-                    </span>
-                  ))}
-                </span>
-              ) : (
-                "—"
-              )}
-            </dd>
-            <dt className="font-semibold">Generation</dt>
-            <dd>{item.generation ?? "—"}</dd>
-          </dl>
-          <AskAboutPokemon pokemonName={item.name} />
+          <PokemonHero
+            name={item.name}
+            imageUrl={item.imageUrl}
+            dexNumber={item.dexNumber}
+            types={item.types}
+            species={item.species}
+          />
+          <PokemonStatPanel stats={item.stats} total={item.statTotal} />
+          <Tabs
+            tabs={[
+              {
+                id: "overview",
+                label: "Overview",
+                panel: (
+                  <div className="flex flex-col gap-4">
+                    <PokemonProfilePanel
+                      height={item.height}
+                      weight={item.weight}
+                      species={item.species}
+                      eggGroups={item.breeding.eggGroups}
+                      eggCycles={item.breeding.eggCycles}
+                      catchRate={item.training.catchRate}
+                      baseExp={item.training.baseExp}
+                    />
+                    <TrainingPanel
+                      evYield={item.training.evYield}
+                      baseFriendship={item.training.baseFriendship}
+                      growthRate={item.training.growthRate}
+                    />
+                  </div>
+                ),
+              },
+              {
+                id: "abilities",
+                label: "Abilities",
+                panel: (
+                  <div className="flex flex-col gap-4">
+                    <AbilityList abilities={item.abilities} />
+                    <TypeDefenses
+                      weaknesses={item.defenses.weaknesses}
+                      resistances={item.defenses.resistances}
+                    />
+                  </div>
+                ),
+              },
+              {
+                id: "evolution",
+                label: "Evolution",
+                panel: (
+                  <EvolutionChain
+                    from={item.evolution.from}
+                    to={item.evolution.to}
+                    current={item.name}
+                  />
+                ),
+              },
+            ]}
+          />
+          <aside>
+            <AskAboutPokemon pokemonName={item.name} />
+          </aside>
         </div>
       )}
     </div>

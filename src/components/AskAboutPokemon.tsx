@@ -1,52 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import Markdown, { type Components } from "react-markdown";
-
-// No rehype-raw plugin — raw HTML in a passage (crawled content, ultimately
-// third-party) is never rendered, only markdown syntax is parsed. Table/
-// heading overrides exist only because passage text is often a raw table
-// chunk (see the tabular-content limitation in plan101.md) and the default
-// unstyled <table> is unreadable; the `a` override forces safe link behavior.
-const MARKDOWN_COMPONENTS: Components = {
-  a: ({ children, ...props }) => (
-    <a {...props} target="_blank" rel="noreferrer" className="underline">
-      {children}
-    </a>
-  ),
-  table: ({ children, ...props }) => (
-    <table {...props} className="my-2 w-full border-collapse text-xs">
-      {children}
-    </table>
-  ),
-  th: ({ children, ...props }) => (
-    <th
-      {...props}
-      className="border border-black/10 bg-black/5 px-2 py-1 text-left font-semibold dark:border-white/15 dark:bg-white/10"
-    >
-      {children}
-    </th>
-  ),
-  td: ({ children, ...props }) => (
-    <td {...props} className="border border-black/10 px-2 py-1 dark:border-white/15">
-      {children}
-    </td>
-  ),
-  h1: ({ children, ...props }) => (
-    <h3 {...props} className="mt-2 mb-1 font-semibold">
-      {children}
-    </h3>
-  ),
-  h2: ({ children, ...props }) => (
-    <h3 {...props} className="mt-2 mb-1 font-semibold">
-      {children}
-    </h3>
-  ),
-};
+import { PokemonMarkdown } from "@/components/PokemonMarkdown";
 
 interface AskAboutPokemonProps {
   pokemonName: string;
 }
+
+// Scoped to what the indexed content can actually answer (Passage
+// Retrieval over pokemondb.net vitals/evolution/moves text) — not the
+// mockup's "Best team comps" or "How to train for PvP", which have no
+// answerable content behind them. See docs/EXECUTION-PLAN-v2.3-frontend.md §4.
+const SUGGESTED_QUESTIONS = [
+  "How does it evolve?",
+  "What are its abilities?",
+  "What moves does it learn?",
+] as const;
 
 interface Passage {
   text: string;
@@ -110,6 +79,18 @@ export function AskAboutPokemon({ pokemonName }: AskAboutPokemonProps) {
   return (
     <div className="mt-8 border-t border-black/10 pt-6 dark:border-white/15">
       <h2 className="mb-2 text-lg font-semibold">Ask about {pokemonName}</h2>
+      <div className="mb-2 flex flex-wrap gap-1.5">
+        {SUGGESTED_QUESTIONS.map((question) => (
+          <button
+            key={question}
+            type="button"
+            onClick={() => setQuery(question)}
+            className="rounded-md border border-black/10 px-2 py-0.5 text-xs text-black/70 hover:bg-black/5 dark:border-white/15 dark:text-white/70 dark:hover:bg-white/10"
+          >
+            {question}
+          </button>
+        ))}
+      </div>
       <div className="flex gap-2">
         <input
           type="text"
@@ -155,7 +136,7 @@ export function AskAboutPokemon({ pokemonName }: AskAboutPokemonProps) {
                 <span>Relevance: {(passage.relevanceScore * 100).toFixed(1)}%</span>
               </div>
               <div className="max-h-48 overflow-y-auto">
-                <Markdown components={MARKDOWN_COMPONENTS}>{passage.text}</Markdown>
+                <PokemonMarkdown text={passage.text} />
               </div>
             </li>
           ))}
