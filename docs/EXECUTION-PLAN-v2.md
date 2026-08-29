@@ -49,20 +49,20 @@ Only after v2.1 is fully verified on Test.
 
 ## Phase v2.3 — Frontend enhancement (roadmap only — component spec deferred to the Opus/mockup session)
 
-Per `docs/mockup-ui-analysis.md`'s per-screen breakdown, the pieces with real data support once v2.1/v2.2 land:
+**Status: done**, built in the seventh session per the full component spec that session wrote first (`docs/EXECUTION-PLAN-v2.3-frontend.md`) — see that session's section in `docs/HANDOFF.md` for the step-by-step build log, real bugs found/fixed, and deferred items. Checkboxes below left as originally written for the historical record; all seven shipped:
 
-- [ ] **Creature Profile panel** on the detail page — height/weight/species/egg groups/catch rate/etc. This is the mockup's best-aligned panel; nearly every field maps directly to a v2.1 field.
-- [ ] **Stat bars** — all 6 real base stats (HP/Attack/Defense/Sp.Atk/Sp.Def/Speed), replacing the mockup's fictional 5-stat set (which included a non-existent "Agility" stat).
-- [ ] **Abilities** shown as a real list (replacing the mockup's fabricated "Synergy Score").
-- [ ] **Simplified evolution display** — evolves-from/evolves-into text; full branching-chain visual is a stretch goal.
-- [ ] **Speed range facet + Abilities facet** on the search results page, once those fields exist.
-- [ ] **Comparison tray** (side-by-side stat table across selected Pokemon) — client-side feature, no new data needed beyond stats already being indexed.
-- [ ] **Richer `GeneratedAnswer.tsx`/`AskAboutPokemon.tsx` presentation** — both already exist and work; enhance with suggested-question chips and citation-count framing, not a rebuild.
+- [x] **Creature Profile panel** on the detail page — height/weight/species/egg groups/catch rate/etc. This is the mockup's best-aligned panel; nearly every field maps directly to a v2.1 field.
+- [x] **Stat bars** — all 6 real base stats (HP/Attack/Defense/Sp.Atk/Sp.Def/Speed), replacing the mockup's fictional 5-stat set (which included a non-existent "Agility" stat).
+- [x] **Abilities** shown as a real list (replacing the mockup's fabricated "Synergy Score").
+- [x] **Simplified evolution display** — evolves-from/evolves-into text; full branching-chain visual explicitly deferred (stretch goal, not built — see plan §9).
+- [x] **Speed range facet + Abilities facet** on the search results page.
+- [x] **Comparison tray** (side-by-side stat table across selected Pokemon) — client-side, `sessionStorage`-backed per `docs/adr/0009-client-only-comparison-state.md`.
+- [x] **Richer `GeneratedAnswer.tsx`/`AskAboutPokemon.tsx` presentation** — suggested-question chips, real citation count, markdown content format fix (was defaulting to `text/plain`), shared `PokemonMarkdown.tsx`.
 
 Explicitly **not** building (no real data, or out of scope — see `docs/mockup-ui-analysis.md` for the full per-element reasoning): Rarity, Level, "Synergy Score," Personality tags, a flat Habitat tag, a structured Abilities & Moves table (the real moves data is Hard-feasibility per the inventory doc — point users at the existing Ask-about-this-Pokemon/Passage Retrieval feature instead, which already surfaces move-table content from page body), Add-to-team/Favorites (no server-side persistence model exists per `docs/adr/0004`'s no-server-layer constraint — client-side-only `localStorage` is the only way to build this at all, and that's an explicit scope decision for the FE session, not assumed here).
 
 ## Decisions carried forward, not yet formalized
 
-- Whether "large tables (moves, per-game flavor text) stay as passage-retrievable body content rather than becoming new Coveo custom fields" deserves its own ADR (next number: `docs/adr/0009-...`) — not written now since nothing's been implemented yet; write it if/when v2.1 is actually built, matching this project's "ADR on real decisions, not code comments" convention.
-- Whether a derived "Evolution Stage" facet (basic/stage 1/stage 2, inferable from the simplified evolution fields) is worth building — flagged as a stretch goal in `docs/mockup-ui-analysis.md`, not core v2.1 scope.
-- The Habitat facet/tag has no honest real-data backing as shown in the mockups (see inventory doc §13 and the UI analysis doc) — needs an explicit go/no-go before any FE work assumes it exists.
+- Whether "large tables (moves, per-game flavor text) stay as passage-retrievable body content rather than becoming new Coveo custom fields" deserves its own ADR — still not written; `docs/adr/0009` ended up going to a different decision (client-only comparison state) once the seventh session actually reached Compare, so this one is still unclaimed if it's ever formalized. Not blocking anything: the behavior itself already shipped (Ask-about-this-Pokemon/Passage Retrieval surfaces move-table content from page body, per the "not building a structured Abilities & Moves table" line above), just never got a dedicated ADR.
+- Whether a derived "Evolution Stage" facet (basic/stage 1/stage 2, inferable from the simplified evolution fields) is worth building — flagged as a stretch goal in `docs/mockup-ui-analysis.md`, not built, still open.
+- The Habitat facet/tag has no honest real-data backing as shown in the mockups (see inventory doc §13 and the UI analysis doc) — not built; needs an explicit go/no-go before any FE work assumes it exists.

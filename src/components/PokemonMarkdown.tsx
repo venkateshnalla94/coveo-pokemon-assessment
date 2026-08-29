@@ -1,10 +1,15 @@
 import Markdown, { type Components } from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 /**
  * Shared markdown rendering for both AI-adjacent surfaces that render
  * server-provided markdown text — AskAboutPokemon (Passage Retrieval) and
  * GeneratedAnswer (RGA). One pipeline, not two — see
  * docs/EXECUTION-PLAN-v2.3-frontend.md §5's GeneratedAnswer note.
+ *
+ * remark-gfm is required for the table overrides below to ever fire —
+ * pipe-table syntax is a GFM extension, not CommonMark, so without it
+ * tables parse as plain paragraph text. It does not enable raw HTML.
  *
  * No rehype-raw plugin — raw HTML in either surface's text (crawled
  * content or a generated answer, ultimately grounded in third-party
@@ -51,5 +56,9 @@ const MARKDOWN_COMPONENTS: Components = {
 };
 
 export function PokemonMarkdown({ text }: { text: string }) {
-  return <Markdown components={MARKDOWN_COMPONENTS}>{text}</Markdown>;
+  return (
+    <Markdown remarkPlugins={[remarkGfm]} components={MARKDOWN_COMPONENTS}>
+      {text}
+    </Markdown>
+  );
 }

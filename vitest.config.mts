@@ -1,15 +1,38 @@
+import react from "@vitejs/plugin-react";
 import { defineConfig } from "vitest/config";
 import path from "node:path";
 
+const alias = {
+  "@": path.resolve(import.meta.dirname, "./src"),
+};
+
 export default defineConfig({
-  resolve: {
-    alias: {
-      "@": path.resolve(import.meta.dirname, "./src"),
-    },
-  },
   test: {
-    environment: "node",
-    include: ["tests/unit/**/*.test.ts"],
+    // Two projects, one node (existing src/coveo + api route tests), one
+    // jsdom (new component tests, docs/standards-adoption.md #12b) — kept
+    // in a single vitest.config.mts via `test.projects` rather than a
+    // separate vitest.workspace file, since both projects share the same
+    // path alias and coverage configuration.
+    projects: [
+      {
+        resolve: { alias },
+        test: {
+          name: "node",
+          environment: "node",
+          include: ["tests/unit/**/*.test.ts"],
+        },
+      },
+      {
+        plugins: [react()],
+        resolve: { alias },
+        test: {
+          name: "jsdom",
+          environment: "jsdom",
+          include: ["tests/unit/components/**/*.test.tsx"],
+          setupFiles: ["./tests/unit/setup-jsdom.ts"],
+        },
+      },
+    ],
     coverage: {
       provider: "v8",
       // Narrow, honest scope — files that hold real logic, named explicitly
