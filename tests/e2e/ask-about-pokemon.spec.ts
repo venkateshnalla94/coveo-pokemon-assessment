@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { CONTENT } from "@/content/pokedex";
 
 /**
  * Bonus-tier "Ask about this Pokemon" (Passage Retrieval) golden path —
@@ -39,7 +40,7 @@ test.describe("ask about this Pokemon (configured)", () => {
     await page.goto("/pokemon/eevee");
 
     const input = page.getByPlaceholder(/how does eevee evolve/i);
-    const askButton = page.getByRole("button", { name: "Ask" });
+    const askButton = page.getByRole("button", { name: CONTENT.pdp.askButtonLabel });
 
     await expect(askButton).toBeDisabled();
 

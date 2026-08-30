@@ -55,10 +55,17 @@ describe("deriveGeneratedAnswerRenderState", () => {
     });
   });
 
-  it("returns the answer text once one has been generated", () => {
+  it("returns the answer text once one has been generated and streaming has finished", () => {
     const result = deriveGeneratedAnswerRenderState(
-      buildState({ answer: "Pikachu is an Electric-type Pokemon." }),
+      buildState({ answer: "Pikachu is an Electric-type Pokemon.", isStreaming: false }),
     );
     expect(result).toEqual({ status: "answer", answer: "Pikachu is an Electric-type Pokemon." });
+  });
+
+  it("is streaming while the answer is still growing", () => {
+    const result = deriveGeneratedAnswerRenderState(
+      buildState({ answer: "Pikachu is an Electric", isStreaming: true }),
+    );
+    expect(result).toEqual({ status: "streaming", answer: "Pikachu is an Electric" });
   });
 });

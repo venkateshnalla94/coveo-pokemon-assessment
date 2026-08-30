@@ -68,7 +68,7 @@ export function Tabs({ tabs }: TabsProps) {
 
   return (
     <div>
-      <div role="tablist" className="flex gap-1 border-b border-black/10 dark:border-white/15">
+      <div role="tablist" className="flex gap-1 border-b border-shell-100 dark:border-shell-600">
         {tabs.map((tab) => {
           const selected = tab.id === activeTab?.id;
           return (
@@ -87,8 +87,8 @@ export function Tabs({ tabs }: TabsProps) {
               onKeyDown={handleKeyDown}
               className={
                 selected
-                  ? "rounded-t-md border border-b-0 border-black/10 px-3 py-1.5 text-sm font-semibold text-black dark:border-white/15 dark:text-white"
-                  : "px-3 py-1.5 text-sm text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white"
+                  ? "font-mono-label border-b-2 border-signal-red px-3 py-2 text-xs text-foreground"
+                  : "font-mono-label border-b-2 border-transparent px-3 py-2 text-xs text-shell-400 hover:text-foreground"
               }
             >
               {tab.label}

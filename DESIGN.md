@@ -2,13 +2,16 @@
 name: Pokedex Search
 description: Coveo-powered search over pokemondb.net, built for the Coveo Pokemon Challenge assessment
 colors:
-  ink: "#171717"
-  ink-dark: "#ededed"
-  paper: "#ffffff"
-  paper-dark: "#0a0a0a"
-  hairline: "rgba(0,0,0,0.10)"
-  hairline-dark: "rgba(255,255,255,0.15)"
-  hairline-strong: "rgba(0,0,0,0.30)"
+  shell-900: "#14161C"
+  shell-800: "#1E212A"
+  shell-600: "#3A3F4C"
+  shell-400: "#767D8E"
+  shell-200: "#C7CBD4"
+  shell-100: "#E4E7EC"
+  shell-050: "#F4F5F8"
+  shell-000: "#FFFFFF"
+  signal-red: "#E3350D"
+  signal-glow: "#FF6B4A"
   caution: "#b45309"
   caution-bg: "#fffbeb"
   caution-border: "#fcd34d"
@@ -20,30 +23,25 @@ colors:
   overlay: "rgba(0,0,0,0.40)"
 typography:
   display:
-    fontFamily: "Arial, Helvetica, sans-serif"
-    fontSize: "1.875rem"
-    fontWeight: 700
-    lineHeight: 1.2
-  title:
-    fontFamily: "Arial, Helvetica, sans-serif"
-    fontSize: "1.5rem"
-    fontWeight: 700
-    lineHeight: 1.3
-  label:
-    fontFamily: "Arial, Helvetica, sans-serif"
-    fontSize: "0.875rem"
-    fontWeight: 600
-    letterSpacing: "0.05em"
+    fontFamily: "'Chakra Petch', Arial, Helvetica, sans-serif"
+    fontWeight: "600 | 700"
+    trackingEm: -0.01
   body:
-    fontFamily: "Arial, Helvetica, sans-serif"
-    fontSize: "0.875rem"
-    fontWeight: 400
-    lineHeight: 1.5
-  caption:
-    fontFamily: "Arial, Helvetica, sans-serif"
-    fontSize: "0.75rem"
-    fontWeight: 400
-    lineHeight: 1.4
+    fontFamily: "'IBM Plex Sans', Arial, Helvetica, sans-serif"
+    fontWeight: "400 | 500 | 600"
+  micro:
+    fontFamily: "'IBM Plex Mono', ui-monospace, monospace"
+    fontWeight: "400 | 500"
+    trackingEm: 0.08
+    textTransform: uppercase
+  scale:
+    3xl: "3rem"
+    2xl: "2rem"
+    xl: "1.5rem"
+    lg: "1.125rem"
+    base: "1rem"
+    sm: "0.875rem"
+    xs: "0.75rem"
 rounded:
   sm: "6px"
   md: "6px"
@@ -53,190 +51,252 @@ spacing:
   md: "16px"
   lg: "24px"
   xl: "40px"
-components:
-  input-search:
-    backgroundColor: "{colors.paper}"
-    textColor: "{colors.ink}"
-    rounded: "{rounded.md}"
-    padding: "8px 16px"
-  input-search-focus:
-    backgroundColor: "{colors.paper}"
-    textColor: "{colors.ink}"
-    rounded: "{rounded.md}"
-    padding: "8px 16px"
-  card-result:
-    backgroundColor: "{colors.paper}"
-    textColor: "{colors.ink}"
-    rounded: "{rounded.md}"
-    padding: "12px"
-  button-pager:
-    backgroundColor: "{colors.paper}"
-    textColor: "{colors.ink}"
-    rounded: "{rounded.md}"
-    padding: "4px 12px"
-  banner-caution:
-    backgroundColor: "{colors.caution-bg}"
-    textColor: "{colors.caution}"
-    rounded: "{rounded.md}"
-    padding: "16px"
-  chip-type:
-    backgroundColor: "type color at ~12% alpha"
-    borderColor: "type color at full strength"
-    textColor: "{colors.ink}"
-    rounded: "{rounded.md}"
-    padding: "2px 8px"
-  chip-neutral:
-    backgroundColor: "transparent"
-    borderColor: "{colors.hairline}"
-    textColor: "ink at 70% opacity"
-    rounded: "{rounded.md}"
-    padding: "2px 8px"
-  stat-bar:
-    trackColor: "{colors.hairline}"
-    fillColor: "ink at 85% opacity"
-    rounded: "{rounded.md}"
-    height: "8px"
 ---
 
 # Design System: Pokedex Search
 
-## Overview
+## Status of this document
 
-**Creative North Star: "The Field Reference"**
+This describes the design system as of the v4 token pass
+(`docs/EXECUTION-PLAN-v4-design-system.md`). Two layers exist right now, at
+different stages:
 
-A restrained, data-forward reference tool — closer to a lab notebook or a technical manual than a consumer app. The system is monochrome by default (pure ink-on-paper, no light/dark accent beyond a single functional caution color), because the primary audience is a Coveo panel evaluating whether this reads as a credible, production-shaped search implementation rather than a themed toy. Density and legibility outrank personality; nothing calls attention to itself except a real state change (an error, a warning, a focused input).
+- **Tokens (implemented, this pass):** the Pokemon-type color palette
+  (`src/coveo/typeColors.ts`, emitted as CSS custom properties from
+  `src/app/layout.tsx`), the chrome neutral ramp, the three-font type system
+  (Chakra Petch / IBM Plex Sans / IBM Plex Mono via `next/font/google`), and
+  the 7-step type scale — all real, in `src/app/globals.css` and
+  `src/app/layout.tsx`, not aspirational.
+- **Component visual application (not yet done):** the search bar's Pokeball
+  motion moment, type-lit result tiles, swatch facets, the RGA scan reveal,
+  and the PDP hero rework are specified in
+  `docs/EXECUTION-PLAN-v4-design-system.md` §4–§9 but land in later batches
+  of that plan. Most components today still use the old monochrome
+  ink-on-paper classes described further below — that's accurate as of this
+  pass, not a documentation error.
 
-The monochrome palette was originally a **placeholder**, documented as the honest state of a project still waiting on Coveo org access (see PRODUCT.md § Operating Context). That placeholder period is over: Phase v2.3 promoted Pokemon type color from a decorative dot to a real `Chip` component (see Components below and PRODUCT.md/`docs/EXECUTION-PLAN-v2.3-frontend.md` §1.1) — the system's first and only decorative-color exception, still bounded by The One Accent Rule.
+Chrome copy (labels, headings, placeholders, empty/error messages) has been
+extracted to `src/content/pokedex.ts` — edit that file, not the components,
+for any copy change.
 
-**Key Characteristics:**
-- Ink-on-paper monochrome, one functional caution color, plus the bounded Pokemon-type-color exception confined to `Chip` — nothing else
-- Flat at rest — no shadows except a suggestion dropdown and the config-required modal
-- Thin (10–15% opacity) hairline borders instead of fills or shadows to separate content
-- Small radius (6px) applied uniformly — never sharp, never pill-shaped
-- Compact type scale, left-aligned, no display/hero typography beyond a 30px bold h1
+## Creative direction
+
+**"The device panel."** Type-driven color is the one place this system
+allows real chroma, deliberately bounded (see The One Accent Rule, below,
+now extended to two accents: caution/amber for config errors, and
+`--signal-red` restricted to exactly the Pokeball glyph and the global focus
+ring). Everything else — the shell/chrome neutrals — stays a quiet, cool
+"device housing" ramp, so the type palette and the Pokemon artwork carry the
+personality instead of the chrome. See
+`docs/EXECUTION-PLAN-v4-design-system.md` §0 and §3.2 for the full
+reasoning, including why the earlier "ink-on-paper lab notebook" framing
+(this document's previous version) was retired in favor of this direction.
 
 ## Colors
 
-Monochrome with a single functional accent (caution/amber) reserved for configuration-error states, plus one bounded decorative exception (Pokemon type color, confined to the `Chip` component's `type` variant — see Data Categories).
+### Chrome (`--shell-*`)
 
-### Primary
-- **Ink** (`#171717` light / `#ededed` dark): body text, headings, primary interactive text. The system's only "color" — everything else is a tint or opacity step of this.
+A cool neutral ramp — `--shell-900` (deepest) through `--shell-000` (white)
+— replacing the old flat ink/paper pair. Both light and dark schemes map
+onto this same ramp (see `src/app/globals.css`'s `:root` / `prefers-color-scheme:
+dark` blocks): light mode uses `--shell-050` as page background and
+`--shell-000` as the tile/card surface; dark mode uses `--shell-900` as page
+background and `--shell-800` as the tile/card surface. In both schemes the
+tile surface is lighter than the page chrome — a deliberate, scheme-agnostic
+relationship (`docs/EXECUTION-PLAN-v4-design-system.md` §3.2).
 
-### Neutral
-- **Paper** (`#ffffff` light / `#0a0a0a` dark): page and card background.
-- **Hairline** (`rgba(0,0,0,0.10)` light / `rgba(255,255,255,0.15)` dark): default borders on inputs, cards, buttons, dividers.
-- **Hairline Strong** (`rgba(0,0,0,0.30)` light): focus-state border on the search input — the only border-weight escalation in the system.
-- **Muted Text** (ink at 40–60% opacity, e.g. `text-black/60`, `text-black/50`, `text-black/40`): secondary copy, facet labels, result counts, loading/empty state text — opacity steps substitute for a separate gray scale.
+### Signal (`--signal-red` / `--signal-glow`)
+
+`--signal-red` (`#E3350D`) is restricted to exactly two uses across the
+whole app: the Pokeball glyph and the global focus ring. Never body text,
+never links, never error states. `--signal-glow` (`#FF6B4A`) is its lighter
+companion for the glyph's motion states. If red ever shows up anywhere else,
+that's a bug against this rule, not a stylistic choice — see
+`docs/EXECUTION-PLAN-v4-design-system.md` §3.2 for why (it stops reading as
+a Pokeball cue and starts reading as an alarm).
 
 ### Functional (not decorative)
-- **Caution** (`#b45309` text / `#fffbeb` bg / `#fcd34d` border, light — `#fde68a` text / `#451a03` bg / `#b45309` border, dark): the config-required banner and popup. Reserved exclusively for "Coveo isn't configured" states.
-- **Danger** (`#dc2626` light / `#f87171` dark): inline error text (`ResultList`'s error render state). No background/border treatment yet — text color only.
 
-### Data Categories
-Pokemon type gets its own small color set — one hue per type, from the community-standard convention used across fan reference sites (Bulbapedia/pokemondb.net's own type-color scheme; not an official Nintendo/Pokemon Company brand asset, so it's safe for a publicly hosted app). See `src/coveo/typeColors.ts` for the 18 hex values.
+- **Caution** (`#b45309` text / `#fffbeb` bg / `#fcd34d` border, light —
+  `#fde68a` text / `#451a03` bg / `#b45309` border, dark): the
+  config-required banner and popup. Reserved exclusively for "Coveo isn't
+  configured" states.
+- **Danger** (`#dc2626` light / `#f87171` dark): inline error text
+  (`ResultList`'s error render state). Text color only.
 
-As of Phase v2.3, this renders as the `Chip` component's `type` variant (see Components below) — a real filled chip (type color at ~12% alpha background, the same hue at full strength for the 1px border, ink text), not the small decorative dot this section previously described. The dot/badge distinction still matters: this is a chip, not a text-on-color badge (no white-on-saturated-color text anywhere), and the type name text is always rendered alongside the color, never color alone. Used on the Type facet's options, every result card, the detail page hero, and anywhere else a type or type-derived value (weaknesses, resistances) is shown.
+### Data Categories — Pokemon type
+
+18 hues, one per Pokemon type, from the community-standard convention used
+across fan reference sites (Bulbapedia/pokemondb.net's own type-color
+scheme — not an official Nintendo/Pokemon Company brand asset). The single
+source of truth is `TYPE_COLORS` in `src/coveo/typeColors.ts`; nothing else
+hardcodes these 18 hex values.
+
+Two derived exports off that same file:
+
+- `typeCssVariables()` — serializes all 18 into `--type-<name>: <hex>;`
+  custom-property declarations, emitted from an inline `<style>` in
+  `src/app/layout.tsx` (permitted under this app's CSP — see
+  `docs/EXECUTION-PLAN-v4-design-system.md` §1).
+- `getTypeTextColor(type)` — returns whichever of `#FFFFFF` / `#1A1C22`
+  clears 4.5:1 (WCAG AA) contrast against that type's hex, for solid-fill
+  badge treatments. Every one of the 18 pairs is checked with the actual
+  WCAG relative-luminance formula in
+  `tests/unit/coveo/typeColors.test.ts`, not eyeballed — only 5 of the 18
+  types (fighting, poison, ghost, dragon, dark) clear the threshold with
+  white text; the other 13 use the dark fallback.
+
+Derived per-element forms (glow/tint/edge) are computed with `color-mix()`
+in `oklab` against an inline `--type-primary`/`--type-secondary` pair, not
+baked into CSS as more hex values — see
+`docs/EXECUTION-PLAN-v4-design-system.md` §3.1 for the exact recipes. This
+wiring lands with the component restyle batches, not this token pass.
+
+**The color-alone rule still holds, unchanged:** every type color is always
+paired with the type's text label. Color is decorative reinforcement, never
+the sole carrier of meaning.
 
 ### Named Rules
-**The One Accent Rule.** Saturated *system* color (currently: caution/amber) is reserved for functional meaning and never used decoratively. Pokemon type colors are a separate, bounded exception: a fixed 18-hue data-category palette, used only inside the `Chip` component's `type` variant (a low-alpha fill + full-strength border, paired with the type name as text) — never a solid/saturated fill, never a general-purpose accent, and never applied to anything that isn't a real type/weakness/resistance value.
+
+**The Two-Accent Rule** (supersedes the old One Accent Rule). Two saturated
+*system* colors exist, each reserved for one specific functional meaning and
+never used decoratively: caution/amber for configuration errors,
+`--signal-red` for the Pokeball glyph and focus ring. Pokemon type colors
+remain a separate, bounded data-category exception — a fixed 18-hue palette,
+always paired with the type name as text, never a general-purpose accent.
 
 ## Typography
 
-**Body Font (as rendered):** Geist Sans (`var(--font-sans)`, loaded via `next/font` in `layout.tsx`), falling back to Arial/Helvetica/sans-serif — set on `body` in `globals.css`.
+Three faces, two registers (display and body/micro count as one
+functional register — see the note below), loaded via `next/font/google` in
+`src/app/layout.tsx` and self-hosted at build time (no runtime font fetch,
+per this app's no-server-layer default):
 
-**Character:** A quiet, functional grotesk — deliberately unremarkable rather than expressive, in keeping with The Field Reference. Hierarchy is carried entirely by size + weight, not by a font pairing.
+| Role | Face | Weights | Applied to |
+|:--|:--|:--|:--|
+| Display | Chakra Petch | 600, 700 | page/section headings, Pokemon names, tab labels |
+| Body | IBM Plex Sans | 400, 500, 600 | running text, facet labels, buttons, counts |
+| Micro | IBM Plex Mono | 400, 500 | dex numbers, stat figures, scan tags, field keys |
 
-### Hierarchy
-- **Title** (700, 30px `text-3xl`, 1.2 line-height): the detail page's Pokemon-name h1. (`/` and `/search` no longer carry their own "Pokedex Search" h1 as of Phase v2.3's `AppHeader` — that wordmark is a persistent link in the header, not a page heading, so it isn't part of this hierarchy.)
-- **Label** (600, 14px `text-sm font-semibold`, uppercase, `tracking-wide`): facet group legends ("Type", "Generation", "Abilities", "Speed"), the generated-answer heading, panel section headings (Abilities, Weaknesses, Resistances, Browse by type).
-- **Body** (400, 14px `text-sm`): result names, facet option labels, banner/dialog copy, loading/empty/error states — the workhorse size for nearly everything below the h1.
-- **Body Muted** (400, 14px, ink at 40–60% opacity): secondary/deemphasized body text (subhead copy, result counts, breadcrumbs).
-- **Caption** (400, 12px `text-xs`): the third size, formalized in Phase v2.3. Used where 14px is too loud for a dense, repeated value: stat numerals and labels in `StatBar`/`PokemonStatPanel`, dex numbers and base-stat totals on result cards, `Chip` label text, profile/training table values. This formalizes usage that already existed ad hoc in `ResultList.tsx` and `AskAboutPokemon.tsx` (`text-xs`) before Phase v2.3 named it — see `docs/EXECUTION-PLAN-v2.3-frontend.md` §1.1.
+IBM Plex Sans and IBM Plex Mono are one type superfamily, so this is two
+typefaces in practice: a display face doing editorial work only, and a
+Plex pairing doing everything functional. The display face must never leak
+into a scanning list (facet options, breadcrumbs) — that's the specific
+failure this two-register split exists to avoid.
 
-### Named Rules
-**The Three-Size Rule** (formerly the Two-Size Rule). Three real sizes exist below the h1 — 12px for dense/repeated data (stat numerals, chip labels, per-card metadata), 14px for regular content, and the h1's own 30px for the one remaining page title (the detail page's Pokemon name). This is a deliberate, documented expansion, not scope creep: `ResultList.tsx` and `AskAboutPokemon.tsx` were already using `text-xs` before this rule existed, contradicting the old Two-Size Rule in practice; formalizing 12px as the third step and naming its real use cases (above) closes that gap rather than leaving the rule wrong. Resist adding a fourth size — weight and opacity still do the rest of the differentiation work.
+### Scale
+
+Seven steps at a 16px root, defined once as CSS custom properties in
+`src/app/globals.css`'s unlayered `:root` block (which outranks Tailwind's
+own layered defaults for the same utility names, so `text-3xl` etc. resolve
+to these values app-wide):
+
+| Token | Value | Px |
+|:--|:--|:--|
+| `--text-3xl` | 3rem | 48px |
+| `--text-2xl` | 2rem | 32px |
+| `--text-xl` | 1.5rem | 24px |
+| `--text-lg` | 1.125rem | 18px |
+| `--text-base` | 1rem | 16px |
+| `--text-sm` | 0.875rem | 14px |
+| `--text-xs` | 0.75rem | 12px |
+
+Display text gets `-0.01em` tracking (`.font-display` utility class in
+`globals.css`); mono micro-labels get `+0.08em` tracking and uppercase
+(`.font-mono-label`).
+
+### Historical note
+
+Components written before this pass (most of them, as of this batch) still
+use ad hoc Tailwind text sizes (`text-3xl`, `text-sm`, `text-xs`) rather
+than referencing the named scale tokens directly by name, and render in the
+body face everywhere (no heading yet opts into `.font-display`). That's
+accurate today, not a gap in this document — see "Status of this document"
+above. Component-level application of the display face and the exact 7-step
+scale is `docs/EXECUTION-PLAN-v4-design-system.md` §4–§9 work.
 
 ## Layout
 
-Single-column, centered, max-width-constrained containers — no full-bleed sections. Home (`/`) centers a narrow column (`max-w-2xl`) with generous vertical breathing room (`py-24`) since it holds only a hero and the search box. `/search` widens to `max-w-6xl` and splits into a fixed 200px facet rail + fluid main column (`grid-cols-[200px_1fr]`) above `md`, collapsing to a single stacked column below it. The result grid itself steps 2 → 3 → 4 columns across `base → sm → md` breakpoints with a consistent 16px gap.
+Unchanged by this pass. Single-column, centered, max-width-constrained
+containers — no full-bleed sections. Home (`/`) centers a narrow column
+(`max-w-2xl`); `/search` widens to `max-w-6xl` with a 200px facet rail +
+fluid main column above `md`. The result grid steps 2 → 3 → 4 columns across
+`base → sm → md`. Horizontal page padding is a flat 24px (`px-6`) at every
+breakpoint.
 
-Horizontal page padding is a flat 24px (`px-6`) at every breakpoint — the system does not scale outer padding by viewport, only the grid inside it. Vertical rhythm between stacked blocks is either 24px (`gap-8`/`mb-6`) between major sections or 8–16px between closely related elements (label to list, input to dropdown).
+`docs/EXECUTION-PLAN-v4-design-system.md` §9 widens the PDP specifically
+(`max-w-2xl` → `max-w-5xl`, full-bleed hero band) in a later batch — not yet
+applied.
 
 ### Named Rules
-**The Constrained Column Rule.** Every page is a centered, max-width column, never full-bleed. Width varies by page purpose (2xl for a single input, 6xl for a results grid), but the centering and the cap are constant.
+
+**The Constrained Column Rule.** Every page is a centered, max-width column,
+never full-bleed (the PDP hero band is the one deliberate, scoped exception
+once §9 lands). Width varies by page purpose, but the centering and the cap
+are constant.
 
 ## Elevation & Depth
 
-Flat by default — the vast majority of surfaces (cards, inputs, buttons, banners) have no shadow at all; depth is implied only by the hairline border and a paper/ink contrast. Two exceptions escalate to a real shadow because they visually float above page content rather than sitting in flow: the Query Suggest dropdown (`shadow-md`) and the config-required popup (`shadow-lg`, over a 40%-opacity black overlay).
-
-### Shadow Vocabulary
-- **Floating (`shadow-md`)**: the suggestion dropdown — a transient overlay anchored to the input.
-- **Modal (`shadow-lg` + `bg-black/40` overlay)**: the config-required dialog — the only true modal in the system.
-- **Floating bar (`shadow-lg`, no overlay)**: `CompareTray` (Phase v2.3), fixed to the viewport bottom edge — the one persistent (not transient) floating element in the system. It earns the shadow for the same reason as the other two: it visually detaches from the page's normal document flow.
+Unchanged by this pass. Flat by default; a shadow appears only when an
+element visually detaches from normal page flow: the Query Suggest dropdown
+(`shadow-md`), the config-required modal (`shadow-lg` + overlay), and the
+Compare tray (`shadow-lg`, fixed to the viewport bottom).
 
 ### Named Rules
-**The Flat-Unless-Floating Rule.** A shadow appears only when an element visually detaches from the page's normal flow (a dropdown, a modal) — never on a card, button, or banner that sits in flow, no matter how much emphasis it needs. Emphasis there comes from the caution/danger color, not elevation.
+
+**The Flat-Unless-Floating Rule.** A shadow appears only when an element
+visually detaches from the page's normal flow — never on a card, button, or
+banner that sits in flow, no matter how much emphasis it needs.
 
 ## Shapes
 
-Uniform 6px radius (`rounded-md`) on every bordered surface — inputs, buttons, cards, banners, the modal, facet legends have none (they're plain text). No sharp corners and no pill/fully-rounded shapes exist anywhere in the system; 6px is the only radius value used.
+Unchanged by this pass. Uniform 6px radius on every bordered surface.
 
 ## Components
 
-Quiet and utilitarian: thin low-contrast borders, no shadow at rest, minimal padding, and hover/focus states that shift opacity or border weight rather than introducing color or elevation.
+Component-level visual treatment (Chip solid-fill variant, type-lit result
+tiles, swatch facets, the Pokeball search glyph, the RGA scan reveal, the
+PDP hero rework) is specified in
+`docs/EXECUTION-PLAN-v4-design-system.md` §4–§9 and lands in later batches
+of that plan, not this one. As of this pass, components still render with
+the pre-existing monochrome hairline-border treatment; only the underlying
+tokens (colors, fonts, scale) and the chrome copy (now sourced from
+`src/content/pokedex.ts`) changed.
 
-### Buttons (Pager prev/next, dialog "Got it")
-- **Shape:** 6px radius, 1px hairline border.
-- **Style:** transparent background, ink text, `px-3 py-1` padding.
-- **Disabled (Pager only):** `opacity-40`, no pointer affordance beyond that.
-- **Hover:** the dialog button gets a subtle background tint (`hover:bg-amber-100`/`hover:bg-amber-900`, matching the caution palette since it lives inside that dialog); Pager's numbered buttons swap to a filled `bg-black/[0.05]`/`bg-white/10` state when active/current page.
-
-### Chip (`src/components/ui/Chip.tsx`)
-Introduced in Phase v2.3 as a real, shared primitive — the extraction point for markup that used to be duplicated across `ResultList.tsx`, `FacetType.tsx`, and the detail page. Two variants, both 6px radius, 1px border, 12px (`text-xs`) label text, never a fully-rounded pill:
-- **`type` variant:** background at the Pokemon type's color at ~12% alpha, border at that same hue full-strength, ink text. The type name is always rendered as text alongside the color — this is the one place decorative color exists in the system (see Data Categories), and it never appears without the label. Used on result cards, the Type facet's option rows, the detail page hero, `TypeDefenses` (weaknesses/resistances), and `BrowseByType`.
-- **`neutral` variant:** no color — a plain hairline-bordered pill, ink text at 70% opacity. Used for abilities, egg groups, Compare tray name chips, and active-filter breadcrumb chips — anything that's a real, discrete value but has no color mapping.
-
-### Chips (Facet options — checkbox rows, not the `Chip` component above)
-- **Style:** no visible chip container — rendered as a checkbox + label row (`flex items-center justify-between`), not a pill. This is a checklist, not a filter-tag pattern; a facet option's *label* may itself render as a `Chip` (e.g. `FacetType`'s type-colored rows) without the row itself becoming one.
-- **State:** result count shown at 40% opacity trailing each label; no distinct selected-state background, only the native checkbox's checked state.
-
-### StatBar (`src/components/ui/StatBar.tsx`)
-Introduced in Phase v2.3 for the six base stats (HP/Attack/Defense/Sp. Atk/Sp. Def/Speed) — deliberately monochrome, not the mockup's per-stat color ramp: a red→green gradient would assert a value judgement about base stats the data doesn't make.
-- **Style:** an 8px-tall track at hairline opacity (1px border, 6px radius, no fill), filled with a solid ink-at-85%-opacity bar sized proportionally to the value.
-- **Scale:** anchored to `MAX_BASE_STAT = 255` (`src/coveo/pokemonStats.ts`) — the real in-game base-stat cap (Blissey's HP), not an invented 0–100 or auto-scaled range.
-- **Numeral:** always printed as 12px text beside the bar — the bar's fill length is a visual aid, never the sole way the value is conveyed.
-- **Missing data:** when a stat value is `undefined`, renders a muted em dash row instead of a zero-width bar — a missing field and a real `0` are different facts and must never look the same.
-- **Accessibility:** `role="meter"` with `aria-valuenow`/`aria-valuemin`/`aria-valuemax`.
-
-### Cards (Result grid items)
-- **Corner Style:** 6px radius.
-- **Background:** paper, no tint.
-- **Shadow Strategy:** none (see Elevation) — separation is the hairline border only.
-- **Border:** 1px hairline.
-- **Internal Padding:** 12px (`p-3`).
-
-### Inputs (Search box)
-- **Style:** 1px hairline border, 6px radius, `px-4 py-2` padding, transparent background.
-- **Focus:** border opacity escalates from 10% to 30% (`focus:border-black/30`) — no ring, no color shift, no shadow.
-- **Error/Disabled:** not yet implemented on this component (the config-required state is handled entirely by the popup, not an input-level error style).
-
-### Navigation (Pager)
-- Text-only prev/next buttons flanking numbered page buttons in a centered horizontal row (`justify-center gap-2`), all sharing the button style above. No icons; "Prev"/"Next" are literal text labels.
-
-### Banner / Dialog (CoveoConfigBanner, ConfigRequiredDialog)
-Signature component pair for the system's one real state it has to communicate today. `CoveoConfigBanner` is an inline block (used on `/search` and `/pokemon/[name]` in place of content); `ConfigRequiredDialog` is the same message promoted to a centered modal with an overlay, used on `/` so the config problem never blocks the page and only appears once the user actually tries to search. Both share the caution color exactly — the dialog is the banner's content reused inside a modal shell, not a separate voice.
+`src/components/ui/ImageSlot.tsx` is new this pass: a named, ratio-locked
+image slot (`<ImageSlot name="heroBackdrop" ratio="21/9" label="..." />`)
+that renders a real image once `CONTENT.art[name]` points at a file under
+`public/art/`, or a labeled dashed placeholder frame at the correct
+aspect ratio otherwise — so page layout is correct before any art exists.
+Four slots are wired in this pass (PDP hero backdrop 21:9, home hero banner
+16:5, empty-search illustration 1:1, type-facet section header 4:1); all
+four currently render as placeholders, since no art files exist yet.
 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** keep system-level saturated color (caution/amber) reserved for functional meaning — never decorative.
-- **Do** keep Pokemon type colors scoped to the `Chip` component's `type` variant (low-alpha fill + full-strength border, paired with text) — never a solid/saturated fill, never a general accent.
-- **Do** use the 6px radius on every new bordered surface; don't introduce a second radius scale.
-- **Do** default new surfaces to flat/no-shadow; escalate to a shadow only for something that visually floats above the page (dropdown, modal, toast).
-- **Do** keep pages as a centered, max-width column — pick the width (`2xl`/`6xl`) by page purpose, not by habit.
-- **Do** show a working UI first and surface Coveo-configuration problems contextually (a popup on interaction), never as a page-blocking swap — this is a confirmed product principle (see PRODUCT.md), not just a visual preference.
+- **Do** keep `--signal-red` restricted to the Pokeball glyph and the global
+  focus ring — nothing else, ever.
+- **Do** keep Pokemon type colors sourced from the single `TYPE_COLORS` map
+  in `src/coveo/typeColors.ts` — never a second hardcoded hex list in CSS or
+  a component.
+- **Do** pair every type color with the type's text label; color alone never
+  conveys the value.
+- **Do** use `getTypeTextColor()` for any solid-fill type badge — never
+  assume white or dark text without checking it.
+- **Do** add new chrome copy to `src/content/pokedex.ts`, not inline in a
+  component.
+- **Do** keep pages as a centered, max-width column — pick the width by page
+  purpose, not by habit.
 
 ### Don't:
-- **Don't** add a second accent color without a plan for what it means (see PRODUCT.md's note on future type-color theming) — an accent added purely for visual variety breaks The One Accent Rule.
-- **Don't** introduce shadows on in-flow elements (cards, buttons, banners) to add emphasis — use the caution/danger color instead.
-- **Don't** override `body`'s font-family with a literal fallback stack again — it should always resolve through `var(--font-sans)` first so the loaded Geist font actually renders.
+- **Don't** let `--signal-red` spread into body text, links, or error
+  states — that's what the existing caution/danger colors are for.
+- **Don't** let the display face (Chakra Petch) leak into a scanning list
+  (facet options, breadcrumbs, table rows) — that's the specific failure
+  the two-register system exists to prevent.
+- **Don't** hardcode a Pokemon name, type, stat, or any other Pokemon fact
+  in `src/content/pokedex.ts` — chrome copy only; real values come from the
+  Coveo index at runtime.
+- **Don't** introduce shadows on in-flow elements (cards, buttons, banners)
+  to add emphasis — use the caution/danger color instead.

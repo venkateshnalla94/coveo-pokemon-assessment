@@ -18,7 +18,9 @@ import { PokemonProfilePanel } from "@/components/PokemonProfilePanel";
 import { PokemonStatPanel } from "@/components/PokemonStatPanel";
 import { TrainingPanel } from "@/components/TrainingPanel";
 import { TypeDefenses } from "@/components/TypeDefenses";
+import { ImageSlot } from "@/components/ui/ImageSlot";
 import { Tabs } from "@/components/ui/Tabs";
+import { CONTENT } from "@/content/pokedex";
 import { isCoveoConfigured } from "@/coveo/config";
 import { getSearchEngine } from "@/coveo/engine";
 import { deriveSearchRenderState } from "@/coveo/searchRenderState";
@@ -99,27 +101,37 @@ export default function PokemonDetailPage() {
       : undefined;
 
   return (
-    <div className="mx-auto max-w-2xl px-6 py-10">
+    <div className="mx-auto max-w-5xl px-6 py-10">
       <Breadcrumb name={name} from={from} />
       {!configured && <CoveoConfigBanner />}
-      {renderState?.status === "loading" && <p>Loading...</p>}
+      {renderState?.status === "loading" && <p>{CONTENT.search.loadingLabel}</p>}
       {renderState?.status === "error" && (
         <p className="text-sm text-red-600 dark:text-red-400">{renderState.error.userMessage}</p>
       )}
+      {/* Rewritten during the v4 content-extraction pass: previously this
+          exact literal — leaking "Coveo source is indexing" ops detail —
+          was duplicated verbatim across these two branches. Both now call
+          the single CONTENT.pdp.notFoundBody function. */}
       {renderState?.status === "success" && !item && (
-        <p className="text-sm text-black/50 dark:text-white/50">
-          No match found for &quot;{name}&quot;. Expected until a Coveo source is indexing
-          pokemondb.net.
+        <p className="text-sm text-shell-400">
+          {CONTENT.pdp.notFoundTitle}. {CONTENT.pdp.notFoundBody(name)}
         </p>
       )}
       {renderState?.status === "empty" && (
-        <p className="text-sm text-black/50 dark:text-white/50">
-          No match found for &quot;{name}&quot;. Expected until a Coveo source is indexing
-          pokemondb.net.
+        <p className="text-sm text-shell-400">
+          {CONTENT.pdp.notFoundTitle}. {CONTENT.pdp.notFoundBody(name)}
         </p>
       )}
       {item && (
         <div>
+          {/* Full-bleed hero band (v4 plan §9): breaks out of this page's
+              max-w-5xl container to the viewport's full width via the
+              standard "left-1/2 / -mx-[50vw]" trick, so the backdrop reads
+              as a band rather than a boxed image. PokemonHero's own sprite
+              then overlaps this band from below via a negative top margin. */}
+          <div className="relative left-1/2 right-1/2 mx-[-50vw] w-screen">
+            <ImageSlot name="heroBackdrop" ratio="21/9" label="PDP hero backdrop" />
+          </div>
           <PokemonHero
             name={item.name}
             imageUrl={item.imageUrl}
@@ -127,12 +139,12 @@ export default function PokemonDetailPage() {
             types={item.types}
             species={item.species}
           />
-          <PokemonStatPanel stats={item.stats} total={item.statTotal} />
+          <PokemonStatPanel stats={item.stats} total={item.statTotal} types={item.types} />
           <Tabs
             tabs={[
               {
                 id: "overview",
-                label: "Overview",
+                label: CONTENT.pdp.tabs.overview,
                 panel: (
                   <div className="flex flex-col gap-4">
                     <PokemonProfilePanel
@@ -154,7 +166,7 @@ export default function PokemonDetailPage() {
               },
               {
                 id: "abilities",
-                label: "Abilities",
+                label: CONTENT.pdp.tabs.abilities,
                 panel: (
                   <div className="flex flex-col gap-4">
                     <AbilityList abilities={item.abilities} />
@@ -167,19 +179,21 @@ export default function PokemonDetailPage() {
               },
               {
                 id: "evolution",
-                label: "Evolution",
+                label: CONTENT.pdp.tabs.evolution,
                 panel: (
                   <EvolutionChain
                     from={item.evolution.from}
                     to={item.evolution.to}
                     current={item.name}
+                    currentImageUrl={item.imageUrl}
+                    currentTypes={item.types}
                   />
                 ),
               },
             ]}
           />
           <aside>
-            <AskAboutPokemon pokemonName={item.name} />
+            <AskAboutPokemon pokemonName={item.name} pokemonTypes={item.types} />
           </aside>
         </div>
       )}

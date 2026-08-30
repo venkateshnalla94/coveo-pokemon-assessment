@@ -3,6 +3,7 @@
 import { buildBreadcrumbManager, buildQuerySummary, buildSort } from "@coveo/headless";
 import { useState } from "react";
 import { Chip } from "@/components/ui/Chip";
+import { CONTENT } from "@/content/pokedex";
 import type { CoveoSearchApiError } from "@/coveo/applicationError";
 import { getSearchEngine } from "@/coveo/engine";
 import { SORT_OPTIONS } from "@/coveo/sortOptions";
@@ -41,11 +42,11 @@ export function SearchSummaryBar() {
       <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-black/60 dark:text-white/60">
         <p>
           {summaryState.hasResults
-            ? `Results ${summaryState.firstResult}-${summaryState.lastResult} of ${summaryState.total}`
+            ? CONTENT.search.resultsSummary(summaryState.firstResult, summaryState.lastResult, summaryState.total)
             : null}
         </p>
         <label className="flex items-center gap-2">
-          Sort by
+          {CONTENT.search.sortByLabel}
           <select
             value={activeSortOption.id}
             onChange={(e) => {
@@ -71,7 +72,7 @@ export function SearchSummaryBar() {
                 const error = engine.state.search.error as CoveoSearchApiError | null;
                 if (error?.type === "InvalidSortValueException") {
                   sort.sortBy(SORT_OPTIONS[0].criterion);
-                  setSortWarning(`"${option.label}" sort isn't available right now — showing relevance instead.`);
+                  setSortWarning(CONTENT.search.sortUnavailableWarning(option.label));
                 }
               });
             }}
@@ -100,7 +101,7 @@ export function SearchSummaryBar() {
                 <Chip label={`${value.value.value}`} variant="neutral" />
                 <button
                   type="button"
-                  aria-label={`Remove filter ${value.value.value}`}
+                  aria-label={CONTENT.search.removeFilterLabel(`${value.value.value}`)}
                   onClick={() => value.deselect()}
                   className="text-black/40 hover:text-black dark:text-white/40 dark:hover:text-white"
                 >
@@ -118,7 +119,7 @@ export function SearchSummaryBar() {
                 <Chip label={`${value.value.start}-${value.value.end}`} variant="neutral" />
                 <button
                   type="button"
-                  aria-label={`Remove filter ${value.value.start}-${value.value.end}`}
+                  aria-label={CONTENT.search.removeFilterLabel(`${value.value.start}-${value.value.end}`)}
                   onClick={() => value.deselect()}
                   className="text-black/40 hover:text-black dark:text-white/40 dark:hover:text-white"
                 >
@@ -133,7 +134,7 @@ export function SearchSummaryBar() {
                 <Chip label={`${value.value.value}`} variant="neutral" />
                 <button
                   type="button"
-                  aria-label={`Remove filter ${value.value.value}`}
+                  aria-label={CONTENT.search.removeFilterLabel(`${value.value.value}`)}
                   onClick={() => value.deselect()}
                   className="text-black/40 hover:text-black dark:text-white/40 dark:hover:text-white"
                 >
@@ -147,7 +148,7 @@ export function SearchSummaryBar() {
             onClick={() => breadcrumbManager.deselectAll()}
             className="text-xs text-black/60 hover:underline dark:text-white/60"
           >
-            Clear all
+            {CONTENT.search.clearAllLabel}
           </button>
         </div>
       )}

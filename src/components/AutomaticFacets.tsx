@@ -3,6 +3,7 @@
 import { buildAutomaticFacetGenerator, type AutomaticFacet } from "@coveo/headless";
 import { useState } from "react";
 import { Chip } from "@/components/ui/Chip";
+import { TypeSwatch } from "@/components/ui/TypeSwatch";
 import { getSearchEngine } from "@/coveo/engine";
 import { POKEMON_FIELDS } from "@/coveo/fields";
 import { getTypeColor } from "@/coveo/typeColors";
@@ -71,11 +72,34 @@ function AutomaticFacetFieldset({ facet }: { facet: AutomaticFacet }) {
           <li key={value.value}>
             <label className="flex cursor-pointer items-center justify-between gap-2 text-sm">
               <span className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={value.state === "selected"}
-                  onChange={() => facet.toggleSelect(value)}
-                />
+                {useChip ? (
+                  // Swatch geometry: 24px visual inside a 32px hit target
+                  // (v4 plan §6). The native checkbox stays in the DOM,
+                  // visually hidden under the swatch rather than replaced
+                  // by it — unlabeled color swatches are a documented
+                  // accessibility failure, and this is also what
+                  // AutomaticFacets.test.tsx's `within(row).getByRole(
+                  // "checkbox")` requires.
+                  <span className="relative flex h-8 w-8 shrink-0 items-center justify-center">
+                    <input
+                      type="checkbox"
+                      checked={value.state === "selected"}
+                      onChange={() => facet.toggleSelect(value)}
+                      // sr-only clips any outline drawn on the input itself,
+                      // so its keyboard focus ring is painted on the
+                      // visible swatch sibling instead — see
+                      // `.swatch-checkbox:focus-visible + *` in globals.css.
+                      className="swatch-checkbox sr-only"
+                    />
+                    <TypeSwatch label={value.value} selected={value.state === "selected"} />
+                  </span>
+                ) : (
+                  <input
+                    type="checkbox"
+                    checked={value.state === "selected"}
+                    onChange={() => facet.toggleSelect(value)}
+                  />
+                )}
                 {useChip ? (
                   <Chip label={value.value} color={getTypeColor(value.value)} variant="type" />
                 ) : (

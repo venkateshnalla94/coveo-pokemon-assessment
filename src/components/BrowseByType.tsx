@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { Chip } from "@/components/ui/Chip";
+import { ImageSlot } from "@/components/ui/ImageSlot";
+import { CONTENT } from "@/content/pokedex";
 import { buildTypeSearchHref } from "@/coveo/browseByTypeUrl";
 import { getTypeColor, POKEMON_TYPES } from "@/coveo/typeColors";
 
@@ -15,8 +17,11 @@ import { getTypeColor, POKEMON_TYPES } from "@/coveo/typeColors";
 export function BrowseByType() {
   return (
     <div className="w-full">
+      <div className="mb-3">
+        <ImageSlot name="typeFacetHeader" ratio="4/1" label="Type-facet section header" />
+      </div>
       <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-black/60 dark:text-white/60">
-        Browse by type
+        {CONTENT.home.browseByTypeHeading}
       </h2>
       <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3">
         {POKEMON_TYPES.map((type) => (

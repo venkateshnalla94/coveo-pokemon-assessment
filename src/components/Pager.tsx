@@ -2,6 +2,7 @@
 
 import { buildPager } from "@coveo/headless";
 import { useState } from "react";
+import { CONTENT } from "@/content/pokedex";
 import { getSearchEngine } from "@/coveo/engine";
 import { useControllerState } from "@/coveo/useControllerState";
 
@@ -19,9 +20,9 @@ export function Pager() {
         type="button"
         onClick={() => pager.previousPage()}
         disabled={!state.hasPreviousPage}
-        className="rounded-md border border-black/10 px-3 py-1 disabled:opacity-40 dark:border-white/15"
+        className="rounded-md border border-shell-100 px-3 py-1 text-foreground disabled:opacity-40 dark:border-shell-600"
       >
-        Previous
+        {CONTENT.search.pagerPreviousLabel}
       </button>
       {state.currentPages.map((page) => (
         <button
@@ -29,10 +30,8 @@ export function Pager() {
           type="button"
           onClick={() => pager.selectPage(page)}
           aria-current={pager.isCurrentPage(page) ? "page" : undefined}
-          className={`rounded-md border px-3 py-1 ${
-            pager.isCurrentPage(page)
-              ? "border-black/30 font-semibold dark:border-white/40"
-              : "border-black/10 dark:border-white/15"
+          className={`rounded-md border px-3 py-1 text-foreground ${
+            pager.isCurrentPage(page) ? "border-shell-400 font-semibold" : "border-shell-100 dark:border-shell-600"
           }`}
         >
           {page}
@@ -42,9 +41,9 @@ export function Pager() {
         type="button"
         onClick={() => pager.nextPage()}
         disabled={!state.hasNextPage}
-        className="rounded-md border border-black/10 px-3 py-1 disabled:opacity-40 dark:border-white/15"
+        className="rounded-md border border-shell-100 px-3 py-1 text-foreground disabled:opacity-40 dark:border-shell-600"
       >
-        Next
+        {CONTENT.search.pagerNextLabel}
       </button>
     </nav>
   );

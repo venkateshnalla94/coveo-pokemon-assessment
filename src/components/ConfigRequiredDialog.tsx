@@ -1,5 +1,8 @@
 "use client";
 
+import { ConfigRequiredMessage } from "@/components/ConfigRequiredMessage";
+import { CONTENT } from "@/content/pokedex";
+
 interface ConfigRequiredDialogProps {
   onClose: () => void;
 }
@@ -21,18 +24,15 @@ export function ConfigRequiredDialog({ onClose }: ConfigRequiredDialogProps) {
         className="w-full max-w-sm rounded-md border border-amber-300 bg-amber-50 p-5 text-sm text-amber-900 shadow-lg dark:border-amber-700 dark:bg-amber-950 dark:text-amber-200"
         onClick={(e) => e.stopPropagation()}
       >
-        <p className="mb-4">
-          Coveo isn&apos;t configured yet. Copy <code>.env.example</code> to{" "}
-          <code>.env.local</code> and set <code>NEXT_PUBLIC_COVEO_ORGANIZATION_ID</code> (client)
-          and <code>COVEO_API_KEY</code> (server-only, used by <code>/api/token</code>) once org
-          access is granted.
-        </p>
+        <div className="mb-4">
+          <ConfigRequiredMessage />
+        </div>
         <button
           type="button"
           onClick={onClose}
           className="rounded-md border border-amber-300 px-3 py-1 text-amber-900 hover:bg-amber-100 dark:border-amber-700 dark:text-amber-200 dark:hover:bg-amber-900"
         >
-          Got it
+          {CONTENT.brand.gotItLabel}
         </button>
       </div>
     </div>

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCompare } from "@/components/compare/CompareProvider";
 import { Chip } from "@/components/ui/Chip";
+import { CONTENT } from "@/content/pokedex";
 
 /**
  * The one deliberately "floating" surface in the app — DESIGN.md's
@@ -25,7 +26,7 @@ export function CompareTray() {
     <div className="fixed inset-x-0 bottom-0 z-40 border-t border-black/10 bg-white p-3 shadow-lg dark:border-white/15 dark:bg-black">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-3 px-3">
         <span className="text-xs font-semibold uppercase tracking-wide text-black/60 dark:text-white/60">
-          Compare
+          {CONTENT.compare.trayLabel}
         </span>
         <ul className="flex flex-wrap items-center gap-1.5" aria-label="Selected for comparison">
           {names.map((name) => (
@@ -34,7 +35,7 @@ export function CompareTray() {
                 <Chip label={name} variant="neutral" />
                 <button
                   type="button"
-                  aria-label={`Remove ${name} from comparison`}
+                  aria-label={CONTENT.compare.removeFromComparisonLabel(name)}
                   onClick={() => remove(name)}
                   className="text-black/40 hover:text-black dark:text-white/40 dark:hover:text-white"
                 >
@@ -49,13 +50,13 @@ export function CompareTray() {
           onClick={clear}
           className="text-xs text-black/60 hover:underline dark:text-white/60"
         >
-          Clear all
+          {CONTENT.compare.clearAllLabel}
         </button>
         <Link
           href={compareHref}
           className="ml-auto rounded-md border border-black/10 px-3 py-1 text-sm font-semibold hover:bg-black/5 dark:border-white/15 dark:hover:bg-white/10"
         >
-          Compare ({names.length})
+          {CONTENT.compare.trayLinkLabel(names.length)}
         </Link>
       </div>
     </div>

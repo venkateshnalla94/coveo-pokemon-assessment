@@ -3,6 +3,7 @@
 import { buildFacet } from "@coveo/headless";
 import type { ReactNode } from "react";
 import { useState } from "react";
+import { CONTENT } from "@/content/pokedex";
 import { getSearchEngine } from "@/coveo/engine";
 import { useControllerState } from "@/coveo/useControllerState";
 
@@ -61,7 +62,7 @@ export function Facet({ field, label, renderValue, searchable }: FacetProps) {
         <input
           type="text"
           value={state.facetSearch.query}
-          placeholder={`Search ${label.toLowerCase()}...`}
+          placeholder={CONTENT.search.facetSearchPlaceholder(label)}
           className="mb-2 w-full rounded-md border border-black/10 px-2 py-1 text-sm outline-none focus:border-black/30 dark:border-white/15 dark:focus:border-white/30"
           onChange={(e) => {
             facet.facetSearch.updateText(e.target.value);
@@ -72,18 +73,26 @@ export function Facet({ field, label, renderValue, searchable }: FacetProps) {
       {isSearching ? (
         <ul className="space-y-1">
           {state.facetSearch.values.length === 0 && (
-            <li className="text-sm text-black/40 dark:text-white/40">No matches.</li>
+            <li className="text-sm text-black/40 dark:text-white/40">{CONTENT.search.facetNoMatches}</li>
           )}
           {state.facetSearch.values.map((result) => (
             <li key={result.rawValue}>
-              <button
-                type="button"
-                onClick={() => facet.facetSearch.select(result)}
-                className="flex w-full cursor-pointer items-center justify-between gap-2 text-left text-sm hover:underline"
-              >
-                <span>{renderValue ? renderValue(result.rawValue) : result.displayValue}</span>
+              {/* A checkbox here, matching the normal (non-searching)
+                  branch below — not a <button> — so a facet value reads
+                  the same way to assistive tech regardless of whether the
+                  user typed in the facet-search box (v4 plan §6).
+                  `SpecificFacetSearchResult` carries no selected-state flag
+                  (confirmed against Headless's own
+                  headless-facet-search.d.ts), so this always renders
+                  unchecked; checking it calls the same
+                  `facet.facetSearch.select(result)` the button used to. */}
+              <label className="flex cursor-pointer items-center justify-between gap-2 text-sm">
+                <span className="flex items-center gap-2">
+                  <input type="checkbox" checked={false} onChange={() => facet.facetSearch.select(result)} />
+                  {renderValue ? renderValue(result.rawValue) : result.displayValue}
+                </span>
                 <span className="text-black/40 dark:text-white/40">{result.count}</span>
-              </button>
+              </label>
             </li>
           ))}
         </ul>

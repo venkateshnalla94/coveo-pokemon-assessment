@@ -1,6 +1,7 @@
 "use client";
 
 import { Facet } from "@/components/Facet";
+import { CONTENT } from "@/content/pokedex";
 import { POKEMON_FIELDS } from "@/coveo/fields";
 
 /**
@@ -10,5 +11,5 @@ import { POKEMON_FIELDS } from "@/coveo/fields";
  * second parallel facet component — see docs/EXECUTION-PLAN-v2.3-frontend.md §5.
  */
 export function FacetAbilities() {
-  return <Facet field={POKEMON_FIELDS.abilities} label="Abilities" searchable />;
+  return <Facet field={POKEMON_FIELDS.abilities} label={CONTENT.search.facetLabels.abilities} searchable />;
 }

@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { CONTENT } from "@/content/pokedex";
 
 /**
  * Smoke tests only — this asserts today's real, unconfigured-Coveo behavior
@@ -15,20 +16,20 @@ test.describe("homepage", () => {
   }) => {
     await page.goto("/");
 
-    await expect(page).toHaveTitle(/Pokedex Search/);
-    await expect(page.getByPlaceholder("Search for a Pokemon...")).toBeVisible();
-    await expect(page.getByText("Coveo isn't configured yet")).not.toBeVisible();
+    await expect(page).toHaveTitle(new RegExp(CONTENT.brand.name));
+    await expect(page.getByPlaceholder(CONTENT.search.placeholder)).toBeVisible();
+    await expect(page.getByText(CONTENT.brand.configRequiredTitle)).not.toBeVisible();
   });
 
   test("surfaces a config-error popup only once the user tries to search", async ({ page }) => {
     await page.goto("/");
 
-    const input = page.getByPlaceholder("Search for a Pokemon...");
+    const input = page.getByPlaceholder(CONTENT.search.placeholder);
     await input.fill("pikachu");
     await input.press("Enter");
 
     await expect(page.getByRole("alertdialog")).toBeVisible();
-    await expect(page.getByText("Coveo isn't configured yet")).toBeVisible();
+    await expect(page.getByText(CONTENT.brand.configRequiredTitle)).toBeVisible();
     // Submitting doesn't navigate away while unconfigured.
     await expect(page).toHaveURL("/");
   });
@@ -40,18 +41,18 @@ test.describe("search results route", () => {
   }) => {
     await page.goto("/search?q=pikachu");
 
-    await expect(page).toHaveTitle(/Pokedex Search/);
+    await expect(page).toHaveTitle(new RegExp(CONTENT.brand.name));
     // Step 6 replaced this page's own "← Back to home" link with the
     // persistent AppHeader wordmark (same href, same destination) mounted
     // in layout.tsx above every route.
-    await expect(page.getByRole("banner").getByRole("link", { name: "Pokedex Search" })).toBeVisible();
-    await expect(page.getByText("Coveo isn't configured yet")).toBeVisible();
+    await expect(page.getByRole("banner").getByRole("link", { name: CONTENT.brand.name })).toBeVisible();
+    await expect(page.getByText(CONTENT.brand.configRequiredTitle)).toBeVisible();
   });
 
   test("also renders when reached directly without a q param", async ({ page }) => {
     await page.goto("/search");
 
-    await expect(page.getByText("Coveo isn't configured yet")).toBeVisible();
+    await expect(page.getByText(CONTENT.brand.configRequiredTitle)).toBeVisible();
   });
 });
 
@@ -64,7 +65,7 @@ test.describe("pokemon detail route", () => {
     // widening to "Home / Search results / <Name>" once Step 5 wires up
     // `?from=` on ResultList's card links). Assert on the breadcrumb's
     // "Home" link, which exists in both states.
-    await expect(page.getByRole("navigation", { name: "Breadcrumb" }).getByRole("link", { name: "Home" })).toBeVisible();
-    await expect(page.getByText("Coveo isn't configured yet")).toBeVisible();
+    await expect(page.getByRole("navigation", { name: "Breadcrumb" }).getByRole("link", { name: CONTENT.pdp.breadcrumbHome })).toBeVisible();
+    await expect(page.getByText(CONTENT.brand.configRequiredTitle)).toBeVisible();
   });
 });

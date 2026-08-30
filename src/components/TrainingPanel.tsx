@@ -1,4 +1,5 @@
 import { DataList } from "@/components/ui/DataList";
+import { CONTENT } from "@/content/pokedex";
 
 /** EV yield, base friendship, growth rate — see docs/EXECUTION-PLAN-v2.3-frontend.md §4. */
 export interface TrainingPanelProps {
@@ -11,9 +12,9 @@ export function TrainingPanel({ evYield, baseFriendship, growthRate }: TrainingP
   return (
     <DataList
       rows={[
-        { label: "EV yield", value: evYield },
-        { label: "Base friendship", value: baseFriendship },
-        { label: "Growth rate", value: growthRate },
+        { label: CONTENT.pdp.trainingLabels.evYield, value: evYield },
+        { label: CONTENT.pdp.trainingLabels.baseFriendship, value: baseFriendship },
+        { label: CONTENT.pdp.trainingLabels.growthRate, value: growthRate },
       ]}
     />
   );

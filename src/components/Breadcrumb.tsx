@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CONTENT } from "@/content/pokedex";
 
 /**
  * "Home / Search results / <Name>" for the detail page. The middle crumb
@@ -17,11 +18,11 @@ export interface BreadcrumbProps {
 
 export function Breadcrumb({ name, from }: BreadcrumbProps) {
   return (
-    <nav aria-label="Breadcrumb" className="mb-6 text-sm text-black/60 dark:text-white/60">
+    <nav aria-label="Breadcrumb" className="mb-6 text-sm text-shell-400">
       <ol className="flex flex-wrap items-center gap-1">
         <li>
           <Link href="/" className="hover:underline">
-            Home
+            {CONTENT.pdp.breadcrumbHome}
           </Link>
         </li>
         {from && (
@@ -29,13 +30,13 @@ export function Breadcrumb({ name, from }: BreadcrumbProps) {
             <li aria-hidden="true">/</li>
             <li>
               <Link href={from} className="hover:underline">
-                Search results
+                {CONTENT.pdp.breadcrumbSearchResults}
               </Link>
             </li>
           </>
         )}
         <li aria-hidden="true">/</li>
-        <li aria-current="page" className="text-black dark:text-white">
+        <li aria-current="page" className="text-foreground">
           {name}
         </li>
       </ol>

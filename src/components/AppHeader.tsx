@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { SearchBox } from "@/components/SearchBox";
+import { CONTENT } from "@/content/pokedex";
 
 /**
  * Minimal persistent header — see docs/EXECUTION-PLAN-v2.3-frontend.md §7.
@@ -24,10 +25,10 @@ export function AppHeader() {
   const isDetailPage = pathname.startsWith("/pokemon/");
 
   return (
-    <header className="border-b border-black/10 px-6 py-3 dark:border-white/15">
+    <header className="border-b border-shell-100 bg-surface px-6 py-3 dark:border-shell-600">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
-        <Link href="/" className="shrink-0 text-sm font-semibold">
-          Pokedex Search
+        <Link href="/" className="font-display shrink-0 text-sm font-semibold text-foreground">
+          {CONTENT.brand.name}
         </Link>
         {isDetailPage && (
           <div className="w-full max-w-xs">

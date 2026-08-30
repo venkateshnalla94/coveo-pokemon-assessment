@@ -1,4 +1,5 @@
 import { DataList } from "@/components/ui/DataList";
+import { CONTENT } from "@/content/pokedex";
 
 /**
  * Height/weight/species/egg groups/hatch/catch rate/base exp — see
@@ -28,13 +29,16 @@ export function PokemonProfilePanel({
   return (
     <DataList
       rows={[
-        { label: "Species", value: species },
-        { label: "Height", value: height },
-        { label: "Weight", value: weight },
-        { label: "Egg groups", value: eggGroups.length > 0 ? eggGroups.join(", ") : undefined },
-        { label: "Egg cycles", value: eggCycles },
-        { label: "Catch rate", value: catchRate },
-        { label: "Base Exp.", value: baseExp },
+        { label: CONTENT.pdp.profileLabels.species, value: species },
+        { label: CONTENT.pdp.profileLabels.height, value: height },
+        { label: CONTENT.pdp.profileLabels.weight, value: weight },
+        {
+          label: CONTENT.pdp.profileLabels.eggGroups,
+          value: eggGroups.length > 0 ? eggGroups.join(", ") : undefined,
+        },
+        { label: CONTENT.pdp.profileLabels.eggCycles, value: eggCycles },
+        { label: CONTENT.pdp.profileLabels.catchRate, value: catchRate },
+        { label: CONTENT.pdp.profileLabels.baseExp, value: baseExp },
       ]}
     />
   );

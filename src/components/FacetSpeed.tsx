@@ -2,6 +2,7 @@
 
 import { buildNumericFacet } from "@coveo/headless";
 import { useState } from "react";
+import { CONTENT } from "@/content/pokedex";
 import { getSearchEngine } from "@/coveo/engine";
 import { POKEMON_FIELDS } from "@/coveo/fields";
 import { SPEED_RANGES } from "@/coveo/speedFacetRanges";
@@ -41,7 +42,7 @@ export function FacetSpeed() {
   return (
     <fieldset className="mb-6">
       <legend className="mb-2 text-sm font-semibold uppercase tracking-wide text-black/60 dark:text-white/60">
-        Speed
+        {CONTENT.search.facetLabels.speed}
       </legend>
       <ul className="space-y-1">
         {state.values.map((value) => {

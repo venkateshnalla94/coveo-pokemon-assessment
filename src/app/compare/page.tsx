@@ -11,6 +11,7 @@ import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { Chip } from "@/components/ui/Chip";
 import { CoveoConfigBanner } from "@/components/CoveoConfigBanner";
+import { CONTENT } from "@/content/pokedex";
 import { isCoveoConfigured } from "@/coveo/config";
 import { getSearchEngine } from "@/coveo/engine";
 import { STAT_ORDER } from "@/coveo/pokemonStats";
@@ -41,7 +42,7 @@ const EMPTY_STATE: ResultListState = {
  */
 export default function ComparePage() {
   return (
-    <Suspense fallback={<p className="mx-auto max-w-6xl px-6 py-10">Loading...</p>}>
+    <Suspense fallback={<p className="mx-auto max-w-6xl px-6 py-10">{CONTENT.search.loadingLabel}</p>}>
       <ComparePageContent />
     </Suspense>
   );
@@ -97,27 +98,26 @@ function ComparePageContent() {
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-10">
-      <Link href="/" className="mb-6 inline-block text-sm text-black/60 hover:underline dark:text-white/60">
-        &larr; Back to search
+      <Link href="/" className="mb-6 inline-block text-sm text-shell-400 hover:underline hover:text-foreground">
+        {CONTENT.compare.backLinkLabel}
       </Link>
-      <h1 className="mb-6 text-3xl font-bold">Compare</h1>
+      <h1 className="font-display mb-6 text-3xl font-bold text-foreground">{CONTENT.compare.pageTitle}</h1>
 
       {!configured && <CoveoConfigBanner />}
 
       {names.length === 0 && configured && (
-        <p className="text-sm text-black/50 dark:text-white/50">
-          No Pokemon selected. Go back to search results and add up to 4 to compare.
+        <p className="text-sm text-shell-400">
+          {CONTENT.compare.emptySelectionMessage}
         </p>
       )}
 
-      {renderState?.status === "loading" && <p>Loading...</p>}
+      {renderState?.status === "loading" && <p>{CONTENT.search.loadingLabel}</p>}
       {renderState?.status === "error" && (
         <p className="text-sm text-red-600 dark:text-red-400">{renderState.error.userMessage}</p>
       )}
       {renderState?.status === "empty" && names.length > 0 && (
-        <p className="text-sm text-black/50 dark:text-white/50">
-          No match found for the selected names. Expected until a Coveo source is indexing
-          pokemondb.net.
+        <p className="text-sm text-shell-400">
+          {CONTENT.compare.notFoundMessage}
         </p>
       )}
 
@@ -126,13 +126,13 @@ function ComparePageContent() {
           <table className="w-full min-w-[480px] border-collapse text-sm">
             <thead>
               <tr>
-                <th className="border-b border-black/10 p-2 text-left font-semibold dark:border-white/15">
+                <th className="border-b border-shell-100 p-2 text-left font-semibold text-foreground dark:border-shell-600">
                   &nbsp;
                 </th>
                 {items.map((item) => (
                   <th
                     key={item.id}
-                    className="border-b border-black/10 p-2 text-left font-semibold dark:border-white/15"
+                    className="border-b border-shell-100 p-2 text-left font-semibold text-foreground dark:border-shell-600"
                   >
                     {item.name}
                   </th>
@@ -141,7 +141,9 @@ function ComparePageContent() {
             </thead>
             <tbody>
               <tr>
-                <th className="p-2 text-left font-normal text-black/60 dark:text-white/60">Type</th>
+                <th className="p-2 text-left font-normal text-shell-400">
+                  {CONTENT.compare.rowLabels.type}
+                </th>
                 {items.map((item) => (
                   <td key={item.id} className="p-2">
                     <span className="flex flex-wrap items-center gap-1.5">
@@ -153,7 +155,9 @@ function ComparePageContent() {
                 ))}
               </tr>
               <tr>
-                <th className="p-2 text-left font-normal text-black/60 dark:text-white/60">Height</th>
+                <th className="p-2 text-left font-normal text-shell-400">
+                  {CONTENT.compare.rowLabels.height}
+                </th>
                 {items.map((item) => (
                   <td key={item.id} className="p-2">
                     {item.height ?? "—"}
@@ -161,7 +165,9 @@ function ComparePageContent() {
                 ))}
               </tr>
               <tr>
-                <th className="p-2 text-left font-normal text-black/60 dark:text-white/60">Weight</th>
+                <th className="p-2 text-left font-normal text-shell-400">
+                  {CONTENT.compare.rowLabels.weight}
+                </th>
                 {items.map((item) => (
                   <td key={item.id} className="p-2">
                     {item.weight ?? "—"}
@@ -169,8 +175,8 @@ function ComparePageContent() {
                 ))}
               </tr>
               <tr>
-                <th className="p-2 text-left font-normal text-black/60 dark:text-white/60">
-                  Abilities
+                <th className="p-2 text-left font-normal text-shell-400">
+                  {CONTENT.compare.rowLabels.abilities}
                 </th>
                 {items.map((item) => (
                   <td key={item.id} className="p-2">
@@ -188,22 +194,22 @@ function ComparePageContent() {
               </tr>
               {STAT_ORDER.map(({ key, label }) => (
                 <tr key={key}>
-                  <th className="border-t border-black/10 p-2 text-left font-normal text-black/60 dark:border-white/15 dark:text-white/60">
+                  <th className="border-t border-shell-100 p-2 text-left font-normal text-shell-400 dark:border-shell-600">
                     {label}
                   </th>
                   {items.map((item) => (
-                    <td key={item.id} className="border-t border-black/10 p-2 tabular-nums dark:border-white/15">
+                    <td key={item.id} className="border-t border-shell-100 p-2 tabular-nums text-foreground dark:border-shell-600">
                       {item.stats[key] ?? "—"}
                     </td>
                   ))}
                 </tr>
               ))}
               <tr>
-                <th className="border-t border-black/10 p-2 text-left font-semibold dark:border-white/15">
-                  Total
+                <th className="border-t border-shell-100 p-2 text-left font-semibold text-foreground dark:border-shell-600">
+                  {CONTENT.compare.rowLabels.total}
                 </th>
                 {items.map((item) => (
-                  <td key={item.id} className="border-t border-black/10 p-2 font-semibold tabular-nums dark:border-white/15">
+                  <td key={item.id} className="border-t border-shell-100 p-2 font-semibold tabular-nums text-foreground dark:border-shell-600">
                     {item.statTotal ?? "—"}
                   </td>
                 ))}

@@ -2,6 +2,7 @@
 
 import { buildDidYouMean } from "@coveo/headless";
 import { useState } from "react";
+import { CONTENT } from "@/content/pokedex";
 import { getSearchEngine } from "@/coveo/engine";
 import { useControllerState } from "@/coveo/useControllerState";
 
@@ -13,8 +14,9 @@ export function DidYouMean() {
   if (state.wasAutomaticallyCorrected) {
     return (
       <p className="mb-4 text-sm text-black/60 dark:text-white/60">
-        No results for &quot;{state.originalQuery}&quot;. Showing results for{" "}
-        <strong>{state.wasCorrectedTo}</strong> instead.
+        {CONTENT.search.noResultsForPrefix} &quot;{state.originalQuery}&quot;.{" "}
+        {CONTENT.search.showingResultsForPrefix}{" "}
+        <strong>{state.wasCorrectedTo}</strong> {CONTENT.search.showingResultsInsteadSuffix}
       </p>
     );
   }
@@ -22,7 +24,7 @@ export function DidYouMean() {
   if (state.hasQueryCorrection) {
     return (
       <p className="mb-4 text-sm text-black/60 dark:text-white/60">
-        Did you mean{" "}
+        {CONTENT.search.didYouMeanPrompt}{" "}
         <button
           type="button"
           onClick={() => didYouMean.applyCorrection()}

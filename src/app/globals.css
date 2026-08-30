@@ -1,21 +1,92 @@
 @import "tailwindcss";
 
+/*
+ * Chrome palette (docs/EXECUTION-PLAN-v4-design-system.md §3.2) — a cool
+ * "device housing" neutral ramp, deliberately quiet so the type-color
+ * custom properties (emitted from layout.tsx via typeCssVariables(), see
+ * src/coveo/typeColors.ts) carry all the chroma. --signal-red is restricted
+ * to exactly two uses: the Pokeball glyph and the global focus ring — never
+ * body text, links, or error states, which keep the existing semantic red
+ * below.
+ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --shell-900: #14161c;
+  --shell-800: #1e212a;
+  --shell-600: #3a3f4c;
+  --shell-400: #767d8e;
+  --shell-200: #c7cbd4;
+  --shell-100: #e4e7ec;
+  --shell-050: #f4f5f8;
+  --shell-000: #ffffff;
+
+  --signal-red: #e3350d;
+  --signal-glow: #ff6b4a;
+
+  /* Light-mode chrome mapping. The tile is lighter than the page chrome in
+     both schemes (docs/EXECUTION-PLAN-v4-design-system.md §3.2). */
+  --background: var(--shell-050);
+  --foreground: var(--shell-900);
+  --surface: var(--shell-000);
+
+  /* Typography scale — 7 steps at a 16px root (v4 plan §3.3). Six steps is
+     the ceiling per the plan; kept as CSS custom properties so components
+     can reach the exact step via `text-[length:var(--text-*)]` (or a future
+     Tailwind theme extension) without a second scale being invented later. */
+  --text-3xl: 3rem; /* 48px — hero/display */
+  --text-2xl: 2rem; /* 32px — page/section headings */
+  --text-xl: 1.5rem; /* 24px */
+  --text-lg: 1.125rem; /* 18px */
+  --text-base: 1rem; /* 16px — body */
+  --text-sm: 0.875rem; /* 14px */
+  --text-xs: 0.75rem; /* 12px — micro/mono labels */
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-surface: var(--surface);
+
+  --color-shell-900: var(--shell-900);
+  --color-shell-800: var(--shell-800);
+  --color-shell-600: var(--shell-600);
+  --color-shell-400: var(--shell-400);
+  --color-shell-200: var(--shell-200);
+  --color-shell-100: var(--shell-100);
+  --color-shell-050: var(--shell-050);
+  --color-shell-000: var(--shell-000);
+
+  --color-signal-red: var(--signal-red);
+  --color-signal-glow: var(--signal-glow);
+
+  /* Display: Chakra Petch 600/700 — page/section headings, Pokemon names,
+     tab labels. Body: IBM Plex Sans 400/500/600 — all running text, facet
+     labels, buttons, counts. Micro: IBM Plex Mono 400/500 — dex numbers,
+     stat figures, scan tags, field keys. Loaded via next/font/google in
+     layout.tsx; each font's own `variable` option (--font-chakra-petch/
+     --font-plex-sans/--font-plex-mono) defines the CSS custom property
+     mapped here — a different name than the Tailwind token on the left,
+     since mapping a property to itself is a circular reference. */
+  --font-display: var(--font-chakra-petch);
+  --font-sans: var(--font-plex-sans);
+  --font-mono: var(--font-plex-mono);
+
+  /* --text-3xl/2xl/xl/lg/base/sm/xs are deliberately NOT redeclared here.
+     They're already set once, unlayered, in the :root block above (an
+     unlayered declaration always outranks a layered one regardless of
+     source order per the CSS cascade, and Tailwind's own generated theme
+     lives in a @layer), so that single declaration already overrides
+     Tailwind's built-in defaults for the text-3xl/text-2xl/... utilities.
+     Redeclaring the same custom property name here would be a circular
+     self-reference (`--text-3xl: var(--text-3xl)`), which resolves to
+     nothing — the mistake this comment exists to prevent someone from
+     reintroducing. */
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: var(--shell-900);
+    --foreground: var(--shell-100);
+    --surface: var(--shell-800);
   }
 }
 
@@ -23,4 +94,458 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+/* Display face gets -0.01em tracking (v4 plan §3.3); apply via a utility
+   class rather than a blanket heading selector, so a heading that
+   deliberately stays in the body register (e.g. a dialog title) isn't
+   force-migrated to the display face by this rule alone. */
+.font-display {
+  font-family: var(--font-display), Arial, Helvetica, sans-serif;
+  letter-spacing: -0.01em;
+}
+
+/* Micro/mono labels get +0.08em tracking and uppercase (v4 plan §3.3) —
+   dex numbers, stat figures, scan tags, field keys. */
+.font-mono-label {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/*
+ * Pokeball search glyph (v4 plan §4) — the search bar is the one chrome
+ * element permitted to move; everything else in the header/shell stays
+ * near-monochrome and static. `shell-top` and `button` are toggled between
+ * four `data-state`s (idle/focus/loading/settle) by
+ * src/components/ui/PokeballGlyph.tsx; the state machine that decides which
+ * one applies lives in SearchBox.tsx, not here.
+ *
+ * The spin uses a non-linear keyframe set on purpose — a constant `linear`
+ * rotate reads as a generic loading spinner and throws away the one moment
+ * this design spends its motion budget on (v4 plan §4).
+ */
+@keyframes pokeball-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  45% {
+    transform: rotate(190deg);
+  }
+  55% {
+    transform: rotate(170deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pokeball-settle {
+  0% {
+    transform: rotate(0deg);
+  }
+  55% {
+    transform: rotate(-16deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes pokeball-button-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.4);
+  }
+}
+
+@keyframes pokeball-opacity-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.pokeball-shell-top {
+  /* Pivot at the band's left edge (x=3, y=16 in the 32x32 viewBox), not the
+     path's own bounding-box center — `transform-box: view-box` makes the
+     origin a viewBox coordinate rather than a fraction of shell-top's own
+     (asymmetric) bounding box. */
+  transform-box: view-box;
+  transform-origin: 3px 16px;
+  transition: transform 320ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.pokeball-shell-top[data-state="idle"] {
+  transform: rotate(0deg);
+}
+.pokeball-shell-top[data-state="focus"] {
+  transform: rotate(-35deg);
+}
+.pokeball-shell-top[data-state="loading"] {
+  transform: rotate(0deg);
+  transition: transform 120ms ease-in;
+  animation: pokeball-spin 900ms cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+}
+.pokeball-shell-top[data-state="settle"] {
+  transform: rotate(0deg);
+  animation: pokeball-settle 260ms ease-out;
+}
+
+.pokeball-button {
+  transition: fill 320ms ease;
+}
+.pokeball-button[data-state="focus"],
+.pokeball-button[data-state="loading"] {
+  fill: var(--signal-red);
+}
+.pokeball-button[data-state="settle"] {
+  fill: var(--signal-red);
+  animation: pokeball-button-pulse 260ms ease-out;
+}
+
+/*
+ * Result tiles (v4 plan §5) — the tile is defined by its light, not a drawn
+ * border. `--type-primary`/`--type-secondary` are set per-card as an inline
+ * `style` from ResultList.tsx (CSP permits inline style attrs); the glow
+ * recipe mixes in oklab, never sRGB, since sRGB mixing turns `ice`/`steel`
+ * grey (plan §3.1). `data-glow` picks the single-type radial vs. dual-type
+ * 135° gradient treatment — dual is the *preferred* form per plan §2.3,
+ * since it doesn't depend on which type happens to be `types[0]`.
+ */
+.result-tile {
+  position: relative;
+  isolation: isolate;
+  /* DESIGN.md's documented `rounded.lg` (8px) — no new radius token
+     introduced for this tile. */
+  border-radius: 8px;
+  transition:
+    transform 200ms ease,
+    box-shadow 200ms ease;
+}
+.result-tile::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  opacity: 0.55;
+  transition: opacity 200ms ease;
+}
+.result-tile[data-glow="single"]::before {
+  background: radial-gradient(
+    120% 90% at 50% 30%,
+    color-mix(in oklab, var(--type-primary) 32%, transparent),
+    transparent 70%
+  );
+}
+.result-tile[data-glow="dual"]::before {
+  background: linear-gradient(
+    135deg,
+    color-mix(in oklab, var(--type-primary) 28%, transparent),
+    color-mix(in oklab, var(--type-secondary, var(--type-primary)) 28%, transparent)
+  );
+}
+.result-tile:hover,
+.result-tile:focus-within {
+  transform: translateY(-4px);
+}
+.result-tile:hover::before,
+.result-tile:focus-within::before {
+  /* "Roughly doubles" (plan §5) via opacity, not a re-mixed percentage —
+     color-mix() percentages aren't independently transitionable, so the
+     intensity step is opacity 0.55 -> 1 against the same gradient stops. */
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .result-tile {
+    transition: none;
+  }
+  .result-tile:hover,
+  .result-tile:focus-within {
+    transform: none;
+  }
+}
+
+/* Required, not optional (v4 plan §4): no rotation, no spin. The loading/
+   settle motion is replaced with an opacity pulse on the button only.
+   `!important` is deliberate here, not a specificity shortcut taken out of
+   laziness: every `.pokeball-shell-top[data-state="..."]` / `.pokeball-
+   button[data-state="..."]` rule above has higher specificity than a bare
+   `.pokeball-shell-top`/`.pokeball-button` override (attribute selector
+   adds a selector component), so a same-specificity or lower-specificity
+   override here would silently lose the cascade and this whole block would
+   verify as "present in the CSS" while doing nothing at runtime — which is
+   exactly what shipped here until it was checked with a real computed-style
+   assertion (not just visual inspection) under
+   `page.emulateMedia({ reducedMotion: "reduce" })`. */
+@media (prefers-reduced-motion: reduce) {
+  .pokeball-shell-top {
+    transition: none !important;
+    animation: none !important;
+    transform: rotate(0deg) !important;
+  }
+  .pokeball-button {
+    animation: none !important;
+    transition: fill 120ms ease !important;
+  }
+  .pokeball-button[data-state="loading"] {
+    animation: pokeball-opacity-pulse 900ms ease-in-out infinite !important;
+  }
+  .pokeball-button[data-state="settle"] {
+    animation: pokeball-opacity-pulse 260ms ease-out 1 !important;
+  }
+}
+
+/*
+ * PDP stat bar fill (v4 plan §9) — type-colored, animates its width in on
+ * mount. `--type-primary` is set as an inline style on an ancestor
+ * (PokemonStatPanel), same convention as the result tile's glow. The width
+ * itself stays a plain inline `style` set by StatBar.tsx (the real,
+ * data-derived percentage — never invented here); `@starting-style` only
+ * supplies the *from* value for the mount transition, so a caller reading
+ * the DOM (e.g. a test asserting the final `aria-valuenow`) is unaffected.
+ *
+ * No `[data-state="..."]`-style attribute selector is layered on top of
+ * `.stat-bar-fill` the way the Pokeball glyph's rules are, so there's no
+ * repeat of the specificity bug documented above: the single
+ * `prefers-reduced-motion` override below is the same specificity as the
+ * base rule and simply wins by appearing later in the cascade — no
+ * `!important` needed. Confirmed with a real computed-style check under
+ * `page.emulateMedia({ reducedMotion: "reduce" })`, not just visual
+ * inspection — see tests/e2e/search.spec.ts's reduced-motion case.
+ */
+.stat-bar-fill {
+  height: 100%;
+  width: 100%;
+  border-radius: inherit;
+  background-color: var(--type-primary, var(--shell-400));
+  transform-origin: left center;
+  transition: transform 700ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+@starting-style {
+  .stat-bar-fill {
+    transform: scaleX(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stat-bar-fill {
+    transition: none;
+  }
+}
+
+/*
+ * PDP evolution stage tiles (v4 plan §9) — a horizontal row of lit sprite
+ * tiles. The current stage gets a `--type-edge` ring (the recipe from plan
+ * §3.1: `color-mix(in oklab, var(--type-primary) 55%, transparent)`),
+ * mixed in oklab for the same reason as the result tile's glow (sRGB
+ * mixing turns `ice`/`steel` grey). `--type-primary` is set inline per
+ * instance by EvolutionChain.tsx from the current Pokemon's own type —
+ * decorative only, per §2.3, since `types[0]` isn't a verified "primary"
+ * type.
+ */
+.evo-stage {
+  border-radius: 8px; /* DESIGN.md `rounded.lg` */
+  border: 1px solid var(--shell-100);
+  transition: box-shadow 200ms ease;
+}
+@media (prefers-color-scheme: dark) {
+  .evo-stage {
+    border-color: var(--shell-600);
+  }
+}
+.evo-stage[data-current="true"] {
+  border-color: transparent;
+  box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px
+    color-mix(in oklab, var(--type-primary, var(--shell-400)) 55%, transparent);
+}
+
+/*
+ * RGA scan reveal (v4 plan §7.1) — `.pokedex-line` fades a completed answer
+ * block up on mount (~180ms). It fires once per block, not per delta:
+ * GeneratedAnswer.tsx splits the streamed answer on blank lines and keys
+ * each block by its array index, so a block already on screen keeps its
+ * position (and never remounts) as later text deltas only extend the final,
+ * still-growing block — this is the native stream itself doing the reveal,
+ * not a typewriter replaying it slower (plan §2.2).
+ *
+ * `.pokedex-cursor` is a blinking block cursor shown only while
+ * `state.isStreaming` is true (real backend state) and removed the instant
+ * it flips false — not a decorative loop that keeps running after the
+ * answer finishes.
+ */
+@keyframes pokedex-line-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.pokedex-line {
+  animation: pokedex-line-fade-up 180ms ease-out both;
+}
+
+@keyframes pokedex-cursor-blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+.pokedex-cursor {
+  display: inline-block;
+  width: 0.5em;
+  height: 1em;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  background: var(--shell-400);
+  animation: pokedex-cursor-blink 1s step-end infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pokedex-line {
+    animation: none;
+  }
+  .pokedex-cursor {
+    animation: none;
+    opacity: 0.6;
+  }
+}
+
+/*
+ * RGA citation scan tags (v4 plan §7.2) — mono scanline tags, not inline
+ * spans (plan §2.1). `--type-primary` is set inline per tag by
+ * GeneratedAnswer.tsx's `CitationTag` only when a real type could be
+ * resolved for that citation's document (see that component's doc comment
+ * for how, and why it degrades to the plain neutral border otherwise rather
+ * than guessing).
+ */
+.scan-citation {
+  border-radius: 6px; /* DESIGN.md `rounded.sm`/`.md` */
+  border: 1px solid var(--shell-100);
+  background: var(--surface);
+  padding: 2px 8px;
+}
+@media (prefers-color-scheme: dark) {
+  .scan-citation {
+    border-color: var(--shell-600);
+  }
+}
+.scan-citation[data-has-type="true"] {
+  border-color: color-mix(in oklab, var(--type-primary) 55%, transparent);
+  background: color-mix(in oklab, var(--type-primary) 8%, var(--surface));
+}
+
+/*
+ * Passage retrieval cards (v4 plan §8) — tinted/edged in the current
+ * Pokemon's type, same glow/tint/edge recipe as the rest of the app
+ * (§3.1). The response from /api/passages is complete, not streamed, so
+ * `.passage-card`'s fade-in is a one-time staged reveal (each `<li>`'s
+ * inline `animationDelay` staggers them) rather than tied to any real
+ * streaming state — there is none here, unlike RGA's `.pokedex-line`.
+ */
+@keyframes passage-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.passage-card {
+  border-radius: 8px;
+  border: 1px solid var(--shell-100);
+  background: var(--surface);
+  animation: passage-fade-in 220ms ease-out both;
+}
+@media (prefers-color-scheme: dark) {
+  .passage-card {
+    border-color: var(--shell-600);
+  }
+}
+.passage-card[data-has-type="true"] {
+  border-color: color-mix(in oklab, var(--type-primary) 55%, transparent);
+  background: color-mix(in oklab, var(--type-primary) 8%, var(--surface));
+}
+@media (prefers-reduced-motion: reduce) {
+  .passage-card {
+    animation: none;
+  }
+}
+
+/*
+ * Global focus ring (v4 plan §3.2) — the second of --signal-red's exactly-
+ * two permitted uses (the Pokeball glyph, above, is the first). A single
+ * `:focus-visible` rule rather than a per-component ring utility, so every
+ * interactive element added across batches 2-5 (result-tile links, compare
+ * checkboxes, facet checkboxes, tabs, citation tags, feedback buttons, the
+ * compare tray) gets a consistent ring automatically, and any element added
+ * later does too without a components-file walk to remember it. `:focus-
+ * visible`, not `:focus`, so mouse/touch activation never shows the ring —
+ * only keyboard/programmatic focus does, matching native browser behavior.
+ *
+ * This block is deliberately outside any `@layer`, the same reasoning
+ * documented at the top of this file for `--text-3xl`: Tailwind's utilities
+ * (including `outline-none`, used on the AskAboutPokemon and Facet
+ * facet-search inputs to strip the default blue outline) are generated
+ * inside `@layer utilities` by `@import "tailwindcss"`, and an unlayered
+ * declaration always outranks a layered one regardless of selector
+ * specificity or source order — so this rule reaches those inputs too
+ * without editing either component.
+ */
+:focus-visible {
+  outline: 2px solid var(--signal-red);
+  outline-offset: 2px;
+  /* No border-radius here: modern browsers already round the outline to
+     match the focused element's own border-radius. Setting one here would
+     override every element's actual corner radius while focused (e.g.
+     squashing a rounded-full swatch down to 2px corners). */
+}
+
+/*
+ * SearchBox's own input (v4 plan §4) already shows an always-on (not just
+ * -visible) --signal-red ring on its wrapper `<div>` whenever `isFocused` is
+ * true — a deliberate design choice tied to the Pokeball glyph's focus
+ * animation, not an oversight. Suppressed here so keyboard focus doesn't
+ * draw a second, redundant ring on the `<input>` itself inside that already-
+ * ringed wrapper. `.search-box-input` carries higher specificity than the
+ * bare `:focus-visible` above (two selector components vs. one), so it wins
+ * regardless of source order even though both are unlayered.
+ */
+.search-box-input:focus-visible {
+  outline: none;
+}
+
+/*
+ * Type-facet swatch checkbox (v4 plan §6) — the native `<input
+ * type="checkbox">` stays in the DOM but visually hidden (`sr-only`) under
+ * the `TypeSwatch` decoration, per the plan's "keep the native checkbox,
+ * don't replace it" rule. `sr-only`'s `clip`/`overflow:hidden` clips any
+ * outline drawn on the input itself, so the global `:focus-visible` rule
+ * above would be silently invisible here — the same class of "present in
+ * the CSS but does nothing at runtime" bug the Pokeball glyph's reduced-
+ * motion override already hit once. Painting the ring on the swatch's
+ * visible sibling span instead — checked live under keyboard focus, not
+ * assumed from the source alone (see the a11y-audit e2e spec).
+ */
+.swatch-checkbox:focus-visible + * {
+  outline: 2px solid var(--signal-red);
+  outline-offset: 2px;
+  /* No border-radius override here either — the swatch sibling is already
+     `rounded-full` (TypeSwatch.tsx), and the outline follows that shape
+     natively. See the global :focus-visible rule above for why an explicit
+     value here would be redundant at best, wrong at worst. */
 }

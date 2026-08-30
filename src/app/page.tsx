@@ -5,6 +5,8 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { BrowseByType } from "@/components/BrowseByType";
 import { SearchBox } from "@/components/SearchBox";
+import { ImageSlot } from "@/components/ui/ImageSlot";
+import { CONTENT } from "@/content/pokedex";
 import { isCoveoConfigured } from "@/coveo/config";
 import { getSearchEngine } from "@/coveo/engine";
 import { useControllerState } from "@/coveo/useControllerState";
@@ -54,14 +56,12 @@ export default function Home() {
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col items-center px-6 py-24 text-center">
-      <p className="mb-8 text-black/60 dark:text-white/60">
-        Search every Pokemon indexed from pokemondb.net, powered by Coveo.
-        {summaryState && summaryState.hasResults && (
-          <>
-            {" "}
-            {summaryState.total.toLocaleString()} Pokemon indexed.
-          </>
-        )}
+      <div className="mb-8 w-full">
+        <ImageSlot name="homeBanner" ratio="16/5" label="Home hero banner" />
+      </div>
+      <p className="mb-8 text-shell-400">
+        {CONTENT.home.heroSubtitle}
+        {summaryState && summaryState.hasResults && CONTENT.home.indexedCountSuffix(summaryState.total)}
       </p>
       <SearchBox onNavigate={(query) => router.push(`/search?q=${encodeURIComponent(query)}`)} />
       <div className="mt-12 w-full">
