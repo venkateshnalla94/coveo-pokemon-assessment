@@ -2,7 +2,7 @@
 
 ## Context
 
-`docs/EXECUTION-PLAN.md` covered the original assessment build — that plan is done (Essential/Intermediate-GitHub/Advanced/Bonus tiers all built and verified live; only Vercel deploy and the two presentation decks remain open there, tracked in `docs/HANDOFF.md`). This file is an **extension**, not a replacement: a second phase the user asked for after seeing the built app — enrich what's indexed from pokemondb.net well beyond the current 5 fields, and redesign the frontend around three AI-generated "Monsterdex" mockups the user supplied (`mock-ups/*.png`).
+`docs/EXECUTION-PLAN.md` covered the original assessment build — that plan is done (Essential/Intermediate-GitHub/Intermediate-Vercel/Advanced/Bonus tiers all built and verified live; only the two presentation decks remain open there, tracked in `docs/HANDOFF.md`). This file is an **extension**, not a replacement: a second phase the user asked for after seeing the built app — enrich what's indexed from pokemondb.net well beyond the current 5 fields, and redesign the frontend around three AI-generated "Monsterdex" mockups the user supplied (`mock-ups/*.png`).
 
 Two research docs back this plan, written the same session:
 - `docs/pokemon-data-inventory.md` — a factual survey of every data section on a real pokemondb.net Pokemon page, with a feasibility rating (Easy/Medium/Hard) for Coveo custom-field extraction.

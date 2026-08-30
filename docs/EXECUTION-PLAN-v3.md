@@ -1,10 +1,19 @@
 # Coveo Pokemon Challenge — Execution Plan v3
 
+Status: **v3.1, v3.3, v3.4 done; v3.2 mostly done.** Branching evolution +
+evolution images (v3.2's expanded scope) shipped and are live-verified on
+both sources; the RelatedPokemon/"Similar Creatures" tab v3.2 originally
+scoped is the one item across this whole plan still unbuilt. See
+`docs/HANDOFF.md`'s tenth-through-twelfth-session sections for what actually
+ran, and the off-cycle ML rebuild note under "What's next" — v3.4's
+exclusion rules are indexed correctly, but RGA/CPR's embedding stores were
+still stale as of the twelfth session.
+
 ## Context
 
 `docs/EXECUTION-PLAN-v2.md` (field expansion + v2.3 frontend) is done — see `docs/HANDOFF.md`'s ninth-session summary. This plan is a third, separate track, opened by a live-usage session: a real sort bug, a PDP that's still missing its two originally-deferred v2.3 items, a search results page that shows far less of the already-indexed/mapped `PokemonItem` data than it has, and RGA/Passage Retrieval output that's noisy because the indexed `body` is very likely the full scraped page rather than curated content.
 
-The RGA/CPR diagnosis in Phase v3.4 is a right-sized version of a plan the user got from ChatGPT (`docs/temp_improvements.md`) — its architecture is correct, but two parts don't fit this project: it assumes a Push-API source (this is a Web crawler — its §5 doesn't apply), and its example of a "cleaned" body is fabricated descriptive prose, which conflicts with this project's no-fabricated-data principle (`CLAUDE.md`/`PRODUCT.md`). Phase v3.4 below keeps the diagnostic sequencing and the prompt-enhancement idea, but replaces "rewrite the body" with "exclude junk from the body via scraping rules" — same mechanism already used for field extraction in `docs/coveo-source-spec.md`.
+The RGA/CPR diagnosis in Phase v3.4 is a right-sized version of a plan the user got from ChatGPT (`docs/temp_improvements.md`, **since deleted** — its content is fully absorbed into this phase and `docs/adr/0012-web-scraping-content-exclusion-for-rga-cpr.md`, so the `§N` references below are historical pointers into a file that no longer exists, not live links) — its architecture is correct, but two parts don't fit this project: it assumes a Push-API source (this is a Web crawler — its §5 doesn't apply), and its example of a "cleaned" body is fabricated descriptive prose, which conflicts with this project's no-fabricated-data principle (`CLAUDE.md`/`PRODUCT.md`). Phase v3.4 below keeps the diagnostic sequencing and the prompt-enhancement idea, but replaces "rewrite the body" with "exclude junk from the body via scraping rules" — same mechanism already used for field extraction in `docs/coveo-source-spec.md`.
 
 These four phases are independent — pick any one per session, no required order, except v3.1 is cheap and worth clearing first since it's an active user-facing break.
 

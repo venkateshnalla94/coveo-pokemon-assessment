@@ -57,23 +57,13 @@ spacing:
 
 ## Status of this document
 
-This describes the design system as of the v4 token pass
-(`docs/EXECUTION-PLAN-v4-design-system.md`). Two layers exist right now, at
-different stages:
-
-- **Tokens (implemented, this pass):** the Pokemon-type color palette
-  (`src/coveo/typeColors.ts`, emitted as CSS custom properties from
-  `src/app/layout.tsx`), the chrome neutral ramp, the three-font type system
-  (Chakra Petch / IBM Plex Sans / IBM Plex Mono via `next/font/google`), and
-  the 7-step type scale — all real, in `src/app/globals.css` and
-  `src/app/layout.tsx`, not aspirational.
-- **Component visual application (not yet done):** the search bar's Pokeball
-  motion moment, type-lit result tiles, swatch facets, the RGA scan reveal,
-  and the PDP hero rework are specified in
-  `docs/EXECUTION-PLAN-v4-design-system.md` §4–§9 but land in later batches
-  of that plan. Most components today still use the old monochrome
-  ink-on-paper classes described further below — that's accurate as of this
-  pass, not a documentation error.
+`docs/EXECUTION-PLAN-v4-design-system.md` is **complete** — all 11
+execution-order steps across six batches have shipped (see
+`docs/HANDOFF.md`'s thirteenth-through-seventeenth-session sections for the
+batch-by-batch build log, and `docs/adr/0013-type-driven-design-system.md`
+for the decisions taken along the way). Everything below describes the
+system as actually built and applied across every component, not a
+token-only foundation waiting on a later pass.
 
 Chrome copy (labels, headings, placeholders, empty/error messages) has been
 extracted to `src/content/pokedex.ts` — edit that file, not the components,
@@ -149,8 +139,9 @@ Two derived exports off that same file:
 Derived per-element forms (glow/tint/edge) are computed with `color-mix()`
 in `oklab` against an inline `--type-primary`/`--type-secondary` pair, not
 baked into CSS as more hex values — see
-`docs/EXECUTION-PLAN-v4-design-system.md` §3.1 for the exact recipes. This
-wiring lands with the component restyle batches, not this token pass.
+`docs/EXECUTION-PLAN-v4-design-system.md` §3.1 for the exact recipes. Wired
+into `ResultList.tsx`'s tile glow, the type facet swatches, `TypeDefenses`,
+`StatBar`'s fill, the RGA citation tags, and the PDP passage cards.
 
 **The color-alone rule still holds, unchanged:** every type color is always
 paired with the type's text label. Color is decorative reinforcement, never
@@ -207,33 +198,33 @@ Display text gets `-0.01em` tracking (`.font-display` utility class in
 
 ### Historical note
 
-Components written before this pass (most of them, as of this batch) still
-use ad hoc Tailwind text sizes (`text-3xl`, `text-sm`, `text-xs`) rather
-than referencing the named scale tokens directly by name, and render in the
-body face everywhere (no heading yet opts into `.font-display`). That's
-accurate today, not a gap in this document — see "Status of this document"
-above. Component-level application of the display face and the exact 7-step
-scale is `docs/EXECUTION-PLAN-v4-design-system.md` §4–§9 work.
+Earlier in the v4 pass (batch 1), components still used ad hoc Tailwind text
+sizes and rendered everywhere in the body face, with no heading opting into
+`.font-display`. That's since been applied throughout: page/section
+headings, Pokemon names, and tab labels use `.font-display`; dex numbers,
+stat figures, and scan tags use `.font-mono-label`. One sanctioned exception
+remains: the PDP's oversized dex-number watermark (`PokemonHero.tsx`) sits
+intentionally off the 6-step scale, logged as a `design-system-font-size`
+ignore rather than a violation (see `docs/HANDOFF.md`'s fifteenth-session
+section).
 
 ## Layout
 
-Unchanged by this pass. Single-column, centered, max-width-constrained
-containers — no full-bleed sections. Home (`/`) centers a narrow column
-(`max-w-2xl`); `/search` widens to `max-w-6xl` with a 200px facet rail +
-fluid main column above `md`. The result grid steps 2 → 3 → 4 columns across
-`base → sm → md`. Horizontal page padding is a flat 24px (`px-6`) at every
-breakpoint.
-
-`docs/EXECUTION-PLAN-v4-design-system.md` §9 widens the PDP specifically
-(`max-w-2xl` → `max-w-5xl`, full-bleed hero band) in a later batch — not yet
-applied.
+Single-column, centered, max-width-constrained containers, with one
+deliberate exception. Home (`/`) centers a narrow column (`max-w-2xl`);
+`/search` widens to `max-w-6xl` with a 200px facet rail + fluid main column
+above `md`; the PDP (`/pokemon/[name]`) widens to `max-w-5xl` with a
+full-bleed hero band breaking out to viewport width above the constrained
+content below it (batch 4, §9). The result grid steps 2 → 3 → 4 columns
+across `base → sm → md`. Horizontal page padding is a flat 24px (`px-6`) at
+every breakpoint.
 
 ### Named Rules
 
 **The Constrained Column Rule.** Every page is a centered, max-width column,
-never full-bleed (the PDP hero band is the one deliberate, scoped exception
-once §9 lands). Width varies by page purpose, but the centering and the cap
-are constant.
+never full-bleed — except the PDP hero band, the one deliberate, scoped
+exception. Width varies by page purpose, but the centering and the cap are
+constant everywhere else.
 
 ## Elevation & Depth
 
@@ -254,14 +245,33 @@ Unchanged by this pass. Uniform 6px radius on every bordered surface.
 
 ## Components
 
-Component-level visual treatment (Chip solid-fill variant, type-lit result
-tiles, swatch facets, the Pokeball search glyph, the RGA scan reveal, the
-PDP hero rework) is specified in
-`docs/EXECUTION-PLAN-v4-design-system.md` §4–§9 and lands in later batches
-of that plan, not this one. As of this pass, components still render with
-the pre-existing monochrome hairline-border treatment; only the underlying
-tokens (colors, fonts, scale) and the chrome copy (now sourced from
-`src/content/pokedex.ts`) changed.
+Every surface listed in `docs/EXECUTION-PLAN-v4-design-system.md` §4–§9 is
+built:
+
+- **Search bar** — a custom `PokeballGlyph` (idle/focus/loading/settle
+  states, non-linear spin, `prefers-reduced-motion` override), plus a real
+  `onBlur` handler and full combobox ARIA on the typeahead (`SearchBox.tsx`).
+- **Result tiles** (`ResultList.tsx`) — the drawn border is gone; each tile
+  is lit by a type-color glow (radial for a single type, a 135° gradient for
+  dual types), synchronized hover across sprite/name/dex-number, and a
+  `Chip variant="type-solid"` badge.
+- **Facets** (`AutomaticFacets.tsx`, `Facet.tsx`) — type-family facets render
+  a `TypeSwatch` alongside the existing `Chip`, with the native checkbox kept
+  (visually hidden, not replaced) for screen-reader/keyboard parity.
+- **RGA panel** (`GeneratedAnswer.tsx`) — an instrument-readout frame with a
+  live `generationSteps` scan sequence, a blinking cursor while streaming,
+  and scanline citation tags (`⟶ retrieved from: ...`) instead of a numbered
+  citation list.
+- **PDP** (`PokemonHero.tsx`, `PokemonStatPanel.tsx`, `EvolutionChain.tsx`,
+  `TypeDefenses.tsx`, `AskAboutPokemon.tsx`) — the widened hero band, a
+  type-colored `StatBar` fill, swatch-paired weakness/resistance lists, a
+  horizontal evolution stage row, and type-tinted passage cards.
+- **Global focus ring and motion/a11y audit** (batch 6) — a `:focus-visible`
+  rule using `--signal-red`, a sibling-selector fix so the type-facet
+  swatch's visually-hidden checkbox still shows a visible ring, and
+  `tabIndex={-1}` on typeahead options so Tab doesn't break the
+  `aria-activedescendant` pattern. Full account in `docs/HANDOFF.md`'s
+  seventeenth-session section.
 
 `src/components/ui/ImageSlot.tsx` is new this pass: a named, ratio-locked
 image slot (`<ImageSlot name="heroBackdrop" ratio="21/9" label="..." />`)
