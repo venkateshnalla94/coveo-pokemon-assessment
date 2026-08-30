@@ -140,7 +140,15 @@ export function AskAboutPokemon({ pokemonName, pokemonTypes }: AskAboutPokemonPr
         <ol aria-label="Passages" className="mt-4 flex flex-col gap-3">
           {state.passages.map((passage, index) => (
             <li
-              key={passage.document.primaryid}
+              // `filter: '@pokemonname=="..."'` scopes every request to one
+              // document, so passage.document.primaryid is identical across
+              // all returned passages (they're chunks of that one page) —
+              // keying on it alone produced React's real duplicate-key
+              // warning, confirmed live via a walkthrough of Charizard's
+              // "Ask about this Pokemon". The index makes each chunk's key
+              // unique; safe here since the list is replaced wholesale on
+              // every new ask, never patched in place.
+              key={`${passage.document.primaryid}-${index}`}
               className="passage-card p-3 text-sm"
               data-has-type={Boolean(typeColor)}
               style={{ ...typeVars, animationDelay: `${index * 90}ms` }}

@@ -20,6 +20,16 @@ test.describe("ask about this Pokemon (configured)", () => {
   );
 
   test("returns scoped passages with relevance scores for a real question", async ({ page }) => {
+    // Regression guard: every passage in a response is scoped to the same
+    // document (filter: '@pokemonname=="..."'), so multiple passages share
+    // one document.primaryid — a naive key={document.primaryid} on the list
+    // produces a real React duplicate-key warning here, caught live via a
+    // manual walkthrough of this exact flow on Charizard.
+    const consoleErrors: string[] = [];
+    page.on("console", (msg) => {
+      if (msg.type() === "error") consoleErrors.push(msg.text());
+    });
+
     await page.goto("/pokemon/eevee");
 
     const input = page.getByPlaceholder(/how does eevee evolve/i);
@@ -34,6 +44,8 @@ test.describe("ask about this Pokemon (configured)", () => {
     for (const passage of await passages.all()) {
       await expect(passage.getByText(/Relevance: \d+(\.\d+)?%/)).toBeVisible();
     }
+
+    expect(consoleErrors).toEqual([]);
   });
 
   test("disables the Ask button until a question is typed", async ({ page }) => {

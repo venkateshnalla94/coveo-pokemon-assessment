@@ -1,4 +1,4 @@
-import { act, render, renderHook, screen } from "@testing-library/react";
+import { act, render, renderHook, screen, waitFor } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { CompareProvider, useCompare } from "@/components/compare/CompareProvider";
@@ -34,10 +34,15 @@ describe("useCompare", () => {
     expect(result.current.isFull).toBe(false);
   });
 
-  it("hydrates initial state from sessionStorage synchronously on first render", () => {
+  it("hydrates initial state from sessionStorage in an effect after mount", async () => {
+    // Not synchronous on first render — the initial render must start empty
+    // on both server and client to avoid a real hydration-mismatch error
+    // (confirmed live; see the comment in CompareProvider.tsx). Hydration
+    // now lands one microtask after mount instead.
     window.sessionStorage.setItem(COMPARE_STORAGE_KEY, JSON.stringify(["Pikachu"]));
     const { result } = renderHook(() => useCompare(), { wrapper });
-    expect(result.current.names).toEqual(["Pikachu"]);
+    expect(result.current.names).toEqual([]);
+    await waitFor(() => expect(result.current.names).toEqual(["Pikachu"]));
     expect(result.current.isSelected("Pikachu")).toBe(true);
   });
 

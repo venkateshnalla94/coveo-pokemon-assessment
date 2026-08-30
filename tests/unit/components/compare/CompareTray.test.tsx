@@ -23,10 +23,13 @@ describe("CompareTray", () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it("lists every selected name with a remove control once a selection exists", () => {
+  it("lists every selected name with a remove control once a selection exists", async () => {
+    // The tray starts empty on mount and hydrates from sessionStorage in an
+    // effect (CompareProvider.tsx) — findBy* waits for that, matching the
+    // real hydration-mismatch fix rather than asserting stale sync behavior.
     window.sessionStorage.setItem(COMPARE_STORAGE_KEY, JSON.stringify(["Pikachu", "Eevee"]));
     renderTray();
-    expect(screen.getByText("Pikachu")).toBeInTheDocument();
+    expect(await screen.findByText("Pikachu")).toBeInTheDocument();
     expect(screen.getByText("Eevee")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Remove Pikachu from comparison" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Remove Eevee from comparison" })).toBeInTheDocument();
@@ -36,7 +39,7 @@ describe("CompareTray", () => {
     const user = userEvent.setup();
     window.sessionStorage.setItem(COMPARE_STORAGE_KEY, JSON.stringify(["Pikachu"]));
     const { container } = renderTray();
-    await user.click(screen.getByRole("button", { name: "Remove Pikachu from comparison" }));
+    await user.click(await screen.findByRole("button", { name: "Remove Pikachu from comparison" }));
     expect(container).toBeEmptyDOMElement();
   });
 
@@ -44,14 +47,14 @@ describe("CompareTray", () => {
     const user = userEvent.setup();
     window.sessionStorage.setItem(COMPARE_STORAGE_KEY, JSON.stringify(["A", "B", "C"]));
     const { container } = renderTray();
-    await user.click(screen.getByRole("button", { name: "Clear all" }));
+    await user.click(await screen.findByRole("button", { name: "Clear all" }));
     expect(container).toBeEmptyDOMElement();
   });
 
-  it("builds the Compare link href from the comma-joined, encoded names", () => {
+  it("builds the Compare link href from the comma-joined, encoded names", async () => {
     window.sessionStorage.setItem(COMPARE_STORAGE_KEY, JSON.stringify(["Mr. Mime", "Eevee"]));
     renderTray();
-    const link = screen.getByRole("link", { name: "Compare (2)" });
+    const link = await screen.findByRole("link", { name: "Compare (2)" });
     expect(link).toHaveAttribute("href", "/compare?names=Mr.%20Mime%2CEevee");
   });
 });

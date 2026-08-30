@@ -1,6 +1,14 @@
 "use client";
 
-import { createContext, type ReactNode, useContext, useEffect, useMemo, useState } from "react";
+import {
+  createContext,
+  type ReactNode,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   addCompareName,
   MAX_COMPARE_NAMES,
@@ -31,15 +39,37 @@ interface CompareContextValue {
 const CompareContext = createContext<CompareContextValue | undefined>(undefined);
 
 export function CompareProvider({ children }: { children: ReactNode }) {
-  // Lazy init reads sessionStorage once, synchronously, on first client
-  // render — avoids a flash of "empty tray" before an effect runs. Reading
-  // `window.sessionStorage` directly here is safe: this component only
-  // ever renders on the client ("use client" + no SSR-sensitive output).
-  const [names, setNames] = useState<string[]>(() =>
-    typeof window === "undefined" ? [] : readCompareNames(window.sessionStorage),
-  );
+  // Starts empty on every render, server and client alike, so the first
+  // client render matches the SSR output exactly. An earlier version read
+  // sessionStorage synchronously in useState's lazy initializer to avoid a
+  // flash of "empty tray" — but this component *is* server-rendered (a
+  // client component still gets an SSR pass), and the server always sees an
+  // empty tray, so a tab with an existing selection produced a real
+  // hydration-mismatch error the moment a page reloaded (confirmed live via
+  // a walkthrough: reload /pokemon/pikachu with a selection already in
+  // sessionStorage). Hydrating in the effect below costs the flash this was
+  // trying to avoid, traded for not throwing on every reload.
+  const [names, setNames] = useState<string[]>([]);
+
+  // Guards the persist effect below from writing this hydration read's
+  // still-stale `names` closure ([]) back over sessionStorage before the
+  // setNames call above has actually committed — see the two effects' order
+  // note there.
+  const skipNextPersist = useRef(true);
 
   useEffect(() => {
+    // queueMicrotask, not a direct call: this repo's `react-hooks/set-state-in-effect`
+    // ESLint rule blocks a synchronous setState in an effect body (see
+    // SearchBox.tsx's identical note) — this schedules the same read on the
+    // microtask queue instead, which still lands before the next paint.
+    queueMicrotask(() => setNames(readCompareNames(window.sessionStorage)));
+  }, []);
+
+  useEffect(() => {
+    if (skipNextPersist.current) {
+      skipNextPersist.current = false;
+      return;
+    }
     writeCompareNames(window.sessionStorage, names);
   }, [names]);
 
