@@ -32,4 +32,6 @@ export const POKEMON_FIELDS = {
   resistances: "pokemonresistances",
   evolvesFrom: "pokemonevolvesfrom",
   evolvesTo: "pokemonevolvesto",
+  evolvesFromImage: "pokemonevolvesfromimageurl",
+  evolvesToImage: "pokemonevolvestoimageurl",
 } as const;

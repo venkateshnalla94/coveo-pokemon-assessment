@@ -124,7 +124,7 @@ describe("mapPokemonResult", () => {
       weaknesses: ["Fighting"],
       resistances: ["Ghost"],
     });
-    expect(item.evolution).toEqual({ from: undefined, to: ["Vaporeon"] });
+    expect(item.evolution).toEqual({ from: undefined, to: [{ name: "Vaporeon", imageUrl: undefined }] });
   });
 
   it("collapses a genderless species' single gender-ratio span to one string", () => {
@@ -135,25 +135,95 @@ describe("mapPokemonResult", () => {
     expect(mapPokemonResult(result).breeding.genderRatio).toBe("Genderless");
   });
 
-  it("derives isBaseStage from evolvesFrom and treats evolvesTo as a (currently single-entry) array", () => {
+  it("derives isBaseStage from evolvesFrom and treats evolvesTo as a multi-value array of EvolutionTargets", () => {
     const baseStage = buildRawResult({
       [POKEMON_FIELDS.evolvesTo]: "Pikachu",
     });
     expect(mapPokemonResult(baseStage).isBaseStage).toBe(true);
-    expect(mapPokemonResult(baseStage).evolution).toEqual({ from: undefined, to: ["Pikachu"] });
+    expect(mapPokemonResult(baseStage).evolution).toEqual({
+      from: undefined,
+      to: [{ name: "Pikachu", imageUrl: undefined }],
+    });
 
     const midChain = buildRawResult({
       [POKEMON_FIELDS.evolvesFrom]: "Pichu",
+      [POKEMON_FIELDS.evolvesFromImage]: "https://img.pokemondb.net/sprites/home/normal/2x/pichu.jpg",
       [POKEMON_FIELDS.evolvesTo]: "Raichu",
+      [POKEMON_FIELDS.evolvesToImage]: "https://img.pokemondb.net/sprites/home/normal/2x/raichu.jpg",
     });
     expect(mapPokemonResult(midChain).isBaseStage).toBe(false);
-    expect(mapPokemonResult(midChain).evolution).toEqual({ from: "Pichu", to: ["Raichu"] });
+    expect(mapPokemonResult(midChain).evolution).toEqual({
+      from: { name: "Pichu", imageUrl: "https://img.pokemondb.net/sprites/home/normal/2x/pichu.jpg" },
+      to: [{ name: "Raichu", imageUrl: "https://img.pokemondb.net/sprites/home/normal/2x/raichu.jpg" }],
+    });
 
     const fullyEvolved = buildRawResult({
       [POKEMON_FIELDS.evolvesFrom]: "Gabite",
     });
     expect(mapPokemonResult(fullyEvolved).isBaseStage).toBe(false);
-    expect(mapPokemonResult(fullyEvolved).evolution).toEqual({ from: "Gabite", to: [] });
+    expect(mapPokemonResult(fullyEvolved).evolution).toEqual({
+      from: { name: "Gabite", imageUrl: undefined },
+      to: [],
+    });
+
+    const branchNames = [
+      "Vaporeon",
+      "Jolteon",
+      "Flareon",
+      "Espeon",
+      "Umbreon",
+      "Leafeon",
+      "Glaceon",
+      "Sylveon",
+    ];
+    const branching = buildRawResult({
+      [POKEMON_FIELDS.evolvesTo]: branchNames,
+    });
+    expect(mapPokemonResult(branching).evolution.to).toEqual(
+      branchNames.map((name) => ({ name, imageUrl: undefined })),
+    );
+  });
+
+  it("keeps two same-named evolution targets as separate entries when their images differ", () => {
+    // Pikachu's real page lists Raichu twice — regular (Thunder Stone) and
+    // Alolan (Thunder Stone in Alola) — same ent-name text "Raichu", but two
+    // genuinely different sprites. Collapsing by name would lose that.
+    const result = buildRawResult({
+      [POKEMON_FIELDS.evolvesFrom]: "Pichu",
+      [POKEMON_FIELDS.evolvesTo]: ["Raichu", "Raichu"],
+      [POKEMON_FIELDS.evolvesToImage]: [
+        "https://img.pokemondb.net/sprites/home/normal/2x/raichu.jpg",
+        "https://img.pokemondb.net/sprites/home/normal/2x/raichu-alolan.jpg",
+      ],
+    });
+    expect(mapPokemonResult(result).evolution.to).toEqual([
+      { name: "Raichu", imageUrl: "https://img.pokemondb.net/sprites/home/normal/2x/raichu.jpg" },
+      { name: "Raichu", imageUrl: "https://img.pokemondb.net/sprites/home/normal/2x/raichu-alolan.jpg" },
+    ]);
+  });
+
+  it("dedupes an evolution target only when both name and image are identical", () => {
+    const result = buildRawResult({
+      [POKEMON_FIELDS.evolvesTo]: ["Raichu", "Raichu"],
+      [POKEMON_FIELDS.evolvesToImage]: [
+        "https://img.pokemondb.net/sprites/home/normal/2x/raichu.jpg",
+        "https://img.pokemondb.net/sprites/home/normal/2x/raichu.jpg",
+      ],
+    });
+    expect(mapPokemonResult(result).evolution.to).toEqual([
+      { name: "Raichu", imageUrl: "https://img.pokemondb.net/sprites/home/normal/2x/raichu.jpg" },
+    ]);
+  });
+
+  it("pairs a name with a missing image by index rather than misaligning, if the image array is shorter", () => {
+    const result = buildRawResult({
+      [POKEMON_FIELDS.evolvesTo]: ["Vaporeon", "Jolteon"],
+      [POKEMON_FIELDS.evolvesToImage]: ["https://img.pokemondb.net/sprites/home/normal/2x/vaporeon.jpg"],
+    });
+    expect(mapPokemonResult(result).evolution.to).toEqual([
+      { name: "Vaporeon", imageUrl: "https://img.pokemondb.net/sprites/home/normal/2x/vaporeon.jpg" },
+      { name: "Jolteon", imageUrl: undefined },
+    ]);
   });
 
   it("leaves scalar fields undefined and types empty when missing or the wrong shape, instead of throwing", () => {

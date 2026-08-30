@@ -1,18 +1,32 @@
+import Image from "next/image";
 import Link from "next/link";
+import type { EvolutionTarget } from "@/coveo/mapPokemonResult";
 
 /**
- * Simplified evolves-from ← this → evolves-to pair, as links to sibling
- * detail pages — see docs/EXECUTION-PLAN-v2.3-frontend.md §4. `to` is
- * mapped over correctly even though the extraction layer only ever
- * captures one branch today (docs/coveo-source-spec.md), so this keeps
- * working unmodified if that's ever fixed upstream. No branching-chain UI
- * beyond that — full branching with conditions is a deferred stretch goal
- * (plan §9).
+ * Evolves-from ← this → evolves-to(es), as links to sibling detail pages —
+ * see docs/EXECUTION-PLAN-v2.3-frontend.md §4. `to` renders every real
+ * branch (e.g. all 8 Eeveelutions), each with its own sprite, since the
+ * extraction layer captures full multi-value evolution data plus an
+ * index-aligned image per branch (docs/coveo-source-spec.md). Pikachu's two
+ * "Raichu" branches (regular vs. Alolan) render as two separate entries on
+ * purpose — see `EvolutionTarget`'s doc comment in `mapPokemonResult.ts` for
+ * why they're not deduped by name.
  */
 export interface EvolutionChainProps {
-  from?: string;
-  to: string[];
+  from?: EvolutionTarget;
+  to: EvolutionTarget[];
   current: string;
+}
+
+function EvolutionSprite({ target }: { target: EvolutionTarget }) {
+  if (!target.imageUrl) return null;
+  // alt="" deliberately: this sits directly next to the same name as visible
+  // text, so a non-empty alt would announce the name twice to screen readers.
+  return (
+    <div className="relative size-8 shrink-0">
+      <Image src={target.imageUrl} alt="" fill className="object-contain" />
+    </div>
+  );
 }
 
 export function EvolutionChain({ from, to, current }: EvolutionChainProps) {
@@ -29,19 +43,27 @@ export function EvolutionChain({ from, to, current }: EvolutionChainProps) {
       {from && (
         <>
           <li>
-            <Link href={`/pokemon/${encodeURIComponent(from)}`} className="hover:underline">
-              {from}
+            <Link
+              href={`/pokemon/${encodeURIComponent(from.name)}`}
+              className="flex items-center gap-1.5 hover:underline"
+            >
+              <EvolutionSprite target={from} />
+              {from.name}
             </Link>
           </li>
           <li aria-hidden="true">&rarr;</li>
         </>
       )}
       <li className="font-semibold">{current}</li>
-      {to.map((name) => (
-        <li key={name} className="flex items-center gap-2">
+      {to.map((target, index) => (
+        <li key={`${target.name}-${index}`} className="flex items-center gap-2">
           <span aria-hidden="true">&rarr;</span>
-          <Link href={`/pokemon/${encodeURIComponent(name)}`} className="hover:underline">
-            {name}
+          <Link
+            href={`/pokemon/${encodeURIComponent(target.name)}`}
+            className="flex items-center gap-1.5 hover:underline"
+          >
+            <EvolutionSprite target={target} />
+            {target.name}
           </Link>
         </li>
       ))}
