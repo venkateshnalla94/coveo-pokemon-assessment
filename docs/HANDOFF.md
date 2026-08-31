@@ -1,6 +1,6 @@
 # Session handoff — Coveo org build status
 
-Updated 2026-08-31, twentieth session. Phase v2.3 is fully built (seventh session). The tenth session closed v3.1 (sort break) and most of v3.3 (search page data), plus a facet-architecture change (Automatic Facet Generation). The eleventh session did most of v3.2 (branching evolution chain + evolution images) and most of v3.4 (RGA/CPR content-exclusion diagnosis and rules). The twelfth session gave the user the full remaining v3.2/v3.4 console sequence. The thirteenth session executed Batch 2 (chrome restyle + Pokeball search bar). The fourteenth session executed Batch 3 (result tiles + facet type-swatches). The fifteenth session executed Batch 4 (PDP restyle). The sixteenth session executed Batch 5 (RGA scan reveal + scanline citations, passage-retrieval restyle). The seventeenth session executed Batch 6, closing out the v4 design pass entirely (motion/a11y audit + ADR-0013). The eighteenth session did the manual walkthrough + two missing e2e specs, found and fixed two real bugs, then shipped the Vercel deploy (live at https://coveo-pokemon-assessment.vercel.app/). The nineteenth session scoped four follow-up execution-plan docs (see below) and executed Doc 3's original scope (real marketing assets + icon-based Browse-by-type) — that code sat uncommitted until this session. **This (twentieth) session committed Doc 3's shipped code, resolved Doc 1's open Analytics-volume decision (Branch B — see "Twentieth session" below), and is mid-flight on enabling ART.** What's left project-wide: the two presentation decks, the Phase 0 email/booking (**deadline 2026-09-06** — user confirmed sending it 2026-08-31), and the four execution docs' remaining work — summarized in "What's next" below. The prior sessions' handoff content is folded into this one; treat this file as the current snapshot, not an addendum.
+Updated 2026-08-31, twentieth session. Phase v2.3 is fully built (seventh session). The tenth session closed v3.1 (sort break) and most of v3.3 (search page data), plus a facet-architecture change (Automatic Facet Generation). The eleventh session did most of v3.2 (branching evolution chain + evolution images) and most of v3.4 (RGA/CPR content-exclusion diagnosis and rules). The twelfth session gave the user the full remaining v3.2/v3.4 console sequence. The thirteenth session executed Batch 2 (chrome restyle + Pokeball search bar). The fourteenth session executed Batch 3 (result tiles + facet type-swatches). The fifteenth session executed Batch 4 (PDP restyle). The sixteenth session executed Batch 5 (RGA scan reveal + scanline citations, passage-retrieval restyle). The seventeenth session executed Batch 6, closing out the v4 design pass entirely (motion/a11y audit + ADR-0013). The eighteenth session did the manual walkthrough + two missing e2e specs, found and fixed two real bugs, then shipped the Vercel deploy (live at https://coveo-pokemon-assessment.vercel.app/). The nineteenth session scoped four follow-up execution-plan docs (see below) and executed Doc 3's original scope (real marketing assets + icon-based Browse-by-type) — that code sat uncommitted until this session. **This (twentieth) session committed Doc 3's shipped code, resolved Doc 1's open Analytics-volume decision (Branch B) and enabled+verified ART, then built item 1 of 3 (the PDP Similar Pokemon carousel, Doc 2) including a manual-testing UX-fix follow-up (whole-card click, hover pop, scroll arrows) — see "Twentieth session" below for all of it.** What's left project-wide: items 2-3 of the three-item build order (home hero carousel + PDP Highlights from Doc 3 §5; the rest of Doc 4's async contract on `GeneratedAnswer`/`AskAboutPokemon`/`ResultList`), the two presentation decks, and the Phase 0 email/booking (**deadline 2026-09-06** — user confirmed sending it 2026-08-31, not independently verified as sent) — summarized in "What's next" below. The prior sessions' handoff content is folded into this one; treat this file as the current snapshot, not an addendum.
 
 ## Twentieth session — committed Doc 3, resolved the ML-recommendations decision (Branch B), enabling ART (in progress)
 
@@ -126,6 +126,38 @@ console errors.
 **Not done this session**: items 2 (home hero carousel + PDP Highlights,
 Doc 3 §5) and 3 (rest of Doc 4 — `GeneratedAnswer`/`AskAboutPokemon`/
 `ResultList`) of the three-item build order are still open.
+
+## Twentieth session, continued — Similar Pokemon carousel UX fixes
+
+User manual-tested the just-shipped carousel and found three real gaps not
+caught by the automated verification above: the card wasn't clickable except
+for the small "View Pokemon" text, there was no hover feedback the way the
+`/search` listing page's `ResultCard` has one, and there was no visible way
+to scroll besides an undiscoverable drag gesture.
+
+`src/components/SimilarPokemon.tsx` reworked: the whole card is now one
+`<Link>` (matching `ResultCard`'s pattern exactly — no nested anchor), reuses
+`ResultCard`'s `.result-tile` treatment (lift + type-color glow on
+hover/focus, sprite scale) for a consistent feel with the listing page, and
+gained prev/next arrow buttons (hand-drawn SVG chevrons, no icon library —
+same posture as `PokeballGlyph.tsx`) wired to `embla-carousel-react`'s
+`scrollPrev`/`scrollNext`, with disabled state synced to
+`canScrollPrev`/`canScrollNext` via embla's `select`/`reInit` events. Arrows
+are hidden entirely when there's only one card (nothing to scroll to).
+
+Verified live via Playwright against the running dev server on
+`/pokemon/Eevee`, not just visual inspection: confirmed the card's own
+`<a>` resolves to `/pokemon/<name>` (not a second nested link), confirmed
+`Previous`/`Next` buttons exist with correct `disabled` state before and
+after a click, confirmed zero console errors. `npm run lint`,
+`npm run typecheck`, `npm test` (208/208), coverage (99.33%) all clean.
+Existing `SimilarPokemon.test.tsx` updated for the new accessible-name
+shape (`getByRole("link", { name: /Flareon/ })` instead of an exact
+`"View Pokemon"` link name, since that text is no longer its own anchor),
+plus a new test asserting the arrow buttons only render once there's more
+than one card.
+
+Commit `8b13f9a`.
 
 ## Nineteenth session — scoped four follow-up execution plans (no implementation yet)
 
@@ -705,6 +737,33 @@ Built interactively, one field group at a time, with the user driving the actual
   2. `src/coveo/engine.ts` never called Headless's `registerFieldsToInclude`. Coveo's Search API only returns a default field set (`title`, `uri`, etc.) per result unless custom fields are explicitly requested — facets still worked (a separate, server-computed aggregation), but every individual result's `pokemontype`/`pokemongeneration`/`pokemonimageurl` came back empty, so **no Pokemon images or per-result type/generation were rendering anywhere** — not on `/search`, not on the PDP — despite the source/mapping/IPE work all being correct. This is the kind of thing that would have been caught live during the panel demo. Fixed by dispatching `loadFieldActions(engine).registerFieldsToInclude(Object.values(POKEMON_FIELDS))` once at engine construction. Verified visually (screenshots) and via the e2e suite: images, type chips, and generation all render correctly now.
 
 ## What's next (in priority order)
+
+**As of the twentieth session, the real current priority list is:**
+
+1. **Item 2 of the three-item build order**: home hero carousel + PDP
+   "Highlights" section, `docs/EXECUTION-PLAN-marketing-assets.md` §5. No
+   open decisions — ready to execute. Re-open `docs/temp/insiprations/` for
+   the actual reference screenshots before building, per that doc's own
+   note (a prose summary is lossy).
+2. **Item 3**: apply the rest of `docs/EXECUTION-PLAN-async-ui-states.md`'s
+   idle/loading/success/error contract to `GeneratedAnswer.tsx`,
+   `AskAboutPokemon.tsx`, and `ResultList.tsx` — the `.async-panel` CSS
+   already exists in `src/app/globals.css` (added for `SimilarPokemon.tsx`,
+   its first consumer), so this is applying an established pattern, not
+   inventing one.
+3. **Both presentation decks** (Advanced tier) — still not started, see
+   item 4 in the older numbered list below, which still applies.
+4. **Phase 0 email + presentation-slot booking** (deadline 2026-09-06) and
+   the off-cycle RGA/Semantic-Encoder/CPR model-rebuild request — user
+   indicated sending both 2026-08-31 (today, at time of writing); **not
+   independently verified as sent this session** — confirm status before
+   assuming either is done.
+
+The numbered list immediately below predates the nineteenth/twentieth
+sessions and is largely historical (most of its own items are marked
+done/superseded inline) — kept for the operational detail in items 0/4/5
+(the ML-rebuild trail and the Phase 0 email context), not as the live
+priority order.
 
 Phase v2.3 is done as of the seventh session — the v2 roadmap (`docs/EXECUTION-PLAN-v2.md`) is now fully closed. **New this session: `docs/EXECUTION-PLAN-v3.md`** — a separate, independent track opened by live usage, four phases, pick any one:
 
