@@ -1,6 +1,191 @@
 # Session handoff — Coveo org build status
 
-Updated 2026-08-30, eighteenth session (v4 wrap-up items: manual walkthrough + two missing e2e specs, two real bugs found and fixed). Phase v2.3 is fully built (seventh session). The tenth session closed v3.1 (sort break) and most of v3.3 (search page data), plus a facet-architecture change (Automatic Facet Generation). The eleventh session did most of v3.2 (branching evolution chain + evolution images) and most of v3.4 (RGA/CPR content-exclusion diagnosis and rules). The twelfth session gave the user the full remaining v3.2/v3.4 console sequence. The thirteenth session executed Batch 2 (chrome restyle + Pokeball search bar). The fourteenth session executed Batch 3 (result tiles + facet type-swatches). The fifteenth session executed Batch 4 (PDP restyle). The sixteenth session executed Batch 5 (RGA scan reveal + scanline citations, passage-retrieval restyle). The seventeenth session executed Batch 6, closing out the v4 design pass entirely (motion/a11y audit + ADR-0013). **This (eighteenth) session did the "What's next" item 1 manual walkthrough plus the two e2e specs that item named** (`compare-selection-survives-navigation`, deep-linked facet URL restore) — see the eighteenth-session section below for two real bugs the walkthrough surfaced and fixed, neither caught by any prior session's automated suite. Vercel deploy followed the same day — see that section below; it's live at https://coveo-pokemon-assessment.vercel.app/. What's left project-wide: the two presentation decks and the Phase 0 email/booking (**deadline 2026-09-06** — user confirmed sending it 2026-08-31) — all pre-existing, summarized in "What's next" below. The prior sessions' handoff content is folded into this one; treat this file as the current snapshot, not an addendum.
+Updated 2026-08-30, nineteenth session (planning only — no code, no org config touched). Phase v2.3 is fully built (seventh session). The tenth session closed v3.1 (sort break) and most of v3.3 (search page data), plus a facet-architecture change (Automatic Facet Generation). The eleventh session did most of v3.2 (branching evolution chain + evolution images) and most of v3.4 (RGA/CPR content-exclusion diagnosis and rules). The twelfth session gave the user the full remaining v3.2/v3.4 console sequence. The thirteenth session executed Batch 2 (chrome restyle + Pokeball search bar). The fourteenth session executed Batch 3 (result tiles + facet type-swatches). The fifteenth session executed Batch 4 (PDP restyle). The sixteenth session executed Batch 5 (RGA scan reveal + scanline citations, passage-retrieval restyle). The seventeenth session executed Batch 6, closing out the v4 design pass entirely (motion/a11y audit + ADR-0013). The eighteenth session did the manual walkthrough + two missing e2e specs, found and fixed two real bugs, then shipped the Vercel deploy (live at https://coveo-pokemon-assessment.vercel.app/). **This (nineteenth) session scoped four follow-up feature areas the user raised (PDP similar/recommended Pokemon, other Coveo ML models, the still-placeholder `ImageSlot`s, and real layout shift on `GeneratedAnswer`/`AskAboutPokemon`) into four new execution-plan docs, after a plan-mode discussion that changed the original approach twice based on user direction** — see "Nineteenth session" below for what's in each doc and what's still genuinely open. What's left project-wide: the two presentation decks, the Phase 0 email/booking (**deadline 2026-09-06** — user confirmed sending it 2026-08-31), and now the four new execution docs' work itself — summarized in "What's next" below. The prior sessions' handoff content is folded into this one; treat this file as the current snapshot, not an addendum.
+
+## Nineteenth session — scoped four follow-up execution plans (no implementation yet)
+
+User raised four gaps after the v4 design pass and Vercel deploy: no
+similar/recommended Pokemon on the PDP, no Coveo ML beyond RGA/Passage
+Retrieval/Query Suggestions/Automatic Facet Generation, four dashed-placeholder
+`ImageSlot`s (`homeBanner`, `heroBackdrop`, `typeFacetHeader`, `emptySearch` —
+`CONTENT.art` in `src/content/pokedex.ts` has all four `undefined`), and real
+layout shift where `GeneratedAnswer.tsx` and `AskAboutPokemon.tsx` go from
+absent straight to a full block the instant Coveo responds, reflowing
+everything below them.
+
+Went through plan mode twice on this. The first pass proposed avoiding any
+new art/dependencies (build "Similar" from a same-type query only, fill the
+placeholder slots from already-fetched sprite data / in-house components like
+`PokeballGlyph`, keep the async-state fix component-local) — **the user
+rejected that plan outright** and gave more specific direction: check real
+Coveo ML options (Content Recommendation model, ART) against the org's actual
+usage-analytics volume before deciding anything, source real downloaded
+images for the placeholder slots (licensing accepted as a non-issue for a
+demo), make the similar-Pokemon UI an actual carousel (`embla-carousel-react`
+approved as a new dependency — the first UI library in this repo beyond
+`@coveo/headless` and Next itself), redesign Browse-by-type from a text-pill
+grid into a horizontal strip of circular type icons, and treat the layout-
+shift fix as a general idle/loading/success/error contract every
+Coveo-or-API-backed component should follow, not a one-off patch.
+
+Produced four new execution docs instead of code, per that direction ("I want
+4 execution files, rather than implementing"):
+
+1. **`docs/EXECUTION-PLAN-ml-recommendations.md`** — research on Coveo's
+   Content Recommendation (CR) model and Automatic Relevance Tuning (ART),
+   done via WebSearch against docs.coveo.com this session (**not yet
+   re-verified by direct page fetch — that's still required before any
+   console action, per the standing rule below**). Key finding: CR needs
+   roughly 10,000+ historical queries to be reliably relevant per Coveo's own
+   guidance; this org's actual volume is unknown and genuinely blocks the
+   doc's "Similar/Recommended/Popular" decision — **next session should open
+   with Analytics → Usage Analytics in the live console to get that number
+   before anything else in this doc proceeds.** ART is recommended
+   independently of that number (console-only, pairs with the org's existing
+   Query Suggestions model per Coveo's own docs).
+2. **`docs/EXECUTION-PLAN-similar-pokemon-carousel.md`** — the PDP carousel
+   UI spec, written to consume either ML doc branch's output identically via
+   one `SimilarPokemon` data shape. Not blocked on doc 1 to *write* the
+   `/api/similar` same-type-query fallback route, since that's needed either
+   way as a safety net.
+3. **`docs/EXECUTION-PLAN-marketing-assets.md`** — ready to execute now, no
+   open decisions. Real images downloaded into `public/art/` (not hotlinked)
+   for the four placeholder slots, plus a real type-icon set (candidates
+   found: `github.com/partywhale/pokemon-type-icons`, a DeviantArt PNG set)
+   for the Browse-by-type icon-strip redesign.
+4. **`docs/EXECUTION-PLAN-async-ui-states.md`** — ready to execute now, no
+   open decisions. A shared idle/loading/success/error contract (persistent
+   wrapper, CSS grid `0fr`→`1fr` collapse/expand, real skeletons) applied to
+   `GeneratedAnswer.tsx`, `AskAboutPokemon.tsx`, `ResultList.tsx`, and the new
+   carousel from day one.
+
+**Nothing was implemented in the planning half of this session** — no code
+changed, no org config touched, no docs.coveo.com pages fetched directly yet
+(only WebSearch snippets, which are not a substitute for a direct page read
+per this project's standing rule — doc 1 says this explicitly and it must be
+honored before any ART/CR console action next session).
+
+## Doc 3 executed — real marketing assets + icon-based Browse-by-type
+
+Same (nineteenth) session, immediately after the four docs above were
+written — user asked to execute Doc 3 (`docs/EXECUTION-PLAN-marketing-assets.md`)
+right away rather than waiting. No Coveo org config touched; no query/
+controller behavior changed.
+
+**Sourcing, real and verified live, not guessed:** confirmed
+`img.pokemondb.net/artwork/large/<name>.jpg` (the same host
+`mapPokemonResult.ts` already trusts as the real image source for every
+Pokemon sprite this app renders) serves full official-style artwork for any
+Pokemon name, distinct from the smaller `sprites/home/normal/2x/` sprites
+used elsewhere in the app. Downloaded 16 of these (Pikachu, Charizard,
+Gyarados, Venusaur, Mewtwo, Snorlax, Lucario, Gengar, Lugia, Garchomp,
+Umbreon, Greninja, Mew, Articuno, Psyduck, Dragonite), chroma-keyed each
+one's white background to transparent (simple near-white threshold + edge
+feather, via Pillow — a real cutout, not a fabricated image), and composited
+three collages: `home-banner.webp` (7-Pokemon marquee, 1920×600),
+`hero-backdrop.webp` (6-legendary lineup, 2100×900), `empty-search.webp`
+(a single Psyduck — genuinely on-brand for a "found nothing, confused" empty
+state). Saved as WebP (not PNG) specifically for size: the PNG composites
+were 1.2–1.8MB each, WebP got them to 44–316KB with no visible quality loss.
+All three now live under `public/art/` and are wired into `CONTENT.art` in
+`src/content/pokedex.ts` — `ImageSlot.tsx` needed zero changes, exactly as
+the doc predicted.
+
+**Type icons**: found `github.com/partywhale/pokemon-type-icons` (MIT
+licensed, confirmed by reading its actual `LICENSE` file, not assumed) — 18
+SVGs, one per real type name, each already a self-contained colored circle
+badge. Downloaded all 18 into `public/art/types/`, with the MIT license text
+and a source/attribution note for the two other composites saved alongside
+them in `public/art/types/LICENSE.txt`.
+
+**`BrowseByType.tsx` rewritten**: the text-pill grid became a horizontal
+scrollable strip of circular icon "pins" (plain `<img>`, not `next/image` —
+next/image's optimizer refuses local SVGs without setting
+`dangerouslyAllowSVG` in `next.config.ts`, and there's no responsive-size
+need for a fixed 56px icon), each still carrying a small type-name label
+below it (never icon-alone, per the same color-plus-label rule
+`ADR-0013` already established for facet swatches) and still using the exact
+same `buildTypeSearchHref` click destination as before — a visual swap only.
+Dropped the `typeFacetHeader` `ImageSlot` and its `CONTENT.art` key entirely
+(unused code deleted, not left as dead scaffolding) rather than filling it
+with a fourth image — the icon strip itself reads as the section's visual
+anchor now, a redundant banner above it would have been clutter, confirmed
+by an actual in-browser look, not decided in the abstract.
+
+**One real bug found and fixed, not anticipated by the doc.** Once
+`hero-backdrop.webp` was live behind the PDP hero sprite
+(`PokemonHero.tsx`), the sprite's own image — a real indexed
+`img.pokemondb.net/sprites/...` asset, always rendered with an *opaque
+white* background baked into the pixels, not a transparent cutout — showed
+up as a jarring hard-edged white rectangle sitting on top of the new
+colorful collage; harmless before this session since it sat on a blank
+dashed placeholder instead. A first fix attempt (a soft radial `var(--surface)`
+glow behind the sprite) did nothing, confirmed live via screenshot — the
+sprite's opaque pixels simply painted over it, since `object-contain` still
+occupies the full image box. Real fix: reframed the sprite's container as a
+deliberate rounded card (`bg-surface`, `shadow-xl`, hairline ring) instead of
+fighting the opaque background — turns the white box into an intentional
+"trading card" floating on the band, confirmed live in both light and dark
+mode via Playwright screenshots (`src/components/PokemonHero.tsx`). This is
+a pre-existing characteristic of the real sprite data, not something this
+session's asset work broke — it was simply invisible against a blank
+placeholder before.
+
+**Verification, all live, not just declared:** `npm run lint`,
+`npm run typecheck`, `npm test` (193/193, no test changes needed — no
+existing test referenced `BrowseByType` or `typeFacetHeader`), `npm run build`
+all clean. Manual Playwright screenshots against a real local dev server
+confirmed: the home banner and type-icon strip render correctly in both light
+and dark mode; the PDP hero backdrop + reframed sprite card render correctly
+in both modes across two different Pokemon (Charizard, Gengar); every
+Browse-by-type icon's click destination is unchanged. The `empty-search.webp`
+slot itself was not separately re-screenshotted this session (a garbage
+query still matched 438 results via Coveo's own query-suggestion/fuzzy
+behavior rather than truly returning zero) — low risk, since it renders
+through the exact same `ImageSlot` code path already proven live for the
+other two slots.
+
+Files touched: `src/content/pokedex.ts`, `src/components/BrowseByType.tsx`,
+`src/components/PokemonHero.tsx` (the unplanned card-framing fix). New:
+`public/art/home-banner.webp`, `public/art/hero-backdrop.webp`,
+`public/art/empty-search.webp`, `public/art/types/*.svg` (18 files),
+`public/art/types/LICENSE.txt`.
+
+**Not done this session**: Docs 1, 2, and 4 — Doc 1's live Analytics console
+check is still the next open item and still gates Doc 2's data source; Doc 4
+is independent and can be picked up any time.
+
+## Same session, continued — new inspiration folded into Docs 2 and 3
+
+User dropped six reference screenshots into `docs/temp/insiprations/{Home,pdp}/`
+(Sleep Country and Sephora product pages) and asked for them to be read and
+folded into the relevant execution docs as new scope, documentation-only —
+no code this pass. Both docs updated directly (see their own files for full
+detail, not re-summarized here to avoid drift):
+
+- **`docs/EXECUTION-PLAN-marketing-assets.md`** gained a new §5: a home hero
+  **carousel** (2-3 slides promoting real, already-shipped features —
+  search, compare, ask-about-Pokemon — superseding the single static
+  `home-banner.webp` as the whole hero; that image becomes one slide's
+  background instead) and a new PDP **"Highlights" section** (icon+label
+  callouts built from real `PokemonItem` fields — type via `TypeSwatch`,
+  top ability, egg group, generation, a to-be-defined catch-rate tier).
+  Sleep Country's bigger "Shop by Category" tile grid was logged as
+  "considered, not proposed yet" rather than queued as work, since it would
+  compete with the icon-pin strip already shipped this session.
+- **`docs/EXECUTION-PLAN-similar-pokemon-carousel.md`**'s card spec (§3)
+  was sharpened against Sephora's "Similar Lip Balms & Treatments" grid as
+  its direct template: price and star-rating fields are explicitly dropped
+  (no Pokemon equivalent — importing them would be fabricated data), replaced
+  with a real stat-highlight line ("Strong in: Attack, Speed", derived from
+  the two highest real values in `item.stats` via `STAT_ORDER`,
+  `src/coveo/pokemonStats.ts`). The `SimilarPokemon` data contract (§1) and
+  the `/api/similar` mapping (§2) both gained a `stats` field to support it.
+
+Both docs still route through `EXECUTION-PLAN-ml-recommendations.md`'s open
+Analytics check where applicable (the carousel doc's data source), and
+neither depends on Doc 4. Nothing in `public/art/`, `src/`, or the Coveo org
+changed this pass.
 
 ## Eighteenth session — manual walkthrough + two missing e2e specs (What's next item 1)
 
