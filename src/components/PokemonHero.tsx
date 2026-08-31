@@ -55,13 +55,24 @@ export function PokemonHero({ name, imageUrl, dexNumber, types, species }: Pokem
           </span>
         )}
         {imageUrl && (
-          <Image
-            src={imageUrl}
-            alt={name}
-            fill
-            sizes="(min-width: 640px) 360px, 220px"
-            className="object-contain drop-shadow-xl"
-          />
+          // The real indexed sprite (img.pokemondb.net) is an opaque
+          // white-background image, not a transparent cutout — against the
+          // hero band's own art (docs/EXECUTION-PLAN-marketing-assets.md)
+          // that white background read as a stray rectangle rather than a
+          // sprite. Framing it as a deliberate card (rounded, `bg-surface`
+          // so it's correct in both themes, shadow + hairline ring) turns
+          // it into an intentional "trading card" floating on the band
+          // instead of fighting the sprite's own opaque background — no
+          // attempt to hide/cut out the real image data itself.
+          <div className="absolute inset-[6%] overflow-hidden rounded-2xl bg-surface shadow-xl ring-1 ring-black/5 dark:ring-white/10">
+            <Image
+              src={imageUrl}
+              alt={name}
+              fill
+              sizes="(min-width: 640px) 360px, 220px"
+              className="object-contain p-2"
+            />
+          </div>
         )}
       </div>
       <div className="flex flex-1 flex-col items-center gap-2 pb-1 sm:items-start">

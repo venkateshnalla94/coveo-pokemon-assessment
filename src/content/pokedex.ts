@@ -142,9 +142,8 @@ export const CONTENT = {
   },
 
   art: {
-    heroBackdrop: undefined as string | undefined,
-    homeBanner: undefined as string | undefined,
-    emptySearch: undefined as string | undefined,
-    typeFacetHeader: undefined as string | undefined,
+    heroBackdrop: "/art/hero-backdrop.webp" as string | undefined,
+    homeBanner: "/art/home-banner.webp" as string | undefined,
+    emptySearch: "/art/empty-search.webp" as string | undefined,
   },
 } as const;
