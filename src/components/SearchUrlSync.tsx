@@ -7,7 +7,7 @@ import {
   loadSearchAnalyticsActions,
 } from "@coveo/headless";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { getSearchEngine } from "@/coveo/engine";
 
 /**
@@ -84,12 +84,25 @@ export function SearchUrlSync() {
   // round-tripped straight back to a bare `/search` with nothing filtered.
   loadAdvancedSearchQueryActions(engine);
 
-  // Built once; the constructor's own dispatch(restoreSearchParameters(...))
-  // is what seeds query/facet/sort state from the URL this page was loaded
-  // with — see the component doc comment above.
-  const [urlManager] = useState(() =>
-    buildUrlManager(engine, { initialState: { fragment: toHeadlessFragment(searchParams) } }),
-  );
+  // Built once, but *not* via a useState lazy initializer — that would run
+  // during render, and the constructor's own dispatch(restoreSearchParameters(...))
+  // (still what seeds query/facet/sort state from the URL this page was
+  // loaded with — see the component doc comment above) notifies every
+  // subscriber on the shared engine synchronously, including any other
+  // already-mounted controller of the same kind elsewhere in the tree (e.g.
+  // AppHeader's own `<SearchBox>` on `/pokemon/[name]`, or a still-mounted
+  // instance mid-route-transition). Notifying a different component's
+  // subscriber from inside this component's render is exactly what trips
+  // React's "Cannot update a component while rendering a different
+  // component" warning — `useControllerState`'s `useSyncExternalStore` only
+  // prevents tearing/loops, not that specific dev warning, since it still
+  // schedules the other component's update on this render's call stack.
+  // `useLayoutEffect` moves construction (and its dispatch) to just after
+  // commit — no longer inside any component's render — while still running
+  // before paint, so `SearchBox` elsewhere is corrected before the user
+  // ever sees a stale value: same UX, no warning.
+  const urlManagerRef = useRef<ReturnType<typeof buildUrlManager>>(undefined);
+  const [urlManagerReady, setUrlManagerReady] = useState(false);
 
   // Tracks the last fragment this component itself reconciled (either
   // direction), so the two effects below never fight each other or loop:
@@ -98,15 +111,33 @@ export function SearchUrlSync() {
   // recognized when urlManager's own subscribe listener re-checks.
   const lastFragment = useRef<string | undefined>(undefined);
 
-  // URL -> state: fires on mount, and again on browser back/forward or any
-  // other external navigation to /search with different params (e.g. a
-  // future "browse by type" link). `restoreSearchParameters` alone doesn't
-  // execute a request, so a real search action is dispatched right after —
-  // the same pairing the detail page already uses (an `aq` dispatch
-  // followed by an explicit submit), just via `loadSearchActions` directly
-  // instead of a `SearchBox` controller, since there's no per-instance
-  // query-set state to worry about going stale here.
+  useLayoutEffect(() => {
+    if (urlManagerRef.current) {
+      return;
+    }
+    urlManagerRef.current = buildUrlManager(engine, {
+      initialState: { fragment: toHeadlessFragment(searchParams) },
+    });
+    setUrlManagerReady(true);
+    // Runs exactly once, on mount — searchParams is read only for its value
+    // at construction time, matching the previous useState-initializer
+    // behavior it replaces.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [engine]);
+
+  // URL -> state: fires once urlManager exists, and again on browser
+  // back/forward or any other external navigation to /search with different
+  // params (e.g. a future "browse by type" link). `restoreSearchParameters`
+  // alone doesn't execute a request, so a real search action is dispatched
+  // right after — the same pairing the detail page already uses (an `aq`
+  // dispatch followed by an explicit submit), just via `loadSearchActions`
+  // directly instead of a `SearchBox` controller, since there's no
+  // per-instance query-set state to worry about going stale here.
   useEffect(() => {
+    const urlManager = urlManagerRef.current;
+    if (!urlManager) {
+      return;
+    }
     const fragment = toHeadlessFragment(searchParams);
     if (lastFragment.current === fragment) {
       return;
@@ -116,7 +147,7 @@ export function SearchUrlSync() {
     const { executeSearch } = loadSearchActions(engine);
     const { logInterfaceLoad } = loadSearchAnalyticsActions(engine);
     engine.dispatch(executeSearch(logInterfaceLoad()));
-  }, [searchParams, urlManager, engine]);
+  }, [searchParams, urlManagerReady, engine]);
 
   // state -> URL: a facet toggle, sort change, or search-box submit changes
   // the controller's fragment; reflect it into the address bar with
@@ -124,6 +155,10 @@ export function SearchUrlSync() {
   // browser history — matching how a real Coveo search page keeps facet
   // selections shareable/bookmarkable without becoming a back-button trap.
   useEffect(() => {
+    const urlManager = urlManagerRef.current;
+    if (!urlManager) {
+      return;
+    }
     return urlManager.subscribe(() => {
       const fragment = urlManager.state.fragment;
       if (fragment === lastFragment.current) {
@@ -132,7 +167,7 @@ export function SearchUrlSync() {
       lastFragment.current = fragment;
       router.replace(fragment ? `${pathname}?${fragment}` : pathname, { scroll: false });
     });
-  }, [urlManager, router, pathname]);
+  }, [urlManagerReady, router, pathname]);
 
   return null;
 }
