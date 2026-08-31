@@ -2,7 +2,7 @@
 
 @AGENTS.md
 
-This file adds Claude-specific process rules on top of `AGENTS.md`'s cross-tool facts (commands, repo map, conventions). Don't restate anything from `AGENTS.md`, `docs/HANDOFF.md`, `docs/plan101.md`, `docs/EXECUTION-PLAN.md`, or `docs/EXECUTION-PLAN-v2.md` here — link to them. Those files are the source of truth for current state; this file goes stale the moment it duplicates a fact that changes.
+This file adds Claude-specific process rules on top of `AGENTS.md`'s cross-tool facts (commands, repo map, conventions). Don't restate anything from `AGENTS.md`, `docs/HANDOFF.md`, `docs/plan101.md`, `docs/archive/EXECUTION-PLAN.md`, or `docs/archive/EXECUTION-PLAN-v2.md` here — link to them. Those files are the source of truth for current state; this file goes stale the moment it duplicates a fact that changes.
 
 ## What this is
 

@@ -1,6 +1,6 @@
 # Execution Plan v2.3 — Frontend component spec
 
-The component-level design `docs/EXECUTION-PLAN-v2.md` deferred. Written against the three mockups in `mock-ups/`, `docs/mockup-ui-analysis.md`, `docs/pokemon-data-inventory.md`, and the code as it stands today. Everything below is a build instruction, not analysis — the analysis lives in the two research docs and isn't repeated.
+The component-level design `docs/archive/EXECUTION-PLAN-v2.md` deferred. Written against the three mockups in `mock-ups/`, `docs/mockup-ui-analysis.md`, `docs/pokemon-data-inventory.md`, and the code as it stands today. Everything below is a build instruction, not analysis — the analysis lives in the two research docs and isn't repeated.
 
 **Correction to `docs/mockup-ui-analysis.md`:** its filename-to-screen mapping is wrong. The real mapping is `A7D995E4…` = search results, `03D97A8B…` = detail page, `BC25DEA1…` = home. Fix that doc's Screen 1/2/3 headings when this plan is actioned.
 

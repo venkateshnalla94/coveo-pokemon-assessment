@@ -52,4 +52,4 @@ Both tiers should map back to a named finding from section 1, not exist as boile
 
 ## Open item — not covered by this file
 
-The challenge's other source document (`Pokemon Challenge (Pre-Sales) - 2026.txt`) specifies a different Topic 2: identify an enterprise customer from past or present experience who could benefit from a similar Coveo solution, and present the value proposition. That's a separate deliverable with no draft yet — worth opening the actual panel session by confirming which Topic 2 the panel wants, with both prepared, per `docs/EXECUTION-PLAN.md`'s own noted resolution to this document conflict.
+The challenge's other source document (`Pokemon Challenge (Pre-Sales) - 2026.txt`) specifies a different Topic 2: identify an enterprise customer from past or present experience who could benefit from a similar Coveo solution, and present the value proposition. That's a separate deliverable with no draft yet — worth opening the actual panel session by confirming which Topic 2 the panel wants, with both prepared, per `docs/archive/EXECUTION-PLAN.md`'s own noted resolution to this document conflict.

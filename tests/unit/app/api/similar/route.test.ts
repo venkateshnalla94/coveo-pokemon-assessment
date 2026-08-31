@@ -77,6 +77,16 @@ describe("POST /api/similar", () => {
     expect(blankEntry.status).toBe(400);
   });
 
+  it("returns 400 when name or types contains structural CAQL characters", async () => {
+    configureEnv();
+
+    const badName = await POST(postRequest({ name: "Eevee) OR @x==(y", types: ["Normal"] }));
+    expect(badName.status).toBe(400);
+
+    const badType = await POST(postRequest({ name: "Eevee", types: ["Normal", "@injected"] }));
+    expect(badType.status).toBe(400);
+  });
+
   it("builds an aq filter from types and name with embedded quotes escaped", async () => {
     configureEnv();
     const fetchMock = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ results: [] }) });

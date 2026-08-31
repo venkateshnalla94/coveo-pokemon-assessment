@@ -1,6 +1,6 @@
 # Architecture docs
 
-Written for the panel demo / executive walkthrough of this project. These describe **what is actually built**, verified by reading the code directly (not the plan docs) as of 2026-08-29. Where a plan doc (`docs/EXECUTION-PLAN*.md`) and the running code disagree, the code — as read in this pass — wins, and the doc says so.
+Written for the panel demo / executive walkthrough of this project. These describe **what is actually built**, verified by reading the code directly (not the plan docs) as of 2026-08-29. Where a plan doc (`docs/archive/EXECUTION-PLAN*.md`) and the running code disagree, the code — as read in this pass — wins, and the doc says so.
 
 Read order:
 

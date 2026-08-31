@@ -113,7 +113,7 @@ keep the remaining jump small, not eliminate it.
   `"empty"` stays its own distinct centered layout (a real content
   difference, not a bug) — just confirmed not to collapse to a drastically
   different height band than the grid it replaces.
-- **New carousel** (`docs/EXECUTION-PLAN-similar-pokemon-carousel.md`): built
+- **New carousel** (`docs/archive/EXECUTION-PLAN-similar-pokemon-carousel.md`): built
   against this same `.async-panel` pattern from the start.
 
 ## 4. Files touched

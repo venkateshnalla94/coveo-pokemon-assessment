@@ -4,7 +4,7 @@ Status: Accepted
 
 ## Context
 
-`docs/EXECUTION-PLAN-v4-design-system.md` (batches 2-6) replaced the untouched
+`docs/archive/EXECUTION-PLAN-v4-design-system.md` (batches 2-6) replaced the untouched
 Next.js starter look with a design system built around the 18 Pokemon type
 colors already sitting unused in `src/coveo/typeColors.ts`. Three decisions
 from that plan are architectural enough, and load-bearing enough for future
@@ -49,7 +49,7 @@ re-tuning a single hex touches exactly one file.
 
 ## Decision 2: `--signal-red` restricted to two uses, with one plan-directed exception
 
-`docs/EXECUTION-PLAN-v4-design-system.md` §3.2 states `--signal-red` is
+`docs/archive/EXECUTION-PLAN-v4-design-system.md` §3.2 states `--signal-red` is
 "restricted to exactly two uses: the Pokeball glyph and the global focus
 ring." Both exist:
 

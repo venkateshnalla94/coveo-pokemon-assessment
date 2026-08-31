@@ -2,9 +2,9 @@
 
 ## Context
 
-The trial org invite arrived, unblocking Phase 3 onward of `docs/EXECUTION-PLAN.md`. Phase 2 (all local code changes) is already done and verified, so the app's field names, mapping expectations, and multi-value handling are fixed points — the org must be configured to match them, not the other way around. This plan sequences the admin-console work end to end: test source → fields/mappings/IPE → full crawl → API key/connect → Query Suggest → RGA → (conditionally) Passage Retrieval. It exists so you can review the order and reasoning before touching the console, since several steps have irreversible-ish costs (a bad crawl config means a 35–45 min rebuild) or silent-failure traps documented in the execution plan (C1–C8).
+The trial org invite arrived, unblocking Phase 3 onward of `docs/archive/EXECUTION-PLAN.md`. Phase 2 (all local code changes) is already done and verified, so the app's field names, mapping expectations, and multi-value handling are fixed points — the org must be configured to match them, not the other way around. This plan sequences the admin-console work end to end: test source → fields/mappings/IPE → full crawl → API key/connect → Query Suggest → RGA → (conditionally) Passage Retrieval. It exists so you can review the order and reasoning before touching the console, since several steps have irreversible-ish costs (a bad crawl config means a 35–45 min rebuild) or silent-failure traps documented in the execution plan (C1–C8).
 
-Nothing here writes code — it's console configuration. No files change as a result of this plan itself; it's a checklist to execute by hand in the Coveo admin UI, with the local repo's `docs/coveo-source-spec.md` and `docs/EXECUTION-PLAN.md` updated to mark status as steps complete.
+Nothing here writes code — it's console configuration. No files change as a result of this plan itself; it's a checklist to execute by hand in the Coveo admin UI, with the local repo's `docs/coveo-source-spec.md` and `docs/archive/EXECUTION-PLAN.md` updated to mark status as steps complete.
 
 ## Day-zero actions (do these first, before any config)
 
@@ -121,7 +121,7 @@ New traps discovered that the original plan didn't anticipate:
 | F1 | Record a 5–8 min demo of the full flow, commit to the repo | The org is on a 14-day deletion clock; a recorded demo is what makes the presentation survive the org disappearing before or during it. |
 | F2 | Screenshot: source config, URL filters, scraping config, fields, mappings, IPE code + log, Content Browser (Pikachu + Garchomp), QS model, the D7 2xx response, RGA model, pipeline associations, CPR model | Each screenshot is evidence for a specific claim made in the Topic 1 technical deep-dive — collect them as each stage completes rather than reconstructing after the org is gone. |
 | F3 | Export and commit: scraping config JSON, IPE Python source, `DEFAULT_QUERIES` CSV, the mapping table | Same rationale as F2 — these are the actual artifacts referenced in the deck, not descriptions of them. |
-| F4 | Update `docs/coveo-source-spec.md` status line and `docs/EXECUTION-PLAN.md` phase checkboxes as each stage above completes | Keeps the plan-of-record accurate; both files are referenced directly in the presentation prep. |
+| F4 | Update `docs/coveo-source-spec.md` status line and `docs/archive/EXECUTION-PLAN.md` phase checkboxes as each stage above completes | Keeps the plan-of-record accurate; both files are referenced directly in the presentation prep. |
 
 ## Ongoing, from Stage A onward
 

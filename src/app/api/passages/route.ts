@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { escapeCaqlExactMatchValue } from "@/coveo/caqlExactMatch";
 import { resolveServerCoveoConfig } from "@/coveo/config";
 import { SEARCH_HUB } from "@/coveo/searchConfig";
 
@@ -83,11 +84,18 @@ export async function POST(request: NextRequest) {
   }
 
   const query = body.query.slice(0, MAX_QUERY_LENGTH);
-  // Same exact-match escaping as the detail page's `aq` filter — see the
-  // comment on the `escapedName` line in src/app/pokemon/[name]/page.tsx.
-  const filter = body.pokemonName
-    ? `@pokemonname=="${body.pokemonName.replace(/"/g, '\\"')}"`
-    : undefined;
+
+  let filter: string | undefined;
+  if (body.pokemonName) {
+    const escapedName = escapeCaqlExactMatchValue(body.pokemonName);
+    if (escapedName === null) {
+      return NextResponse.json(
+        { error: "`pokemonName` contains unsupported characters." },
+        { status: 400 },
+      );
+    }
+    filter = `@pokemonname=="${escapedName}"`;
+  }
 
   const upstream = await fetch(
     `https://platform.cloud.coveo.com/rest/search/v3/passages/retrieve?organizationId=${encodeURIComponent(config.organizationId)}`,

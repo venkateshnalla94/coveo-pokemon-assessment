@@ -18,11 +18,17 @@ jobs:
 
       - run: npm ci
 
+      - name: Dependency audit
+        run: npm audit --audit-level=high
+
       - name: Lint
         run: npm run lint -- --max-warnings=0
 
       - name: Typecheck
         run: npm run typecheck
+
+      - name: Test coverage guard (every src/coveo/*, src/app/api/* file has a mirroring test)
+        run: node scripts/check-test-coverage.mjs
 
       - name: Unit tests (with coverage)
         run: npm run test:coverage
@@ -33,7 +39,17 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
 
+      # NEXT_PUBLIC_* vars must be present here, not just at runtime — Playwright's
+      # webServer (playwright.config.ts) runs its own `next build`, and Next.js only
+      # inlines NEXT_PUBLIC_* into the client bundle at build time (see the comment
+      # on resolveCoveoConfig in src/coveo/config.ts). Without these, the four specs
+      # below silently test.skip() and only unconfigured.spec.ts actually runs.
       - name: E2E smoke tests
         run: npm run test:e2e
         env:
           CI: true
+          NEXT_PUBLIC_COVEO_ORGANIZATION_ID: ${{ secrets.NEXT_PUBLIC_COVEO_ORGANIZATION_ID }}
+          NEXT_PUBLIC_COVEO_ACCESS_TOKEN: ${{ secrets.NEXT_PUBLIC_COVEO_ACCESS_TOKEN }}
+          NEXT_PUBLIC_COVEO_AUTH_MODE: ${{ secrets.NEXT_PUBLIC_COVEO_AUTH_MODE }}
+          NEXT_PUBLIC_COVEO_SEARCH_HUB: ${{ secrets.NEXT_PUBLIC_COVEO_SEARCH_HUB }}
+          NEXT_PUBLIC_COVEO_PIPELINE: ${{ secrets.NEXT_PUBLIC_COVEO_PIPELINE }}

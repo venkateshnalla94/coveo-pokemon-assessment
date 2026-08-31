@@ -9,7 +9,7 @@ Scope: which Coveo ML capability (if any) backs three requested surfaces —
 "Similar," "Recommended," and "Popular" Pokemon — plus a standalone
 recommendation to enable Automatic Relevance Tuning (ART) regardless of that
 decision. No code in this doc; it produces a console-configuration sequence
-and an ADR. `docs/EXECUTION-PLAN-similar-pokemon-carousel.md` builds the UI
+and an ADR. `docs/archive/EXECUTION-PLAN-similar-pokemon-carousel.md` builds the UI
 once this doc's branch is chosen.
 
 ---
@@ -103,7 +103,7 @@ query count.
 
 **Branch B — usage volume is too low for CR to be honest.**
 - Ship "Similar" only, as a deterministic same-type/same-generation Search
-  API query (fully speced in `docs/EXECUTION-PLAN-similar-pokemon-carousel.md`
+  API query (fully speced in `docs/archive/EXECUTION-PLAN-similar-pokemon-carousel.md`
   — no ML model, no cold-start risk, always has real data to show).
 - Do not build "Recommended" or "Popular" as their own surfaces yet — document
   in the ADR below that CR is the intended future path once analytics
@@ -131,5 +131,5 @@ creating a CR model, associating either with the `Pokedex` pipeline):
 - A `docs/HANDOFF.md` update recording the console changes made (ART
   enabled/associated; CR model created and associated, if Branch A) and the
   docs.coveo.com pages read.
-- Unblocks `docs/EXECUTION-PLAN-similar-pokemon-carousel.md`, which is
+- Unblocks `docs/archive/EXECUTION-PLAN-similar-pokemon-carousel.md`, which is
   written to consume either branch's data shape identically.

@@ -64,14 +64,13 @@ describe("resolveServerCoveoConfig", () => {
       configured: true,
       organizationId: "myorg",
       apiKey: "xx-privileged-key",
-      mlApiKey: undefined,
     });
   });
 
-  it("is configured with only the org ID — apiKey/mlApiKey are each optional here", () => {
-    // configured deliberately doesn't require apiKey: /api/passages only needs
-    // mlApiKey, and COVEO_API_KEY is unset entirely in "direct" client auth mode
-    // (ADR-0007). Each route checks the specific key it actually needs.
+  it("is configured with only the org ID — apiKey is optional here", () => {
+    // configured deliberately doesn't require apiKey: COVEO_API_KEY is unset
+    // entirely in "direct" client auth mode (ADR-0007). Each route checks
+    // for it directly when it actually needs it.
     const config = resolveServerCoveoConfig({
       environment: { NEXT_PUBLIC_COVEO_ORGANIZATION_ID: "myorg" },
     });
@@ -80,7 +79,6 @@ describe("resolveServerCoveoConfig", () => {
       configured: true,
       organizationId: "myorg",
       apiKey: undefined,
-      mlApiKey: undefined,
     });
   });
 

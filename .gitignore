@@ -48,6 +48,15 @@ next-env.d.ts
 # private interview prep notes — not for a public repo
 docs/presentation_guidence.md
 
+# presentation deck build toolchain, generated output, and prep notes — not part of the app
+presentation/build/
+presentation/output/
+presentation/DECK-ACTION-PLAN.md
+presentation/assets/
+
+# deck-prep screenshots, not build/session verification evidence (docs/temp/stage-d/ stays tracked)
+docs/temp/deck-assets/
+
 # claude code / copilot tooling (not part of the app)
 .claude/skills/impeccable/
 .github/skills/impeccable/

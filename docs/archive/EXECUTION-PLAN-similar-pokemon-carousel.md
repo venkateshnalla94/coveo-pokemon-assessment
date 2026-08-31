@@ -1,7 +1,7 @@
 # Execution Plan — Similar/Recommended Pokemon Carousel
 
 Status: **complete.** Built in the twentieth session once
-`docs/EXECUTION-PLAN-ml-recommendations.md`'s decision landed (Branch B). See
+`docs/archive/EXECUTION-PLAN-ml-recommendations.md`'s decision landed (Branch B). See
 `docs/HANDOFF.md`'s twentieth-session entry for what shipped, and the
 twenty-first session's follow-up UX fixes (whole-card click, hover pop,
 scroll arrows).
@@ -107,7 +107,7 @@ Plus, unchanged from the original spec:
   applies. A plain `<Link href={"/pokemon/" + encodeURIComponent(name)}>`
   per card.
 - Must implement the full idle/loading/success/error state contract from
-  `docs/EXECUTION-PLAN-async-ui-states.md` from the start — this is exactly
+  `docs/archive/EXECUTION-PLAN-async-ui-states.md` from the start — this is exactly
   the kind of async-on-mount component that doc is about, and shipping it
   without that contract just creates another component needing the same
   follow-up fix.

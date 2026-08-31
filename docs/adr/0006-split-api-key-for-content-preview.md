@@ -30,3 +30,7 @@ Naming convention: `Pokedex - Content Preview` for the Custom key, keeping the `
 - Two keys to track and rotate/expire instead of one. `COVEO_ML_API_KEY` (Custom purpose) requires an explicit expiration date at creation — set past the 2026-09-06 presentation deadline.
 - If Passage Retrieval enablement never lands on the trial org, `COVEO_ML_API_KEY` still gets created (Custom doesn't gate on the extension being enabled) but `/api/passages` will surface Coveo's 403 unchanged, same fallback behavior ADR-0005 already accounts for.
 - This narrows scope further than ADR-0005's original single-key design intended — arguably a better outcome for least-privilege than what was originally planned, even though it wasn't the goal going in.
+
+## Correction (superseded by ADR-0008)
+
+The premise here — that Passage Retrieval needs `ALLOW_CONTENT_PREVIEW` — turned out to be wrong. ADR-0008 found `/api/passages` actually needs `EXECUTE_QUERY`, the same privilege `COVEO_API_KEY` already carries, and gets a `403` when authenticated with `COVEO_ML_API_KEY` instead. `/api/passages/route.ts` now reads `apiKey`, not `mlApiKey`; `COVEO_ML_API_KEY` has been removed from `src/coveo/config.ts` and `.env.example` — this ADR's two-key design is no longer what's built. Kept for the record of why the split was originally made and the console constraint (Custom purpose can't grant Execute queries/Push) that's still true and still relevant if a similar split is ever needed again.

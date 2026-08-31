@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { escapeCaqlExactMatchValue } from "@/coveo/caqlExactMatch";
 import { resolveServerCoveoConfig } from "@/coveo/config";
 import { POKEMON_FIELDS } from "@/coveo/fields";
 import { asNumber, asString, toStringArray, type PokemonStats } from "@/coveo/mapPokemonResult";
@@ -98,14 +99,20 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // Same exact-match escaping as the detail page's `aq` filter and
-  // /api/passages' `filter` — see the comment on `escapedName` in
-  // src/app/pokemon/[name]/page.tsx.
-  const escapedName = body.name.replace(/"/g, '\\"');
-  const typeValues = body.types
-    .slice(0, MAX_TYPES)
-    .map((type) => `"${type.replace(/"/g, '\\"')}"`)
-    .join(",");
+  const escapedName = escapeCaqlExactMatchValue(body.name);
+  if (escapedName === null) {
+    return NextResponse.json({ error: "`name` contains unsupported characters." }, { status: 400 });
+  }
+
+  const escapedTypes: string[] = [];
+  for (const type of body.types.slice(0, MAX_TYPES)) {
+    const escaped = escapeCaqlExactMatchValue(type);
+    if (escaped === null) {
+      return NextResponse.json({ error: "`types` contains unsupported characters." }, { status: 400 });
+    }
+    escapedTypes.push(`"${escaped}"`);
+  }
+  const typeValues = escapedTypes.join(",");
   const aq = `@${POKEMON_FIELDS.type}==(${typeValues}) AND @${POKEMON_FIELDS.name}<>"${escapedName}"`;
 
   const upstream = await fetch(

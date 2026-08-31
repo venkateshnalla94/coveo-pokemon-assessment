@@ -10,7 +10,7 @@ Principle 1 additionally favors *"a credible, restrained Coveo customer-style se
 
 ## Screen 1: Home page (`BC25DEA1...png`)
 
-<!-- Filename correction, applied when docs/EXECUTION-PLAN-v2.3-frontend.md was
+<!-- Filename correction, applied when docs/archive/EXECUTION-PLAN-v2.3-frontend.md was
      actioned: this doc originally had the three screens' filename hashes
      wrong (each screen's content-type analysis below was correct, only the
      hash attached to it wasn't). Real mapping, per that plan's opening note:
@@ -64,4 +64,4 @@ Hero image, breadcrumb, name + dex-style badge + Type/Rarity/Level chips, descri
 
 ## Net takeaway for the next (Opus/FE) session
 
-The detail page's **Creature Profile panel** and the **stat-bar concept** are the strongest, most directly portable pieces of the mockups — nearly every field they need becomes real once `docs/EXECUTION-PLAN-v2.md`'s v2.1 fields land. The **Abilities & Moves table**, **Habitat**, **Rarity/Level/Synergy Score/Personality**, and **Add-to-team/Favorites** are the pieces that need an explicit decision (drop, adapt, or accept as a client-side-only feature with no real backing) before component work starts — that decision is exactly what got flagged rather than silently resolved in this doc.
+The detail page's **Creature Profile panel** and the **stat-bar concept** are the strongest, most directly portable pieces of the mockups — nearly every field they need becomes real once `docs/archive/EXECUTION-PLAN-v2.md`'s v2.1 fields land. The **Abilities & Moves table**, **Habitat**, **Rarity/Level/Synergy Score/Personality**, and **Add-to-team/Favorites** are the pieces that need an explicit decision (drop, adapt, or accept as a client-side-only feature with no real backing) before component work starts — that decision is exactly what got flagged rather than silently resolved in this doc.

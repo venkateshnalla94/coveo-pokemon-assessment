@@ -40,3 +40,7 @@ Support two client auth strategies, selected by `NEXT_PUBLIC_COVEO_AUTH_MODE`, r
 - `direct` mode means a real, working Coveo credential sits in the client bundle, visible via devtools. This is by design and matches the privilege tier Coveo scoped the key to, not an oversight — worth stating explicitly in the Topic 1 deck alongside the introspection evidence above, since "there's an API key in the browser" reads as alarming without that context.
 - `server` mode is unverified end-to-end on this specific org (it was fully built under ADR-0005 but never successfully exercised against real credentials, since no compatible key exists yet) — don't claim it as demonstrated/working without testing it against a key that actually has `SEARCH_API/IMPERSONATE`.
 - Two credentials now needed in `.env.local` for `direct` mode's happy path (`NEXT_PUBLIC_COVEO_ACCESS_TOKEN` and `COVEO_ML_API_KEY`), plus an unused `COVEO_API_KEY` kept around only for a future `server`-mode flip.
+
+## Correction (superseded by ADR-0008)
+
+Line 38 above and the `COVEO_ML_API_KEY` credential in the list just above this note are both stale as of ADR-0008: a direct test found `/api/passages` returns `403` when authenticated with `COVEO_ML_API_KEY` and succeeds with `COVEO_API_KEY` instead — Passage Retrieval gates on `EXECUTE_QUERY`, not `ALLOW_CONTENT_PREVIEW`. `COVEO_ML_API_KEY` is confirmed unused by any route in this app. See ADR-0008 for the full finding; this note exists so reading this ADR alone doesn't leave the wrong mental model of the credential setup.

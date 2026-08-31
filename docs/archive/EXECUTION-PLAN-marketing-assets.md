@@ -133,7 +133,7 @@ summary of real screenshots, not the source of truth.
   (no multi-angle imagery, no variants per Pokemon) — noted and dropped, not
   silently ignored. The "Similar Lip Balms & Treatments" card grid at the
   bottom is the direct template for Similar Pokemon — captured in
-  `docs/EXECUTION-PLAN-similar-pokemon-carousel.md` instead of here.
+  `docs/archive/EXECUTION-PLAN-similar-pokemon-carousel.md` instead of here.
 
 **Pokemon has no price, no reviews, no star ratings, no user tags** —
 copying those fields directly would mean fabricating data (`CLAUDE.md`
@@ -146,7 +146,7 @@ features, not a literal port of the reference's field list.
 `home-banner.webp` (already shipped, §0-4) becomes one slide's background
 rather than the whole hero. `embla-carousel-react` — already approved as a
 dependency for the similar-Pokemon carousel
-(`docs/EXECUTION-PLAN-similar-pokemon-carousel.md`) — should back this too,
+(`docs/archive/EXECUTION-PLAN-similar-pokemon-carousel.md`) — should back this too,
 so the app doesn't end up with two different carousel mechanisms. Proposed
 2-3 slides, each promoting a real, already-shipped feature rather than a
 sale/promo (this app has no commerce to promote):

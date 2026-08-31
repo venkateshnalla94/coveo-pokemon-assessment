@@ -1,6 +1,6 @@
 # Pokemon data inventory (pokemondb.net)
 
-A factual survey of what data actually exists on a pokemondb.net Pokemon page, gathered by fetching `https://pokemondb.net/pokedex/pikachu` directly (not assumed from memory) as research for `docs/EXECUTION-PLAN-v2.md`. This is a reference doc, not a phased plan — it stays useful regardless of which fields v2 actually ships, and is the place to check "does real data exist for X" before inventing a UI element around it.
+A factual survey of what data actually exists on a pokemondb.net Pokemon page, gathered by fetching `https://pokemondb.net/pokedex/pikachu` directly (not assumed from memory) as research for `docs/archive/EXECUTION-PLAN-v2.md`. This is a reference doc, not a phased plan — it stays useful regardless of which fields v2 actually ships, and is the place to check "does real data exist for X" before inventing a UI element around it.
 
 Each section below: what's on the page, real values for Pikachu, and a feasibility classification for Coveo custom-field extraction:
 

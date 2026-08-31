@@ -4,7 +4,7 @@ Status: Accepted
 
 ## Context
 
-Phase v3.4 (`docs/EXECUTION-PLAN-v3.md`) set out to diagnose two live complaints — RGA "dumps every stat" and Passage Retrieval "returns random text" — by inspecting what's actually indexed into `body` before changing anything. `docs/temp_improvements.md` (a draft plan the user got from ChatGPT) hypothesized the crawler indexes the entire scraped page; this session confirmed that directly via Content Browser's Quick View on Charizard, a real live item on `Pokedex - Full`, not a guess.
+Phase v3.4 (`docs/archive/EXECUTION-PLAN-v3.md`) set out to diagnose two live complaints — RGA "dumps every stat" and Passage Retrieval "returns random text" — by inspecting what's actually indexed into `body` before changing anything. `docs/temp_improvements.md` (a draft plan the user got from ChatGPT) hypothesized the crawler indexes the entire scraped page; this session confirmed that directly via Content Browser's Quick View on Charizard, a real live item on `Pokedex - Full`, not a guess.
 
 ## Findings
 

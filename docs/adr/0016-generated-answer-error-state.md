@@ -6,7 +6,7 @@ Status: Accepted
 
 `deriveGeneratedAnswerRenderState` originally folded every `state.error` case into `{ status: "hidden" }`, on the reasoning documented in its own header comment: RGA is an org-gated Advanced-tier feature, this org doesn't have it enabled yet, and a missing generative answer should never read as a broken search — it should just not be there. `tests/unit/coveo/generatedAnswerRenderState.test.ts` pinned this with a test literally titled "is hidden — not surfaced as an error — when the controller reports an error."
 
-`docs/EXECUTION-PLAN-async-ui-states.md` §3 requires every Coveo-or-own-API-backed component to have a distinct, real "couldn't retrieve" state for a genuine failure, and calls out `GeneratedAnswer.tsx` by name as needing this arm if the mapper doesn't already model it.
+`docs/archive/EXECUTION-PLAN-async-ui-states.md` §3 requires every Coveo-or-own-API-backed component to have a distinct, real "couldn't retrieve" state for a genuine failure, and calls out `GeneratedAnswer.tsx` by name as needing this arm if the mapper doesn't already model it.
 
 These two are compatible once "RGA isn't enabled/visible on this org" and "RGA was enabled and visible but a request genuinely failed" are treated as different situations, which they are: `state.isEnabled`/`state.isVisible` already capture the first (an org-capability check, unrelated to any single request), while `state.error` on an enabled+visible controller is a second, independent signal — a real runtime failure the previous version had no way to surface.
 
@@ -19,4 +19,4 @@ This is a refinement of the original decision's scope, not a reversal of its rea
 ## Consequences
 
 - `tests/unit/coveo/generatedAnswerRenderState.test.ts`'s error case now asserts `{ status: "error" }` instead of `{ status: "hidden" }` — updated in the same change, with its description rewritten to state the new behavior rather than describing behavior that no longer exists.
-- `GeneratedAnswer.tsx` no longer `return null`s for its hidden state either — see `docs/EXECUTION-PLAN-async-ui-states.md` §2's persistent-wrapper mechanism, applied here for the same reason it was applied to `SimilarPokemon.tsx` first.
+- `GeneratedAnswer.tsx` no longer `return null`s for its hidden state either — see `docs/archive/EXECUTION-PLAN-async-ui-states.md` §2's persistent-wrapper mechanism, applied here for the same reason it was applied to `SimilarPokemon.tsx` first.

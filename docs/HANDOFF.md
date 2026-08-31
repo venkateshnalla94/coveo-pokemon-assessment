@@ -114,7 +114,7 @@ threshold at ~10,000 queries — two orders of magnitude above this org's real
 volume. Decision: **Branch B** — "Similar" only, as a deterministic same-type
 Search API query (no CR model, no `/api/recommendations` route), documented
 in new `docs/adr/0014-recommendation-strategy.md`. This unblocks
-`docs/EXECUTION-PLAN-similar-pokemon-carousel.md` to proceed on its
+`docs/archive/EXECUTION-PLAN-similar-pokemon-carousel.md` to proceed on its
 `/api/similar` route as the sole data source.
 
 **ART (independent of the branch decision, recommended regardless per Doc 1)
@@ -174,9 +174,9 @@ All fetched directly (not WebSearch-only), per `CLAUDE.md`'s docs-first rule:
 
 With Doc 1 resolved (Branch B, ART live), built the first of the three
 remaining items: the PDP "Similar Pokemon" carousel from
-`docs/EXECUTION-PLAN-similar-pokemon-carousel.md`, to its full spec including
+`docs/archive/EXECUTION-PLAN-similar-pokemon-carousel.md`, to its full spec including
 the idle/loading/success/error contract from
-`docs/EXECUTION-PLAN-async-ui-states.md` (built in from day one, not as a
+`docs/archive/EXECUTION-PLAN-async-ui-states.md` (built in from day one, not as a
 follow-up, per that doc's own instruction).
 
 **New**: `src/app/api/similar/route.ts` (calls Search API v2 directly with a
@@ -542,7 +542,7 @@ Coveo-or-API-backed component should follow, not a one-off patch.
 Produced four new execution docs instead of code, per that direction ("I want
 4 execution files, rather than implementing"):
 
-1. **`docs/EXECUTION-PLAN-ml-recommendations.md`** — research on Coveo's
+1. **`docs/archive/EXECUTION-PLAN-ml-recommendations.md`** — research on Coveo's
    Content Recommendation (CR) model and Automatic Relevance Tuning (ART),
    done via WebSearch against docs.coveo.com this session (**not yet
    re-verified by direct page fetch — that's still required before any
@@ -554,17 +554,17 @@ Produced four new execution docs instead of code, per that direction ("I want
    before anything else in this doc proceeds.** ART is recommended
    independently of that number (console-only, pairs with the org's existing
    Query Suggestions model per Coveo's own docs).
-2. **`docs/EXECUTION-PLAN-similar-pokemon-carousel.md`** — the PDP carousel
+2. **`docs/archive/EXECUTION-PLAN-similar-pokemon-carousel.md`** — the PDP carousel
    UI spec, written to consume either ML doc branch's output identically via
    one `SimilarPokemon` data shape. Not blocked on doc 1 to *write* the
    `/api/similar` same-type-query fallback route, since that's needed either
    way as a safety net.
-3. **`docs/EXECUTION-PLAN-marketing-assets.md`** — ready to execute now, no
+3. **`docs/archive/EXECUTION-PLAN-marketing-assets.md`** — ready to execute now, no
    open decisions. Real images downloaded into `public/art/` (not hotlinked)
    for the four placeholder slots, plus a real type-icon set (candidates
    found: `github.com/partywhale/pokemon-type-icons`, a DeviantArt PNG set)
    for the Browse-by-type icon-strip redesign.
-4. **`docs/EXECUTION-PLAN-async-ui-states.md`** — ready to execute now, no
+4. **`docs/archive/EXECUTION-PLAN-async-ui-states.md`** — ready to execute now, no
    open decisions. A shared idle/loading/success/error contract (persistent
    wrapper, CSS grid `0fr`→`1fr` collapse/expand, real skeletons) applied to
    `GeneratedAnswer.tsx`, `AskAboutPokemon.tsx`, `ResultList.tsx`, and the new
@@ -579,7 +579,7 @@ honored before any ART/CR console action next session).
 ## Doc 3 executed — real marketing assets + icon-based Browse-by-type
 
 Same (nineteenth) session, immediately after the four docs above were
-written — user asked to execute Doc 3 (`docs/EXECUTION-PLAN-marketing-assets.md`)
+written — user asked to execute Doc 3 (`docs/archive/EXECUTION-PLAN-marketing-assets.md`)
 right away rather than waiting. No Coveo org config touched; no query/
 controller behavior changed.
 
@@ -674,7 +674,7 @@ folded into the relevant execution docs as new scope, documentation-only —
 no code this pass. Both docs updated directly (see their own files for full
 detail, not re-summarized here to avoid drift):
 
-- **`docs/EXECUTION-PLAN-marketing-assets.md`** gained a new §5: a home hero
+- **`docs/archive/EXECUTION-PLAN-marketing-assets.md`** gained a new §5: a home hero
   **carousel** (2-3 slides promoting real, already-shipped features —
   search, compare, ask-about-Pokemon — superseding the single static
   `home-banner.webp` as the whole hero; that image becomes one slide's
@@ -684,7 +684,7 @@ detail, not re-summarized here to avoid drift):
   Sleep Country's bigger "Shop by Category" tile grid was logged as
   "considered, not proposed yet" rather than queued as work, since it would
   compete with the icon-pin strip already shipped this session.
-- **`docs/EXECUTION-PLAN-similar-pokemon-carousel.md`**'s card spec (§3)
+- **`docs/archive/EXECUTION-PLAN-similar-pokemon-carousel.md`**'s card spec (§3)
   was sharpened against Sephora's "Similar Lip Balms & Treatments" grid as
   its direct template: price and star-rating fields are explicitly dropped
   (no Pokemon equivalent — importing them would be fabricated data), replaced
@@ -733,11 +733,11 @@ Ahead of the import, `package.json` got a new `"engines": { "node": "^22.11.0 ||
 
 ## Seventeenth session — v4 design pass, Batch 6 (motion/a11y pass + ADR + wrap-up, closes the v4 pass)
 
-Executed execution-order steps 10-11 of `docs/EXECUTION-PLAN-v4-design-system.md` (§10/§11, verification checklist in §12), the last batch of the plan. No Coveo org config touched; no controller/query behavior changed beyond one combobox-conformance fix (below), which is UI interaction correctness, not a query/facet change.
+Executed execution-order steps 10-11 of `docs/archive/EXECUTION-PLAN-v4-design-system.md` (§10/§11, verification checklist in §12), the last batch of the plan. No Coveo org config touched; no controller/query behavior changed beyond one combobox-conformance fix (below), which is UI interaction correctness, not a query/facet change.
 
 **This was not a clean audit — three real bugs found and fixed, verified live, not assumed from reading the CSS/JSX.**
 
-1. **No global focus ring existed at all**, despite `docs/EXECUTION-PLAN-v4-design-system.md` §3.2 stating `--signal-red` covers "exactly two uses: the Pokeball glyph and the global focus ring." The Pokeball glyph use was real (batch 2); the focus-ring use was never actually built in any prior batch — checkboxes, `Tabs` buttons, citation `<a>` tags, feedback buttons, the compare tray, and result-tile `<Link>`s all fell back to the browser default outline (or, on the `AskAboutPokemon`/`Facet` search inputs, `outline-none` with only a faint `focus:border-black/30` swap — no ring of any kind). Fixed with one rule in `src/app/globals.css`: `:focus-visible { outline: 2px solid var(--signal-red); outline-offset: 2px; }`, deliberately unlayered so it outranks Tailwind's `outline-none` utility (which lives in the generated `@layer utilities`) regardless of selector specificity or source order — the same cascade rule this file already documents for `--text-3xl`. Confirmed live via Playwright `getComputedStyle` reads on a real result-tile link and the search input (see `tests/e2e/a11y-motion.spec.ts`), not just "the CSS exists."
+1. **No global focus ring existed at all**, despite `docs/archive/EXECUTION-PLAN-v4-design-system.md` §3.2 stating `--signal-red` covers "exactly two uses: the Pokeball glyph and the global focus ring." The Pokeball glyph use was real (batch 2); the focus-ring use was never actually built in any prior batch — checkboxes, `Tabs` buttons, citation `<a>` tags, feedback buttons, the compare tray, and result-tile `<Link>`s all fell back to the browser default outline (or, on the `AskAboutPokemon`/`Facet` search inputs, `outline-none` with only a faint `focus:border-black/30` swap — no ring of any kind). Fixed with one rule in `src/app/globals.css`: `:focus-visible { outline: 2px solid var(--signal-red); outline-offset: 2px; }`, deliberately unlayered so it outranks Tailwind's `outline-none` utility (which lives in the generated `@layer utilities`) regardless of selector specificity or source order — the same cascade rule this file already documents for `--text-3xl`. Confirmed live via Playwright `getComputedStyle` reads on a real result-tile link and the search input (see `tests/e2e/a11y-motion.spec.ts`), not just "the CSS exists."
 2. **The fix above would have been silently invisible on the type-facet swatch.** Its native checkbox is `sr-only` (clipped, `overflow: hidden`) per plan §6's "keep the native checkbox, don't replace it" rule — so a focus ring drawn on the checkbox itself is clipped away with it. Added `.swatch-checkbox:focus-visible + * { outline: 2px solid var(--signal-red); ... }` to paint the ring on the swatch's visible sibling span instead (`src/components/AutomaticFacets.tsx` now applies a `swatch-checkbox` class to that input). Verified live: focusing the hidden checkbox does show a ring on the visible swatch, and the checkbox's own (invisible) outline is still present separately, proving the rule targets the right element rather than accidentally matching by coincidence.
 3. **The typeahead's suggestion `<button>`s had no `tabIndex={-1}`.** This is a combobox-popup conformance bug from batch 2, not new to this session, but only surfaced during this session's real keyboard walk: without it, Tab drops through the input onto the option buttons in document order, which both breaks the `aria-activedescendant` virtual-focus pattern batch 2 built and immediately closes the very listbox being tabbed into (via the input's `onBlur`). Fixed in `src/components/SearchBox.tsx`.
 
@@ -759,11 +759,11 @@ Executed execution-order steps 10-11 of `docs/EXECUTION-PLAN-v4-design-system.md
 
 Files touched: `src/app/globals.css` (global `:focus-visible` rule, `.search-box-input` suppression, `.swatch-checkbox` sibling rule), `src/components/SearchBox.tsx` (`search-box-input` class, suggestion-button `tabIndex={-1}`), `src/components/AutomaticFacets.tsx` (`swatch-checkbox` class). New: `docs/adr/0013-type-driven-design-system.md`, `tests/e2e/a11y-motion.spec.ts`.
 
-This closes execution-order steps 1-11 of `docs/EXECUTION-PLAN-v4-design-system.md` — the v4 design pass (batches 1-6) is complete.
+This closes execution-order steps 1-11 of `docs/archive/EXECUTION-PLAN-v4-design-system.md` — the v4 design pass (batches 1-6) is complete.
 
 ## Sixteenth session — v4 design pass, Batch 5 (AI surfaces)
 
-Executed execution-order step 9 of `docs/EXECUTION-PLAN-v4-design-system.md` (§7/§8/§11), building on Batches 1–4 (already landed uncommitted). No Coveo org config touched; no controller/query behavior changed — specifically, **no `fieldsToIncludeInCitations` was added** to `buildGeneratedAnswer`'s initial state, even though that would have been the obvious way to get a citation's Pokemon type directly. It was rejected as exactly the kind of controller-config change plan §1 restricts to the two named `SearchBox` exceptions; see the citation-coloring paragraph below for what was done instead.
+Executed execution-order step 9 of `docs/archive/EXECUTION-PLAN-v4-design-system.md` (§7/§8/§11), building on Batches 1–4 (already landed uncommitted). No Coveo org config touched; no controller/query behavior changed — specifically, **no `fieldsToIncludeInCitations` was added** to `buildGeneratedAnswer`'s initial state, even though that would have been the obvious way to get a citation's Pokemon type directly. It was rejected as exactly the kind of controller-config change plan §1 restricts to the two named `SearchBox` exceptions; see the citation-coloring paragraph below for what was done instead.
 
 **`generatedAnswerRenderState.ts` — one new `streaming` arm, not a parallel state machine.** Before this session, `state.answer` truthy alone produced `{ status: "answer" }` regardless of `state.isStreaming` — a partially-streamed answer and a finished one were indistinguishable, so the component had no signal to drive the cursor/reveal treatment differently. Now: `state.answer` truthy + `state.isStreaming === true` → `{ status: "streaming", answer }`; `state.answer` truthy + `isStreaming === false` → `{ status: "answer", answer }` (unchanged shape/behavior from before). `loading`/`hidden` arms untouched. `tests/unit/coveo/generatedAnswerRenderState.test.ts` updated in the same commit: the existing "returns the answer text" case now pins `isStreaming: false` explicitly, plus a new case for the `streaming` arm — all via exact `toEqual`, per the file's existing convention.
 
@@ -781,7 +781,7 @@ Files touched: `src/coveo/generatedAnswerRenderState.ts`, `src/components/Genera
 
 ## Fifteenth session — v4 design pass, Batch 4 (PDP)
 
-Executed execution-order step 8 of `docs/EXECUTION-PLAN-v4-design-system.md` (§9/§11), building on Batches 1–3 (tokens/typography/content/`ImageSlot`, chrome/Pokeball search bar, result tiles/facets — already landed uncommitted). No Coveo org config touched; no controller/query behavior changed.
+Executed execution-order step 8 of `docs/archive/EXECUTION-PLAN-v4-design-system.md` (§9/§11), building on Batches 1–3 (tokens/typography/content/`ImageSlot`, chrome/Pokeball search bar, result tiles/facets — already landed uncommitted). No Coveo org config touched; no controller/query behavior changed.
 
 **Test-first, per the plan's explicit ordering.** `tests/unit/components/ui/StatBar.test.tsx` was rewritten from asserting `container.querySelector(".bg-black\\/85")` + inline `style.width` to the `role="meter"`/`aria-valuenow`/`aria-valuemin`/`aria-valuemax` contract the component already exposed — run and confirmed green against the *pre-restyle* `StatBar` first, then `StatBar.tsx` was restyled and the same test re-run green again. The fill-width assertions became aria-attribute assertions (`aria-valuenow` reports the real, unclamped value even past `max`; the caller/consumer computes the visual percentage from `aria-valuenow`/`aria-valuemax`), which is a stronger contract than the old literal-class check, not a weaker one.
 
@@ -803,7 +803,7 @@ Files touched: `src/app/pokemon/[name]/page.tsx`, `src/components/PokemonHero.ts
 
 ## Fourteenth session — v4 design pass, Batch 3 (result tiles + facets)
 
-Executed execution-order steps 6–7 of `docs/EXECUTION-PLAN-v4-design-system.md` (§11), building on Batches 1–2 (tokens/typography/content/`ImageSlot` + chrome/Pokeball search bar, already landed uncommitted). No Coveo org config touched; no controller/query behavior changed.
+Executed execution-order steps 6–7 of `docs/archive/EXECUTION-PLAN-v4-design-system.md` (§11), building on Batches 1–2 (tokens/typography/content/`ImageSlot` + chrome/Pokeball search bar, already landed uncommitted). No Coveo org config touched; no controller/query behavior changed.
 
 **Step 6 — Result tiles (`src/components/ResultList.tsx`'s `ResultCard`, `src/components/ui/Chip.tsx`).** Dropped the drawn `border border-black/10` from the `<li>`; the tile is now `.result-tile` (new class in `globals.css`), lit by a `::before` pseudo-element using `--type-primary`/`--type-secondary` custom properties set per-card via inline `style` (CSP-permitted). `data-glow="single"` gets the radial `color-mix(in oklab, ...)` glow; `data-glow="dual"` (both types present and different) gets the 135° linear gradient — the *preferred* treatment per plan §2.3, since `types[0]` isn't a verified primary type. Glow intensity "roughly doubles" on hover/focus via an opacity step (0.55 → 1) against the same gradient stops, not a re-mixed percentage (`color-mix()` percentages aren't independently transitionable). Sprite gets a `sizes` prop on `next/image` (there was none before — Next was serving the largest candidate for every tile) and a `mt-[-12%]` bleed past the tile's own padding so it overflows the top edge. Dex number and a new compact stat-total bar (`role="meter"`, absolute-scaled against `MAX_BASE_STAT * 6`) sit at `opacity-0` at rest, revealed via `group-hover`/`group-focus-within` so nothing reflows. Synchronized hover: sprite (scale), name + dex number (one `group`) move together; type chips are excluded from the group and always render at full solid color. Type badges switched from `Chip variant="type"` (12%-alpha tint) to a new `variant="type-solid"` (full-strength fill, text color from `getTypeTextColor()`) — added as a third variant on the existing `Chip` component, not a rewrite; `data-variant` contract preserved. Grid gap raised `gap-4` → `gap-6` for the larger sprites; 2/3/4-column grid unchanged. `--signal-red` was deliberately **not** used for the hover highlight (it's restricted to the Pokeball glyph + focus ring per plan §3.2) — used an underline (`decoration-transparent` → `decoration-current`) instead.
 
@@ -817,7 +817,7 @@ Files touched: `src/components/ResultList.tsx`, `src/components/ui/Chip.tsx`, `s
 
 ## Thirteenth session — v4 design pass, Batch 2 (chrome + Pokeball search bar)
 
-Executed execution-order steps 4–5 of `docs/EXECUTION-PLAN-v4-design-system.md` (§11), building on Batch 1's tokens/typography/content-extraction (already landed, uncommitted, lint/typecheck/test/build clean at session start). No Coveo org config touched; no controller/query behavior changed except the two deliberate `SearchBox.tsx` fixes called out in the plan's §4.1.
+Executed execution-order steps 4–5 of `docs/archive/EXECUTION-PLAN-v4-design-system.md` (§11), building on Batch 1's tokens/typography/content-extraction (already landed, uncommitted, lint/typecheck/test/build clean at session start). No Coveo org config touched; no controller/query behavior changed except the two deliberate `SearchBox.tsx` fixes called out in the plan's §4.1.
 
 **Step 4 — Chrome.** Restyled `AppHeader.tsx`, `ui/Tabs.tsx`, `Breadcrumb.tsx`, `Pager.tsx`, and the page shells (`app/page.tsx`, `app/compare/page.tsx`, `app/pokemon/[name]/page.tsx`) off the old `border-black/10 dark:border-white/15` / `text-black/60 dark:text-white/60` pairs onto the `--shell-*` ramp from Batch 1 (`border-shell-100 dark:border-shell-600`, `text-shell-400`, `text-foreground` — the last one already flips with `prefers-color-scheme` via the existing `--foreground` custom property, so no `dark:` variant is needed for it at all). Deliberately left alone: semantic error red (`text-red-600 dark:text-red-400` in the two page shells) and `ConfigRequiredDialog.tsx`'s amber warning colors — neither is part of the quiet chrome ramp per plan §3.2. `src/app/search/page.tsx` had no `dark:` usages to begin with. Scope was the plan's own explicit Step-4 file list, not every one of the ~133 `dark:` sites in the repo — the rest (ResultList, facets, PDP panels, GeneratedAnswer, AskAboutPokemon) belong to later batches (6–9) per the plan's own execution order and weren't touched here.
 
@@ -920,7 +920,7 @@ Both rewritten on strict same-parent sibling axes, verified by executing them wi
 - `src/coveo/mapPokemonResult.ts` — new `EvolutionTarget` export, `evolution.to`/`from` reshaped, new `zipEvolutionTargets` helper (dedupes only exact pairs, degrades gracefully to `imageUrl: undefined` if the image array is shorter than the name array for any reason).
 - `src/components/EvolutionChain.tsx` — renders a sprite per entry (`alt=""`), keys on `${name}-${index}` (not just `name`, to survive two entries sharing a name — same defensive-key lesson as the tenth session's breadcrumb duplicate-key bug).
 - Tests updated/added in `tests/unit/coveo/mapPokemonResult.test.ts` and `tests/unit/components/EvolutionChain.test.tsx` — including a dedicated test asserting regular/Alolan Raichu render as two separate entries, and a test asserting the `alt=""` accessibility fix.
-- `docs/coveo-source-spec.md` and `docs/EXECUTION-PLAN-v3.md` updated in the same session, not deferred.
+- `docs/coveo-source-spec.md` and `docs/archive/EXECUTION-PLAN-v3.md` updated in the same session, not deferred.
 - `docs/adr/0012-web-scraping-content-exclusion-for-rga-cpr.md` — new, covers the v3.4 exclusion-rules decision.
 
 **Not touched at all this session, despite being in scope for v3.4**: RGA's Prompt Enhancement configuration, Passage Retrieval, and Knowledge Hub (Chunk Inspector was *researched* this session — see docs read below — but never actually run against a live query, since the Quick View inspection alone was decisive enough to write the exclusion rules). Also not touched: `Pokedex - Full` rebuild (only `Test` has the new config), RelatedPokemon (still fully deferred, per the tenth-session note).
@@ -969,7 +969,7 @@ Full reasoning in `docs/adr/0011-automatic-facet-generation-on-search-page.md` �
 
 ## Tenth session, continued — Phase v3.3 (search page data) + a real, serious pre-existing bug found and fixed
 
-Picked up v3.3 right after v3.1, per the four-phase list's independence. Treated Automatic Facet Generation (raised by the user mid-session) as a separate, deliberately-unscheduled future item — see `docs/EXECUTION-PLAN-v3.md`'s new "Future item" section for the full findings (Coveo's real `buildAutomaticFacetGenerator`/Facet Generator feature, confirmed present in the installed `@coveo/headless`, and why it doesn't cleanly replace this app's fixed-shape facet sidebar).
+Picked up v3.3 right after v3.1, per the four-phase list's independence. Treated Automatic Facet Generation (raised by the user mid-session) as a separate, deliberately-unscheduled future item — see `docs/archive/EXECUTION-PLAN-v3.md`'s new "Future item" section for the full findings (Coveo's real `buildAutomaticFacetGenerator`/Facet Generator feature, confirmed present in the installed `@coveo/headless`, and why it doesn't cleanly replace this app's fixed-shape facet sidebar).
 
 **v3.3 built, all frontend, zero org-config changes needed** (data layer — `POKEMON_FIELDS`, `PokemonItem`, `registerFieldsToInclude` — was already complete from earlier sessions):
 - `ResultList.tsx` cards: generation badge and an abilities preview (comma-joined, truncated).
@@ -1023,7 +1023,7 @@ Two things prompted this session: a parity check against a sibling project's "co
 
 Built via a single `headless-frontend-dev` subagent run through all 7 of the plan's build-order steps sequentially, each shipped complete (code + tests + typecheck + lint green) before the next started, per this session's own scoping. Final state: 84 unit tests (up from 49 at the end of the sixth session), typecheck/lint/build/e2e all green.
 
-**Decision resolved before any component code was written, per the sixth session's explicit flag:** `PokemonItem` was reshaped from the flat fields the sixth session built into the grouped sub-objects (`stats`, `training`, `breeding`, `defenses`, `evolution`) that `docs/EXECUTION-PLAN-v2.3-frontend.md` §2.2 specifies — the plan's own panel component signatures (`PokemonStatPanel({ stats, total })` etc.) are written against that shape, and reshaping before any of the ~15 new components existed to depend on the old one was the cheap point to do it. Two real bugs were found and fixed in the same pass, not just a mechanical reshape:
+**Decision resolved before any component code was written, per the sixth session's explicit flag:** `PokemonItem` was reshaped from the flat fields the sixth session built into the grouped sub-objects (`stats`, `training`, `breeding`, `defenses`, `evolution`) that `docs/archive/EXECUTION-PLAN-v2.3-frontend.md` §2.2 specifies — the plan's own panel component signatures (`PokemonStatPanel({ stats, total })` etc.) are written against that shape, and reshaping before any of the ~15 new components existed to depend on the old one was the cheap point to do it. Two real bugs were found and fixed in the same pass, not just a mechanical reshape:
 - `breeding.genderRatio` — the flat version ran this through `toStringArray` incorrectly typed as an array; investigation found `pokemongenderratio` is genuinely two-part multi-value data (e.g. `"87.5% male"` + `"12.5% female"`) collapsing to one part only for genderless species. Kept `toStringArray`, joined the parts with `", "`, typed the result as `string | undefined` to match the plan's interface. A naive switch to `asString` (my own initial suggestion) would have silently dropped half of every normal Pokemon's ratio — confirmed wrong before it was built, not after.
 - `evolution.to` is `string[]` per the plan's type, but `docs/coveo-source-spec.md` documents `pokemonevolvesto` as a single-value field at the source — branching evolutions (Eevee-style) only ever capture the first branch in document order, an accepted extraction simplification from the sixth session, not something frontend typing can fix. The array type is still correct and forward-compatible if that selector is ever upgraded; today it always holds 0 or 1 entries, and the tests assert that honestly rather than pretending branching works.
 
@@ -1058,9 +1058,9 @@ Built interactively, one field group at a time, with the user driving the actual
 - **`pokemonevolvesfrom` is genuinely absent for base-stage Pokemon** (no pre-evolution) — confirmed correct, not a bug, via the Web Scraping Configuration test panel against Pichu (not in `Pokedex - Test`'s 3-doc crawl scope). `src/coveo/mapPokemonResult.ts` now derives `isBaseStage: boolean` from that absence, so the frontend (Phase v2.3, not built yet) has a ready-made fallback rather than needing to re-derive "no pre-evolution" from an undefined field itself.
 - **`src/coveo/fields.ts`, `src/coveo/mapPokemonResult.ts`, `docs/coveo-source-spec.md` updated in lockstep**, per this repo's standing sync contract. Two pre-existing unit tests (`tests/unit/coveo/mapPokemonResult.test.ts`, `tests/unit/coveo/searchRenderState.test.ts`) hardcoded the old 5-field `PokemonItem` shape and needed updating for the new one — full suite (49 tests), typecheck, and lint all pass as of end of session.
 - **Phase v2.2 (port to `Pokedex - Full`) also completed this session.** One real snag: the first config diff only carried over the scraping extraction rules and the two IPE-output field mappings (`pokemonweaknesses`/`pokemonresistances`) — not the other 19 field mappings. Content Browser showed only 7 of 26 fields on the first rebuild of Full, the same "unmapped metadata is invisible" trap this project already knew about, just resurfacing on a second source during a config copy rather than a fresh build. Fixed by adding all 21 missing mappings directly via the mappings JSON array (same raw-edit mechanism as the Web Scraping Configuration — Full's mapping list is exposed as pasteable JSON too, not just a one-row-at-a-time form). After the fix and a second rebuild: Pikachu/Garchomp/Sprigatito match `Pokedex - Test` field-for-field on `Pokedex - Full`, and a broader spot-check of the four multi-value facets (`pokemonabilities`, `pokemonegggroups`, `pokemonweaknesses`, `pokemonresistances`) across the full 1025-item index showed clean, correctly-split values throughout (hundreds of distinct ability names, all 15 real egg groups, 17/18 types in weaknesses — correctly missing Normal, which nothing is weak to — no semicolon-joined compounds anywhere). Both IPEs (`pokemongeneration`, weaknesses/resistances) were confirmed to be attached **per-source**, not per-pipeline — this needed an explicit second attachment on `Pokedex - Full`, it did not come along automatically with the scraping config.
-- **Phase v2.3 (frontend UI using these fields) is the only phase still open** — see `docs/EXECUTION-PLAN-v2.md`. Also not done: `docs/EXECUTION-PLAN-v2.md`'s "Decisions carried forward" section flags a possible ADR-0009 for the moves/flavor-text-stays-as-body-content decision — now that v2.1/v2.2 are actually built, that's a real candidate for next session if the ADR discipline matters for the presentation.
-- **A real divergence for whoever picks up Phase v2.3**: `docs/EXECUTION-PLAN-v2.3-frontend.md` (an untracked planning doc already in the repo, not authored or read in full this session until the handoff pass) specs `PokemonItem` as **grouped sub-objects** (e.g. a nested `PokemonStats` interface so a stat-bars panel takes one prop). What actually got built this session extends `PokemonItem` as **flat fields**, the natural continuation of how the pre-existing 5 fields were already shaped — this session's task was field-group-by-field-group console work, not a `PokemonItem` redesign, so it wasn't reshaped to match that doc's plan. Reconciling the two (reshape the interface to match the doc, or update the doc to match what's built) is a real decision for the v2.3 session, not something to infer from this note.
-- **Pre-existing, unrelated to this session's work**: `pokemondexnumber` has been in `POKEMON_FIELDS` since the original 5-field build but has never been mapped into `PokemonItem` (dex number isn't rendered anywhere in the current app). Already flagged in `docs/EXECUTION-PLAN-v2.3-frontend.md` as something v2.3 should close — not a new finding, just confirmed still true.
+- **Phase v2.3 (frontend UI using these fields) is the only phase still open** — see `docs/archive/EXECUTION-PLAN-v2.md`. Also not done: `docs/archive/EXECUTION-PLAN-v2.md`'s "Decisions carried forward" section flags a possible ADR-0009 for the moves/flavor-text-stays-as-body-content decision — now that v2.1/v2.2 are actually built, that's a real candidate for next session if the ADR discipline matters for the presentation.
+- **A real divergence for whoever picks up Phase v2.3**: `docs/archive/EXECUTION-PLAN-v2.3-frontend.md` (an untracked planning doc already in the repo, not authored or read in full this session until the handoff pass) specs `PokemonItem` as **grouped sub-objects** (e.g. a nested `PokemonStats` interface so a stat-bars panel takes one prop). What actually got built this session extends `PokemonItem` as **flat fields**, the natural continuation of how the pre-existing 5 fields were already shaped — this session's task was field-group-by-field-group console work, not a `PokemonItem` redesign, so it wasn't reshaped to match that doc's plan. Reconciling the two (reshape the interface to match the doc, or update the doc to match what's built) is a real decision for the v2.3 session, not something to infer from this note.
+- **Pre-existing, unrelated to this session's work**: `pokemondexnumber` has been in `POKEMON_FIELDS` since the original 5-field build but has never been mapped into `PokemonItem` (dex number isn't rendered anywhere in the current app). Already flagged in `docs/archive/EXECUTION-PLAN-v2.3-frontend.md` as something v2.3 should close — not a new finding, just confirmed still true.
 
 ## Prior sessions (through the fifth) — unchanged this session
 
@@ -1116,7 +1116,7 @@ marked done/superseded inline) — kept for the operational detail in items
 0/4/5 (the ML-rebuild trail and the Phase 0 email context), not as the live
 priority order.
 
-Phase v2.3 is done as of the seventh session — the v2 roadmap (`docs/EXECUTION-PLAN-v2.md`) is now fully closed. **New this session: `docs/EXECUTION-PLAN-v3.md`** — a separate, independent track opened by live usage, four phases, pick any one:
+Phase v2.3 is done as of the seventh session — the v2 roadmap (`docs/archive/EXECUTION-PLAN-v2.md`) is now fully closed. **New this session: `docs/archive/EXECUTION-PLAN-v3.md`** — a separate, independent track opened by live usage, four phases, pick any one:
 
 - v3.1 — fix the sort break (`pokemonname` "Use for sorting" + a resilience fix so a bad sort criterion can't blank the whole grid again)
 - v3.2 — PDP: RelatedPokemon tab + full branching evolution chain (the two items deferred from v2.3 §9)
@@ -1256,7 +1256,7 @@ Grouped by what they were read to resolve. Where a page's actual rendered conten
 ## Reference docs
 
 - `docs/plan101.md` — full step-by-step build plan, status per step, live-findings appendix, now current through Stage E3 (only E4 and D11 open).
-- `docs/EXECUTION-PLAN.md` — overall plan across Phases 0–6, Phase 4/5 sections kept in sync with plan101's Stage D/E.
+- `docs/archive/EXECUTION-PLAN.md` — overall plan across Phases 0–6, Phase 4/5 sections kept in sync with plan101's Stage D/E.
 - `docs/adr/0005-server-token-and-passage-routes.md` — original server-minting design and original Passage Retrieval privilege assumption (both superseded, see ADR-0007 and ADR-0008 respectively).
 - `docs/adr/0006-split-api-key-for-content-preview.md` — why two keys instead of one. Now stale on one point: `COVEO_ML_API_KEY`, the key this ADR justified creating, turned out unused by anything (ADR-0008) — not rewritten, since the two-key *reasoning* (Custom purpose's template-lock) is still accurate even though the specific consumer it was built for isn't real.
 - `docs/adr/0007-dual-auth-mode-direct-vs-server-token.md` — why `/api/token` can't work on this org, and the `direct`/`server` auth-mode split that replaces it.
@@ -1266,5 +1266,5 @@ Grouped by what they were read to resolve. Where a page's actual rendered conten
 - `docs/final_config.json` — the Full source's complete saved JSON configuration, from the end of the fourth session — **stale as of this (sixth) session's Phase v2.2 migration**: `Pokedex - Full` now has 24 real fields, not the 5 this file describes. Not re-exported/updated this session; treat the live console as ground truth over this file until it's refreshed.
 - `docs/DEFAULT_QUERIES.csv` — the D7 Query Suggest preload file, committed in the fourth session (1070 rows: 1025 live-pulled Pokemon names + 45 curated intent phrases).
 - `docs/temp/` — screenshots across the first four sessions; `docs/temp/stage-d/` holds fourth-session evidence (D7's 200 response, D9/D10's RGA answer).
-- `docs/EXECUTION-PLAN-v2.md` — a second-phase plan (richer indexed data + a mockup-inspired frontend), separate from and building on `EXECUTION-PLAN.md` above — not a build-status doc, a forward-looking roadmap. Phase v2.1's checkboxes are now checked off (sixth session). Read alongside its two research docs: `docs/pokemon-data-inventory.md` (factual survey of real pokemondb.net data, feasibility-rated) and `docs/mockup-ui-analysis.md` (breakdown of the `mock-ups/*.png` designs against real data availability).
-- `docs/EXECUTION-PLAN-v2.3-frontend.md` — an untracked frontend design doc already in the repo (not yet committed as of this session). Specs a grouped-sub-object `PokemonItem` shape that diverges from what actually got built this session (flat fields) — see the sixth-session section above before starting Phase v2.3 work from this doc as if it already matches the code.
+- `docs/archive/EXECUTION-PLAN-v2.md` — a second-phase plan (richer indexed data + a mockup-inspired frontend), separate from and building on `EXECUTION-PLAN.md` above — not a build-status doc, a forward-looking roadmap. Phase v2.1's checkboxes are now checked off (sixth session). Read alongside its two research docs: `docs/pokemon-data-inventory.md` (factual survey of real pokemondb.net data, feasibility-rated) and `docs/mockup-ui-analysis.md` (breakdown of the `mock-ups/*.png` designs against real data availability).
+- `docs/archive/EXECUTION-PLAN-v2.3-frontend.md` — an untracked frontend design doc already in the repo (not yet committed as of this session). Specs a grouped-sub-object `PokemonItem` shape that diverges from what actually got built this session (flat fields) — see the sixth-session section above before starting Phase v2.3 work from this doc as if it already matches the code.

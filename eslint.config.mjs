@@ -19,6 +19,8 @@ const eslintConfig = defineConfig([
     // Vendored third-party tooling (impeccable skill), not our source:
     ".claude/skills/impeccable/**",
     ".github/skills/impeccable/**",
+    // Presentation deck build toolchain, not app source (see .gitignore):
+    "presentation/build/**",
   ]),
 ]);
 

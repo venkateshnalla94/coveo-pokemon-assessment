@@ -4,7 +4,7 @@ Status: Accepted.
 
 ## Context
 
-`docs/EXECUTION-PLAN-ml-recommendations.md` scoped which Coveo ML capability, if
+`docs/archive/EXECUTION-PLAN-ml-recommendations.md` scoped which Coveo ML capability, if
 any, should back three requested PDP/home surfaces — "Similar," "Recommended,"
 and "Popular" Pokemon — against Coveo's own guidance that a Content
 Recommendation (CR) model needs a usage-analytics dataset of roughly 10,000+
@@ -20,7 +20,7 @@ this session: **1,200 search events, all-time** (since org creation, not a
 **Branch B**, per the execution-plan doc's own framing:
 
 - Ship "Similar" only, as a deterministic same-type Search API query
-  (`docs/EXECUTION-PLAN-similar-pokemon-carousel.md`, `/api/similar` route) —
+  (`docs/archive/EXECUTION-PLAN-similar-pokemon-carousel.md`, `/api/similar` route) —
   no ML model, no cold-start risk, always returns real data.
 - Do not build "Recommended" or "Popular" as their own surfaces. A CR model
   fed 1,200 events would still return *something*, but it would be
@@ -39,7 +39,7 @@ this session: **1,200 search events, all-time** (since org creation, not a
 - No new `/api/recommendations` route, no CR model, no second CR-dedicated
   query pipeline (`docs.coveo.com/en/1886` warns CR must not share the
   `Default`/existing pipeline — avoided entirely by not building it).
-- `docs/EXECUTION-PLAN-similar-pokemon-carousel.md` proceeds on its
+- `docs/archive/EXECUTION-PLAN-similar-pokemon-carousel.md` proceeds on its
   `/api/similar` route as the only data source, not a fallback alongside a
   CR-backed one.
 - Revisit if usage analytics ever crosses roughly 10,000 queries — re-check

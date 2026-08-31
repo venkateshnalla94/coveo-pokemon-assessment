@@ -98,47 +98,33 @@ export interface ServerCoveoConfig {
   configured: boolean;
   organizationId: string | undefined;
   apiKey: string | undefined;
-  mlApiKey: string | undefined;
 }
 
 /**
- * Two separate keys, not one, because Coveo's Custom API key purpose can no
- * longer grant Execute queries / Analytics-Push (those are now
- * template-locked to purposes like "Anonymous search") while ML - Allow
- * content preview is only grantable via Custom. A single key covering all
- * three isn't buildable in the console anymore. See
- * docs/adr/0005-server-token-and-passage-routes.md.
- *
  * `apiKey` (COVEO_API_KEY, "Anonymous search" purpose): Execute queries +
  * Analytics-Push. Used by /api/token, and by /api/passages for Passage
  * Retrieval — direct testing against the live org found `POST /rest/search/
  * v3/passages/retrieve` requires EXECUTE_QUERY, not content preview; see
  * docs/adr/0008-passage-retrieval-needs-execute-query-not-content-preview.md.
  *
- * `mlApiKey` (COVEO_ML_API_KEY, Custom purpose, ML - Allow content preview
- * only): unused by any route, confirmed dead. ADR-0008's follow-up test
- * against a live, Active CPR model got a full 200 with real passage content
- * using `apiKey` alone — content-preview isn't needed anywhere in this app.
- * Not deleted this session (inert, not urgent), but there's no reason to
- * keep it or the underlying Coveo key around beyond convenience.
+ * A second `COVEO_ML_API_KEY` (Custom purpose, ML - Allow content preview)
+ * was built for this originally (ADR-0006) but ADR-0008 confirmed it's
+ * unused by any route — content-preview isn't needed anywhere in this app —
+ * and it was removed from here and `.env.example` accordingly.
  */
 export function resolveServerCoveoConfig({
   environment = process.env,
 }: ResolveCoveoConfigOptions = {}): ServerCoveoConfig {
   const organizationId = environment.NEXT_PUBLIC_COVEO_ORGANIZATION_ID;
   const apiKey = environment.COVEO_API_KEY;
-  const mlApiKey = environment.COVEO_ML_API_KEY;
 
   return {
-    // Only organizationId is universally required here — apiKey and mlApiKey
-    // are each optional depending on which route/auth mode is in play (e.g.
-    // COVEO_API_KEY isn't set at all in "direct" client-auth mode). Callers
-    // (/api/token, /api/passages) each separately check the specific key
-    // they need; folding apiKey into this flag would make /api/passages
-    // wrongly report "not configured" whenever only mlApiKey is set.
+    // Only organizationId is universally required here — apiKey is optional
+    // depending on which route/auth mode is in play (e.g. COVEO_API_KEY
+    // isn't set at all in "direct" client-auth mode). Callers (/api/token,
+    // /api/passages) each separately check for it.
     configured: Boolean(organizationId),
     organizationId,
     apiKey,
-    mlApiKey,
   };
 }

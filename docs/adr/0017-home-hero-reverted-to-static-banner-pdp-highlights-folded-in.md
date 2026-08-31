@@ -4,7 +4,7 @@ Status: Accepted
 
 ## Context
 
-The nineteenth/twentieth sessions (`docs/EXECUTION-PLAN-marketing-assets.md`) shipped a static home hero banner (`ImageSlot`) and icon-based `BrowseByType`. The twenty-first session then built two new pieces on top of that: a carousel version of the home hero (multiple rotating banner images), and a standalone `PdpHighlights` component on the Pokemon detail page surfacing fields (generation among them) that weren't already shown elsewhere. Both were built to close out `docs/EXECUTION-PLAN-async-ui-states.md`/Doc 4's remaining scope.
+The nineteenth/twentieth sessions (`docs/archive/EXECUTION-PLAN-marketing-assets.md`) shipped a static home hero banner (`ImageSlot`) and icon-based `BrowseByType`. The twenty-first session then built two new pieces on top of that: a carousel version of the home hero (multiple rotating banner images), and a standalone `PdpHighlights` component on the Pokemon detail page surfacing fields (generation among them) that weren't already shown elsewhere. Both were built to close out `docs/archive/EXECUTION-PLAN-async-ui-states.md`/Doc 4's remaining scope.
 
 A live product review with the user immediately after, in the same session, found both additions weren't earning their complexity:
 

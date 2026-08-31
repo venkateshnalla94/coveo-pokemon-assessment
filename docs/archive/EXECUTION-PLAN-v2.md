@@ -2,7 +2,7 @@
 
 ## Context
 
-`docs/EXECUTION-PLAN.md` covered the original assessment build — that plan is done (Essential/Intermediate-GitHub/Intermediate-Vercel/Advanced/Bonus tiers all built and verified live; only the two presentation decks remain open there, tracked in `docs/HANDOFF.md`). This file is an **extension**, not a replacement: a second phase the user asked for after seeing the built app — enrich what's indexed from pokemondb.net well beyond the current 5 fields, and redesign the frontend around three AI-generated "Monsterdex" mockups the user supplied (`mock-ups/*.png`).
+`docs/archive/EXECUTION-PLAN.md` covered the original assessment build — that plan is done (Essential/Intermediate-GitHub/Intermediate-Vercel/Advanced/Bonus tiers all built and verified live; only the two presentation decks remain open there, tracked in `docs/HANDOFF.md`). This file is an **extension**, not a replacement: a second phase the user asked for after seeing the built app — enrich what's indexed from pokemondb.net well beyond the current 5 fields, and redesign the frontend around three AI-generated "Monsterdex" mockups the user supplied (`mock-ups/*.png`).
 
 Two research docs back this plan, written the same session:
 - `docs/pokemon-data-inventory.md` — a factual survey of every data section on a real pokemondb.net Pokemon page, with a feasibility rating (Easy/Medium/Hard) for Coveo custom-field extraction.
@@ -49,7 +49,7 @@ Only after v2.1 is fully verified on Test.
 
 ## Phase v2.3 — Frontend enhancement (roadmap only — component spec deferred to the Opus/mockup session)
 
-**Status: done**, built in the seventh session per the full component spec that session wrote first (`docs/EXECUTION-PLAN-v2.3-frontend.md`) — see that session's section in `docs/HANDOFF.md` for the step-by-step build log, real bugs found/fixed, and deferred items. Checkboxes below left as originally written for the historical record; all seven shipped:
+**Status: done**, built in the seventh session per the full component spec that session wrote first (`docs/archive/EXECUTION-PLAN-v2.3-frontend.md`) — see that session's section in `docs/HANDOFF.md` for the step-by-step build log, real bugs found/fixed, and deferred items. Checkboxes below left as originally written for the historical record; all seven shipped:
 
 - [x] **Creature Profile panel** on the detail page — height/weight/species/egg groups/catch rate/etc. This is the mockup's best-aligned panel; nearly every field maps directly to a v2.1 field.
 - [x] **Stat bars** — all 6 real base stats (HP/Attack/Defense/Sp.Atk/Sp.Def/Speed), replacing the mockup's fictional 5-stat set (which included a non-existent "Agility" stat).

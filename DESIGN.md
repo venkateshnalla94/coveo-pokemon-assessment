@@ -57,7 +57,7 @@ spacing:
 
 ## Status of this document
 
-`docs/EXECUTION-PLAN-v4-design-system.md` is **complete** — all 11
+`docs/archive/EXECUTION-PLAN-v4-design-system.md` is **complete** — all 11
 execution-order steps across six batches have shipped (see
 `docs/HANDOFF.md`'s thirteenth-through-seventeenth-session sections for the
 batch-by-batch build log, and `docs/adr/0013-type-driven-design-system.md`
@@ -78,7 +78,7 @@ now extended to two accents: caution/amber for config errors, and
 ring). Everything else — the shell/chrome neutrals — stays a quiet, cool
 "device housing" ramp, so the type palette and the Pokemon artwork carry the
 personality instead of the chrome. See
-`docs/EXECUTION-PLAN-v4-design-system.md` §0 and §3.2 for the full
+`docs/archive/EXECUTION-PLAN-v4-design-system.md` §0 and §3.2 for the full
 reasoning, including why the earlier "ink-on-paper lab notebook" framing
 (this document's previous version) was retired in favor of this direction.
 
@@ -93,7 +93,7 @@ dark` blocks): light mode uses `--shell-050` as page background and
 `--shell-000` as the tile/card surface; dark mode uses `--shell-900` as page
 background and `--shell-800` as the tile/card surface. In both schemes the
 tile surface is lighter than the page chrome — a deliberate, scheme-agnostic
-relationship (`docs/EXECUTION-PLAN-v4-design-system.md` §3.2).
+relationship (`docs/archive/EXECUTION-PLAN-v4-design-system.md` §3.2).
 
 ### Signal (`--signal-red` / `--signal-glow`)
 
@@ -102,7 +102,7 @@ whole app: the Pokeball glyph and the global focus ring. Never body text,
 never links, never error states. `--signal-glow` (`#FF6B4A`) is its lighter
 companion for the glyph's motion states. If red ever shows up anywhere else,
 that's a bug against this rule, not a stylistic choice — see
-`docs/EXECUTION-PLAN-v4-design-system.md` §3.2 for why (it stops reading as
+`docs/archive/EXECUTION-PLAN-v4-design-system.md` §3.2 for why (it stops reading as
 a Pokeball cue and starts reading as an alarm).
 
 ### Functional (not decorative)
@@ -127,7 +127,7 @@ Two derived exports off that same file:
 - `typeCssVariables()` — serializes all 18 into `--type-<name>: <hex>;`
   custom-property declarations, emitted from an inline `<style>` in
   `src/app/layout.tsx` (permitted under this app's CSP — see
-  `docs/EXECUTION-PLAN-v4-design-system.md` §1).
+  `docs/archive/EXECUTION-PLAN-v4-design-system.md` §1).
 - `getTypeTextColor(type)` — returns whichever of `#FFFFFF` / `#1A1C22`
   clears 4.5:1 (WCAG AA) contrast against that type's hex, for solid-fill
   badge treatments. Every one of the 18 pairs is checked with the actual
@@ -139,7 +139,7 @@ Two derived exports off that same file:
 Derived per-element forms (glow/tint/edge) are computed with `color-mix()`
 in `oklab` against an inline `--type-primary`/`--type-secondary` pair, not
 baked into CSS as more hex values — see
-`docs/EXECUTION-PLAN-v4-design-system.md` §3.1 for the exact recipes. Wired
+`docs/archive/EXECUTION-PLAN-v4-design-system.md` §3.1 for the exact recipes. Wired
 into `ResultList.tsx`'s tile glow, the type facet swatches, `TypeDefenses`,
 `StatBar`'s fill, the RGA citation tags, and the PDP passage cards.
 
@@ -246,7 +246,7 @@ Unchanged by this pass. Uniform 6px radius on every bordered surface.
 
 ## Components
 
-Every surface listed in `docs/EXECUTION-PLAN-v4-design-system.md` §4–§9 is
+Every surface listed in `docs/archive/EXECUTION-PLAN-v4-design-system.md` §4–§9 is
 built:
 
 - **Search bar** — a custom `PokeballGlyph` (idle/focus/loading/settle
@@ -287,7 +287,7 @@ so page layout is correct before any art exists. Four slots were originally
 wired in this pass (PDP hero backdrop 21:9, home hero banner 16:5,
 empty-search illustration 1:1, type-facet section header 4:1), all rendering
 as placeholders since no art existed yet. As of the marketing-assets pass
-(`docs/EXECUTION-PLAN-marketing-assets.md`) and the home-hero/PDP-hero rework
+(`docs/archive/EXECUTION-PLAN-marketing-assets.md`) and the home-hero/PDP-hero rework
 (ADR-0017), two slots remain: `homeBanner` and `emptySearch`, both now
 rendering real downloaded art (`public/art/*.webp`) instead of placeholders.
 The PDP hero backdrop slot was removed along with the full-bleed backdrop

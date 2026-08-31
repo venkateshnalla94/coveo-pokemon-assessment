@@ -69,6 +69,14 @@ describe("POST /api/passages", () => {
     expect(response.status).toBe(400);
   });
 
+  it("returns 400 when pokemonName contains structural CAQL characters", async () => {
+    configureEnv();
+
+    const response = await POST(postRequest({ query: "evolve", pokemonName: "Eevee) OR @x==(y" }));
+
+    expect(response.status).toBe(400);
+  });
+
   it("builds a filter from pokemonName with embedded quotes escaped", async () => {
     configureEnv();
     const fetchMock = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ items: [] }) });
