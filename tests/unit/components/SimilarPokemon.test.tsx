@@ -46,10 +46,43 @@ describe("SimilarPokemon", () => {
     expect(screen.getByText("Fire")).toBeInTheDocument();
     // Two highest real stats: Attack (130) and Sp. Def (110).
     expect(screen.getByText("Strong in: Attack, Sp. Def")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "View Pokemon" })).toHaveAttribute(
+    expect(screen.getByText("View Pokemon")).toBeInTheDocument();
+    // The whole card is one click target, not just the "View Pokemon" text.
+    expect(screen.getByRole("link", { name: /Flareon/ })).toHaveAttribute(
       "href",
       "/pokemon/Flareon",
     );
+    // A single card has nothing to scroll through — no arrow buttons.
+    expect(screen.queryByRole("button", { name: "Next similar Pokemon" })).not.toBeInTheDocument();
+  });
+
+  it("shows carousel arrow buttons once there is more than one card", async () => {
+    const items = [
+      {
+        name: "Flareon",
+        imageUrl: "https://img.pokemondb.net/sprites/flareon.png",
+        dexNumber: "136",
+        types: ["Fire"],
+        stats: { hp: 65, attack: 130, defense: 60, spAtk: 95, spDef: 110, speed: 65 },
+      },
+      {
+        name: "Vaporeon",
+        imageUrl: "https://img.pokemondb.net/sprites/vaporeon.png",
+        dexNumber: "134",
+        types: ["Water"],
+        stats: { hp: 130, attack: 65, defense: 60, spAtk: 110, spDef: 95, speed: 65 },
+      },
+    ];
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({ ok: true, json: async () => ({ items }) }),
+    );
+
+    render(<SimilarPokemon pokemonName="Eevee" pokemonTypes={["Normal"]} />);
+
+    await waitFor(() => expect(screen.getByText("Flareon")).toBeInTheDocument());
+    expect(screen.getByRole("button", { name: "Previous similar Pokemon" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Next similar Pokemon" })).toBeInTheDocument();
   });
 
   it("shows a distinct empty message when the request succeeds with zero items", async () => {

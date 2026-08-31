@@ -113,6 +113,8 @@ export const CONTENT = {
     similarEmptyMessage: (name: string) => `No similar Pokemon found for ${name}.`,
     similarStrongInPrefix: "Strong in:",
     similarViewLabel: "View Pokemon",
+    similarPrevLabel: "Previous similar Pokemon",
+    similarNextLabel: "Next similar Pokemon",
   },
 
   answer: {

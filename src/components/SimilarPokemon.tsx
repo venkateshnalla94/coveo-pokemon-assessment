@@ -3,7 +3,8 @@
 import useEmblaCarousel from "embla-carousel-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import type { CSSProperties } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Chip } from "@/components/ui/Chip";
 import { CONTENT } from "@/content/pokedex";
 import type { PokemonStats } from "@/coveo/mapPokemonResult";
@@ -49,7 +50,36 @@ type SimilarState =
  */
 export function SimilarPokemon({ pokemonName, pokemonTypes }: SimilarPokemonProps) {
   const [state, setState] = useState<SimilarState>({ status: "loading" });
-  const [emblaRef] = useEmblaCarousel({ align: "start", dragFree: true });
+  const [emblaRef, emblaApi] = useEmblaCarousel({ align: "start", dragFree: true });
+  const [canScrollPrev, setCanScrollPrev] = useState(false);
+  const [canScrollNext, setCanScrollNext] = useState(false);
+
+  // Arrow buttons alongside embla's own drag/swipe (kept — a touch/trackpad
+  // user still expects to drag a carousel; the arrows are for anyone who
+  // wouldn't otherwise discover that, mouse-wheel or keyboard users
+  // included). Re-synced on every `select`/`reInit` embla emits, not just on
+  // mount, so button disabled-state tracks the real scroll position (e.g.
+  // "next" grays out once the last card is reached).
+  useEffect(() => {
+    if (!emblaApi) return;
+
+    const syncButtons = () => {
+      setCanScrollPrev(emblaApi.canScrollPrev());
+      setCanScrollNext(emblaApi.canScrollNext());
+    };
+
+    syncButtons();
+    emblaApi.on("select", syncButtons);
+    emblaApi.on("reInit", syncButtons);
+
+    return () => {
+      emblaApi.off("select", syncButtons);
+      emblaApi.off("reInit", syncButtons);
+    };
+  }, [emblaApi]);
+
+  const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
+  const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -99,11 +129,31 @@ export function SimilarPokemon({ pokemonName, pokemonTypes }: SimilarPokemonProp
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pokemonName, pokemonTypes.join(",")]);
 
+  const showArrows = state.status === "success" && state.items.length > 1;
+
   return (
     <div className="mt-8 border-t border-shell-600/40 pt-6">
-      <h2 className="font-display text-lg font-semibold text-foreground">
-        {CONTENT.pdp.similarHeading(pokemonName)}
-      </h2>
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="font-display text-lg font-semibold text-foreground">
+          {CONTENT.pdp.similarHeading(pokemonName)}
+        </h2>
+        {showArrows && (
+          <div className="flex items-center gap-2">
+            <CarouselArrowButton
+              direction="prev"
+              label={CONTENT.pdp.similarPrevLabel}
+              disabled={!canScrollPrev}
+              onClick={scrollPrev}
+            />
+            <CarouselArrowButton
+              direction="next"
+              label={CONTENT.pdp.similarNextLabel}
+              disabled={!canScrollNext}
+              onClick={scrollNext}
+            />
+          </div>
+        )}
+      </div>
       <div className="async-panel mt-4" data-open="true">
         <div>
           {state.status === "loading" && <SimilarSkeleton />}
@@ -127,6 +177,48 @@ export function SimilarPokemon({ pokemonName, pokemonTypes }: SimilarPokemonProp
         </div>
       </div>
     </div>
+  );
+}
+
+/**
+ * Plain hand-drawn chevrons, not an icon library — matches
+ * `docs/EXECUTION-PLAN-marketing-assets.md` §5.2's existing rule for this
+ * repo (`PokeballGlyph.tsx`'s posture): no new icon dependency for a couple
+ * of small glyphs.
+ */
+function CarouselArrowButton({
+  direction,
+  label,
+  disabled,
+  onClick,
+}: {
+  direction: "prev" | "next";
+  label: string;
+  disabled: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      disabled={disabled}
+      onClick={onClick}
+      className="flex h-8 w-8 items-center justify-center rounded-full border border-shell-100 text-foreground transition-opacity disabled:opacity-30 dark:border-shell-600"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        width="16"
+        height="16"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        {direction === "prev" ? <path d="M15 18l-6-6 6-6" /> : <path d="M9 18l6-6-6-6" />}
+      </svg>
+    </button>
   );
 }
 
@@ -164,46 +256,69 @@ function SimilarPokemonCard({ item }: { item: SimilarPokemonItem }) {
   const highlights = topStats(item.stats);
   const detailHref = `/pokemon/${encodeURIComponent(item.name)}`;
 
+  // Same type-driven glow treatment as ResultList.tsx's ResultCard
+  // (ADR-0013) — `types[0]` isn't a verified "primary" type, used only for
+  // decorative lighting, same caveat as that component.
+  const typeColors = item.types
+    .map((type) => getTypeColor(type))
+    .filter((color): color is string => Boolean(color));
+  const [primaryColor, secondaryColor] = typeColors;
+  const isDualGlow = Boolean(primaryColor && secondaryColor && primaryColor !== secondaryColor);
+  const glowVars = primaryColor
+    ? ({
+        "--type-primary": primaryColor,
+        "--type-secondary": secondaryColor ?? primaryColor,
+      } as CSSProperties)
+    : undefined;
+
   return (
-    <li className="w-40 shrink-0 rounded-lg bg-surface p-3">
-      <div className="relative aspect-square w-full">
-        <Image
-          src={item.imageUrl}
-          alt={item.name}
-          fill
-          sizes="160px"
-          className="object-contain"
-        />
-      </div>
-      <p className="font-display mt-2 flex items-baseline justify-between gap-2 text-sm font-semibold text-foreground">
-        <span>{item.name}</span>
-        {item.dexNumber && (
-          <span className="font-mono-label shrink-0 text-xs text-shell-400">#{item.dexNumber}</span>
+    <li
+      className="result-tile group w-40 shrink-0 bg-surface p-3"
+      data-glow={primaryColor ? (isDualGlow ? "dual" : "single") : undefined}
+      style={glowVars}
+    >
+      {/* Whole card is one click target, same as ResultList.tsx's
+          ResultCard — "View Pokemon" below is a visual label inside this
+          link, not a second nested anchor. */}
+      <Link href={detailHref} className="block">
+        <div className="relative aspect-square w-full">
+          <Image
+            src={item.imageUrl}
+            alt={item.name}
+            fill
+            sizes="160px"
+            className="object-contain transition-transform duration-200 ease-out group-hover:scale-105 group-focus-within:scale-105"
+          />
+        </div>
+        <p className="font-display mt-2 flex items-baseline justify-between gap-2 text-sm font-semibold text-foreground underline decoration-transparent decoration-2 underline-offset-2 transition-colors group-hover:decoration-current group-focus-within:decoration-current">
+          <span>{item.name}</span>
+          {item.dexNumber && (
+            <span className="font-mono-label shrink-0 text-xs text-shell-400">
+              #{item.dexNumber}
+            </span>
+          )}
+        </p>
+        {item.types.length > 0 && (
+          <p className="mt-1 flex flex-wrap items-center gap-1.5">
+            {item.types.map((type) => (
+              <Chip
+                key={type}
+                label={type}
+                color={getTypeColor(type)}
+                textColor={getTypeTextColor(type)}
+                variant="type-solid"
+              />
+            ))}
+          </p>
         )}
-      </p>
-      {item.types.length > 0 && (
-        <p className="mt-1 flex flex-wrap items-center gap-1.5">
-          {item.types.map((type) => (
-            <Chip
-              key={type}
-              label={type}
-              color={getTypeColor(type)}
-              textColor={getTypeTextColor(type)}
-              variant="type-solid"
-            />
-          ))}
-        </p>
-      )}
-      {highlights.length > 0 && (
-        <p className="mt-1 truncate text-xs text-shell-400">
-          {CONTENT.pdp.similarStrongInPrefix} {highlights.join(", ")}
-        </p>
-      )}
-      <Link
-        href={detailHref}
-        className="mt-2 inline-block text-xs font-medium text-foreground underline decoration-transparent decoration-2 underline-offset-2 transition-colors hover:decoration-current"
-      >
-        {CONTENT.pdp.similarViewLabel}
+        {highlights.length > 0 && (
+          <p className="mt-1 truncate text-xs text-shell-400">
+            {CONTENT.pdp.similarStrongInPrefix} {highlights.join(", ")}
+          </p>
+        )}
+        <span className="mt-2 inline-block text-xs font-medium text-foreground underline decoration-transparent decoration-2 underline-offset-2 transition-colors group-hover:decoration-current group-focus-within:decoration-current">
+          {CONTENT.pdp.similarViewLabel}
+        </span>
       </Link>
     </li>
   );
