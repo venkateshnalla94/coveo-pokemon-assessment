@@ -1,11 +1,19 @@
 "use client";
 
-import { buildBreadcrumbManager, buildQuerySummary, buildSort } from "@coveo/headless";
-import { useState } from "react";
+import {
+  buildBreadcrumbManager,
+  buildQuerySummary,
+  buildSort,
+  loadSearchActions,
+  loadSearchAnalyticsActions,
+} from "@coveo/headless";
+import { useEffect, useState } from "react";
 import { Chip } from "@/components/ui/Chip";
 import { CONTENT } from "@/content/pokedex";
+import { clearBrowseByTypeFilter } from "@/coveo/advancedSearchQuery";
 import type { CoveoSearchApiError } from "@/coveo/applicationError";
 import { getSearchEngine } from "@/coveo/engine";
+import { parseTypeFromAq } from "@/coveo/browseByTypeUrl";
 import { SORT_OPTIONS } from "@/coveo/sortOptions";
 import { useControllerState } from "@/coveo/useControllerState";
 
@@ -30,7 +38,19 @@ export function SearchSummaryBar() {
   // re-render whenever the sort controller's state changes.
   useControllerState(sort);
 
-  if (!summaryState.hasResults && !breadcrumbState.hasBreadcrumbs) {
+  // No Headless controller owns the `advancedSearchQueries` slice (`aq`,
+  // used by the home page's Browse-by-type pills — see
+  // src/coveo/advancedSearchQuery.ts / docs/adr/0011), so subscribe to the
+  // engine directly to notice when it's set or cleared.
+  const [aq, setAq] = useState(() => engine.state.advancedSearchQueries?.aq);
+  useEffect(() => {
+    return engine.subscribe(() => {
+      setAq(engine.state.advancedSearchQueries?.aq);
+    });
+  }, [engine]);
+  const activeTypeFilter = parseTypeFromAq(aq);
+
+  if (!summaryState.hasResults && !breadcrumbState.hasBreadcrumbs && !activeTypeFilter) {
     return null;
   }
 
@@ -93,8 +113,26 @@ export function SearchSummaryBar() {
         </p>
       )}
 
-      {breadcrumbState.hasBreadcrumbs && (
+      {(breadcrumbState.hasBreadcrumbs || activeTypeFilter) && (
         <div className="flex flex-wrap items-center gap-1.5">
+          {activeTypeFilter && (
+            <span className="inline-flex items-center gap-1">
+              <Chip label={`Type: ${activeTypeFilter}`} variant="neutral" />
+              <button
+                type="button"
+                aria-label={CONTENT.search.removeFilterLabel(activeTypeFilter)}
+                onClick={() => {
+                  clearBrowseByTypeFilter(engine);
+                  const { executeSearch } = loadSearchActions(engine);
+                  const { logInterfaceLoad } = loadSearchAnalyticsActions(engine);
+                  engine.dispatch(executeSearch(logInterfaceLoad()));
+                }}
+                className="text-black/40 hover:text-black dark:text-white/40 dark:hover:text-white"
+              >
+                &times;
+              </button>
+            </span>
+          )}
           {breadcrumbState.facetBreadcrumbs.flatMap((breadcrumb) =>
             breadcrumb.values.map((value) => (
               <span key={`${breadcrumb.facetId}-${value.value.value}`} className="inline-flex items-center gap-1">
@@ -145,7 +183,14 @@ export function SearchSummaryBar() {
           )}
           <button
             type="button"
-            onClick={() => breadcrumbManager.deselectAll()}
+            onClick={() => {
+              // Clear `aq` first so deselectAll()'s own executeSearch picks
+              // it up in the same request instead of firing a second one.
+              if (activeTypeFilter) {
+                clearBrowseByTypeFilter(engine);
+              }
+              breadcrumbManager.deselectAll();
+            }}
             className="text-xs text-black/60 hover:underline dark:text-white/60"
           >
             {CONTENT.search.clearAllLabel}

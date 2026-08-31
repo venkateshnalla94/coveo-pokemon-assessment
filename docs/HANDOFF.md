@@ -1,6 +1,57 @@
 # Session handoff — Coveo org build status
 
-Updated 2026-08-31, twenty-second session. **This (twenty-second) session fixed two real layout-stability bugs the user found by eyeballing the running app, no org config touched — see "Twenty-second session" below; the rest of this paragraph covers the twenty-first session and earlier.** Phase v2.3 is fully built (seventh session). The tenth session closed v3.1 (sort break) and most of v3.3 (search page data), plus a facet-architecture change (Automatic Facet Generation). The eleventh session did most of v3.2 (branching evolution chain + evolution images) and most of v3.4 (RGA/CPR content-exclusion diagnosis and rules). The twelfth session gave the user the full remaining v3.2/v3.4 console sequence. The thirteenth session executed Batch 2 (chrome restyle + Pokeball search bar). The fourteenth session executed Batch 3 (result tiles + facet type-swatches). The fifteenth session executed Batch 4 (PDP restyle). The sixteenth session executed Batch 5 (RGA scan reveal + scanline citations, passage-retrieval restyle). The seventeenth session executed Batch 6, closing out the v4 design pass entirely (motion/a11y audit + ADR-0013). The eighteenth session did the manual walkthrough + two missing e2e specs, found and fixed two real bugs, then shipped the Vercel deploy (live at https://coveo-pokemon-assessment.vercel.app/). The nineteenth session scoped four follow-up execution-plan docs (see below) and executed Doc 3's original scope (real marketing assets + icon-based Browse-by-type) — that code sat uncommitted until the twentieth session. The twentieth session committed Doc 3's shipped code, resolved Doc 1's open Analytics-volume decision (Branch B) and enabled+verified ART, then built item 1 of 3 (the PDP Similar Pokemon carousel, Doc 2) including a manual-testing UX-fix follow-up (whole-card click, hover pop, scroll arrows). **This (twenty-first) session built items 2 and 3 of the three-item build order — home hero carousel + PDP Highlights (Doc 3 §5), and the async idle/loading/success/error contract on `GeneratedAnswer`/`AskAboutPokemon`/`ResultList` (Doc 4) — closing out all four follow-up execution docs from the nineteenth session, then (same session, after live user review) reworked the hero/PDP/Highlights UI it had just shipped: un-carouseled the home hero in favor of a carousel Browse-by-type, widened Home/Search/PDP to match the header's container width, dropped the PDP's full-bleed backdrop photo for a commerce-style two-column hero, and deleted `PdpHighlights` in favor of folding its one genuinely new field (generation) into the existing Overview tab and Hero — then, after a second round of live feedback, replaced the search page's flat-color facet swatches (Type/Weaknesses/Resistances) with the same real type-icon art the home page's Browse-by-type strip uses, and reordered the facet rail to lead with Type, then Generation, then the rest. See "Twenty-first session" and both "Twenty-first session, continued" entries below for all of it.** What's left project-wide: the two presentation decks, and confirming whether the Phase 0 email/booking + off-cycle ML-rebuild request actually got sent (**deadline 2026-09-06** — user indicated sending both 2026-08-31, still not independently verified) — summarized in "What's next" below. The prior sessions' handoff content is folded into this one; treat this file as the current snapshot, not an addendum.
+Updated 2026-08-31, twenty-third session. **This (twenty-third) session fixed a real query-state bug the user found by using the running app: a category filter picked up from the home page's Browse-by-type links (`aq`) survived a brand-new search-box query, ANDing a stale type filter into unrelated searches (and starving RGA of results) — no org config touched; see "Twenty-third session" below.** The twenty-second session fixed two real layout-stability bugs the user found by eyeballing the running app, no org config touched — see "Twenty-second session" below; the rest of this paragraph covers the twenty-first session and earlier. Phase v2.3 is fully built (seventh session). The tenth session closed v3.1 (sort break) and most of v3.3 (search page data), plus a facet-architecture change (Automatic Facet Generation). The eleventh session did most of v3.2 (branching evolution chain + evolution images) and most of v3.4 (RGA/CPR content-exclusion diagnosis and rules). The twelfth session gave the user the full remaining v3.2/v3.4 console sequence. The thirteenth session executed Batch 2 (chrome restyle + Pokeball search bar). The fourteenth session executed Batch 3 (result tiles + facet type-swatches). The fifteenth session executed Batch 4 (PDP restyle). The sixteenth session executed Batch 5 (RGA scan reveal + scanline citations, passage-retrieval restyle). The seventeenth session executed Batch 6, closing out the v4 design pass entirely (motion/a11y audit + ADR-0013). The eighteenth session did the manual walkthrough + two missing e2e specs, found and fixed two real bugs, then shipped the Vercel deploy (live at https://coveo-pokemon-assessment.vercel.app/). The nineteenth session scoped four follow-up execution-plan docs (see below) and executed Doc 3's original scope (real marketing assets + icon-based Browse-by-type) — that code sat uncommitted until the twentieth session. The twentieth session committed Doc 3's shipped code, resolved Doc 1's open Analytics-volume decision (Branch B) and enabled+verified ART, then built item 1 of 3 (the PDP Similar Pokemon carousel, Doc 2) including a manual-testing UX-fix follow-up (whole-card click, hover pop, scroll arrows). **This (twenty-first) session built items 2 and 3 of the three-item build order — home hero carousel + PDP Highlights (Doc 3 §5), and the async idle/loading/success/error contract on `GeneratedAnswer`/`AskAboutPokemon`/`ResultList` (Doc 4) — closing out all four follow-up execution docs from the nineteenth session, then (same session, after live user review) reworked the hero/PDP/Highlights UI it had just shipped: un-carouseled the home hero in favor of a carousel Browse-by-type, widened Home/Search/PDP to match the header's container width, dropped the PDP's full-bleed backdrop photo for a commerce-style two-column hero, and deleted `PdpHighlights` in favor of folding its one genuinely new field (generation) into the existing Overview tab and Hero — then, after a second round of live feedback, replaced the search page's flat-color facet swatches (Type/Weaknesses/Resistances) with the same real type-icon art the home page's Browse-by-type strip uses, and reordered the facet rail to lead with Type, then Generation, then the rest. See "Twenty-first session" and both "Twenty-first session, continued" entries below for all of it.** What's left project-wide: the two presentation decks, and confirming whether the Phase 0 email/booking + off-cycle ML-rebuild request actually got sent (**deadline 2026-09-06** — user indicated sending both 2026-08-31, still not independently verified) — summarized in "What's next" below. The prior sessions' handoff content is folded into this one; treat this file as the current snapshot, not an addendum.
+
+## Twenty-third session — fixed stale category-filter (`aq`) surviving a new search (no org config touched)
+
+User reported: click a "Browse by category" pill on the home page (e.g.
+"Normal") → lands on `/search?aq=%40pokemontype%3D%3D%22Normal%22` → then
+type a brand-new query ("pikachu") in the search box → URL becomes
+`/search?q=pikachu&aq=%40pokemontype%3D%3D%22Normal%22` and returns zero
+results (Pikachu is Electric-type, still filtered to Normal), with RGA also
+not triggering. Investigated in plan mode before any code changed.
+
+**Root cause**: `BrowseByType.tsx`'s category pills pre-filter `/search` via
+a raw `aq` (advanced query) expression, not a facet — a deliberate design
+from `docs/adr/0011-automatic-facet-generation-on-search-page.md`, since
+`/search`'s type facet is Automatic Facet Generation, which has no stable
+`facetId`/URL param `aq` doesn't depend on. That ADR fixed `aq` reaching the
+Search API at all, but never addressed clearing it afterward.
+`SearchBox.tsx`'s in-place `submit()`/`selectSuggestion()` (used on
+`/search`) call the Headless `SearchBox` controller directly, which only
+owns `state.query.q` — it has no knowledge of the `advancedSearchQueries`
+slice `aq` lives in, so a new query got ANDed with the stale filter forever.
+Separately, `SearchSummaryBar.tsx`'s breadcrumb row never surfaced `aq` at
+all: no chip, and "Clear all" (`breadcrumbManager.deselectAll()`) only
+touches facets — so before this session there was **no UI affordance at
+all** to remove a category filter once applied, not even by clicking "Clear
+all." Confirmed as a genuine bug (not intended per ADR-0011) and agreed with
+the user to close both gaps together rather than ship a partial fix that
+just makes the filter invisible instead of stuck.
+
+**Fix**, four files: new `src/coveo/advancedSearchQuery.ts`
+(`clearBrowseByTypeFilter(engine)`, dispatches
+`updateAdvancedSearchQueries({ aq: "" })`); `src/coveo/browseByTypeUrl.ts`
+gained `parseTypeFromAq` (display-side inverse of the existing
+`buildTypeSearchHref`, for rendering a breadcrumb label — the URL/state
+mechanism itself is unchanged); `SearchBox.tsx`'s in-place `submit()`/
+`selectSuggestion()` now call `clearBrowseByTypeFilter` immediately before
+dispatching the new query; `SearchSummaryBar.tsx` now subscribes directly to
+`engine.state.advancedSearchQueries?.aq` (no Headless controller owns that
+slice), renders a `"Type: <value>" ×` breadcrumb chip when it's set, and
+"Clear all" clears `aq` too (before calling `deselectAll()`, so both land in
+one Search API request instead of two). No new ADR — this doesn't reverse
+ADR-0011's decision, it fixes a lifecycle gap that ADR never addressed.
+
+**Verification**: `npm run typecheck`, `npm run lint` clean. Confirmed live
+against the already-running dev server (not a fresh one — Turbopack detected
+the existing process on port 3000 and reused it) that `/search?aq=...Normal`
+server-renders the new "Type: Normal" chip. Full manual click-through
+(type a new query after a category-pill landing, click the chip's ×, click
+"Clear all" with only the type filter active, confirm a single network
+request each time, confirm RGA renders for the previously-broken query) was
+**not** independently re-verified by this session after handoff — worth a
+quick pass next session if not already done live by the user.
 
 ## Twenty-second session — fixed two layout-shift/flicker bugs (no org config touched)
 
