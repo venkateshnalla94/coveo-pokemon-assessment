@@ -109,7 +109,13 @@ match the type's lowercase name for a simple lookup). Each circular button:
 
 ## 5. Home hero carousel + PDP Highlights (Sephora / Sleep Country references)
 
-**Not started.** New scope added after Doc 3's initial execution (§0-4 above),
+**Complete.** Executed in the twenty-first session; see `docs/HANDOFF.md`'s
+"Twenty-first session" entry for what was actually shipped, including one
+scope decision (all three carousel slides share one background image) and
+one dropped field (the catch-rate tier callout — no defensible bucketing)
+this doc's own text below flagged as open calls.
+
+New scope added after Doc 3's initial execution (§0-4 above),
 based on six reference screenshots the user dropped into
 `docs/temp/insiprations/{Home,pdp}/` — re-open those directly in a future
 session rather than relying only on the prose below, which is a lossy

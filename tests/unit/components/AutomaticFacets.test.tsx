@@ -109,6 +109,20 @@ describe("AutomaticFacets", () => {
     expect(toggleSelect).toHaveBeenCalledWith(idle);
   });
 
+  it("orders Type first, then Generation, then whatever else Coveo returned, in its own order", () => {
+    generatorMock.state = {
+      automaticFacets: [
+        makeFacet(POKEMON_FIELDS.eggGroups, "Egg Groups", [facetValue("Field")]),
+        makeFacet(POKEMON_FIELDS.weaknesses, "Weaknesses", [facetValue("Fire")]),
+        makeFacet(POKEMON_FIELDS.generation, "Generation", [facetValue("Generation 9")]),
+        makeFacet(POKEMON_FIELDS.type, "Type", [facetValue("Water")]),
+      ],
+    };
+    render(<AutomaticFacets />);
+    const legends = screen.getAllByRole("group").map((fieldset) => fieldset.querySelector("legend")?.textContent);
+    expect(legends).toEqual(["Type", "Generation", "Egg Groups", "Weaknesses"]);
+  });
+
   it("shows numberOfResults next to each value", () => {
     generatorMock.state = {
       automaticFacets: [

@@ -61,20 +61,37 @@ export function GeneratedAnswer() {
 
   const renderState = deriveGeneratedAnswerRenderState(state);
 
+  // Persistent-wrapper contract (docs/EXECUTION-PLAN-async-ui-states.md §2):
+  // this div stays mounted across every status, including "hidden" — no
+  // `return null` — so a later transition into "loading" animates an
+  // expand instead of the whole page snapping open. Panel's own mb-6/
+  // border-t only paint when something is actually rendered inside, so the
+  // collapsed "hidden" state leaves no stray spacing behind.
+  let content: React.ReactNode = null;
   switch (renderState.status) {
     case "hidden":
-      return null;
+      content = null;
+      break;
     case "loading":
-      return (
+      content = (
         <Panel>
           <ScanSequence generationSteps={state?.generationSteps ?? []} />
           <p className="font-mono-label text-xs text-shell-400">{CONTENT.answer.loadingLabel}</p>
+          <AnswerSkeleton />
         </Panel>
       );
+      break;
+    case "error":
+      content = (
+        <Panel>
+          <p className="text-sm text-red-600 dark:text-red-400">{CONTENT.answer.errorMessage}</p>
+        </Panel>
+      );
+      break;
     case "streaming":
     case "answer": {
       const isStreaming = renderState.status === "streaming";
-      return (
+      content = (
         <Panel>
           <div className="mb-2 flex items-center justify-between">
             <ScanSequence generationSteps={state?.generationSteps ?? []} />
@@ -92,8 +109,26 @@ export function GeneratedAnswer() {
           )}
         </Panel>
       );
+      break;
     }
   }
+
+  return (
+    <div className="async-panel" data-open={renderState.status !== "hidden" ? "true" : "false"}>
+      <div>{content}</div>
+    </div>
+  );
+}
+
+/** 2-3 bars roughly matching a short answer's height (plan §3). */
+function AnswerSkeleton() {
+  return (
+    <div className="mt-3 flex flex-col gap-2" aria-hidden="true">
+      <div className="h-3 w-11/12 animate-pulse rounded bg-shell-100 dark:bg-shell-600/40" />
+      <div className="h-3 w-3/4 animate-pulse rounded bg-shell-100 dark:bg-shell-600/40" />
+      <div className="h-3 w-5/6 animate-pulse rounded bg-shell-100 dark:bg-shell-600/40" />
+    </div>
+  );
 }
 
 /**

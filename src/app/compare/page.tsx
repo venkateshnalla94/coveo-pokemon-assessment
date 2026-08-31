@@ -42,7 +42,7 @@ const EMPTY_STATE: ResultListState = {
  */
 export default function ComparePage() {
   return (
-    <Suspense fallback={<p className="mx-auto max-w-6xl px-6 py-10">{CONTENT.search.loadingLabel}</p>}>
+    <Suspense fallback={<p className="mx-auto max-w-7xl px-6 py-10">{CONTENT.search.loadingLabel}</p>}>
       <ComparePageContent />
     </Suspense>
   );
@@ -97,7 +97,7 @@ function ComparePageContent() {
   const items = renderState?.status === "success" ? renderState.items : [];
 
   return (
-    <div className="mx-auto max-w-6xl px-6 py-10">
+    <div className="mx-auto max-w-7xl px-6 py-10">
       <Link href="/" className="mb-6 inline-block text-sm text-shell-400 hover:underline hover:text-foreground">
         {CONTENT.compare.backLinkLabel}
       </Link>

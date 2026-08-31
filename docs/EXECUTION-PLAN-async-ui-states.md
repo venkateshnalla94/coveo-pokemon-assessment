@@ -1,9 +1,12 @@
 # Execution Plan — Consistent Idle/Loading/Success/Error States Across Async Components
 
-Status: **ready to execute** — no open decisions, no Coveo org config
-changes. Independent of the ML/carousel docs, though the new carousel
-(`docs/EXECUTION-PLAN-similar-pokemon-carousel.md`) must ship built to this
-contract from day one rather than needing a follow-up pass.
+Status: **complete.** `SimilarPokemon.tsx` shipped built to this contract
+from day one (twentieth session). `GeneratedAnswer.tsx`, `AskAboutPokemon.tsx`,
+and `ResultList.tsx` were brought onto it in the twenty-first session — see
+`docs/HANDOFF.md`'s "Twenty-first session" entry, including
+`docs/adr/0016-generated-answer-error-state.md` for the one real design
+decision this pass required (a new, previously-absent "error" status on
+`GeneratedAnswer`).
 
 Scope: every component in this app that waits on Coveo or this app's own API
 routes gets the same four-state contract, so the surrounding page never jumps

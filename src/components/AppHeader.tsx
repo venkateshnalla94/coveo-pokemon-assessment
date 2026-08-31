@@ -26,7 +26,7 @@ export function AppHeader() {
 
   return (
     <header className="border-b border-shell-100 bg-surface px-6 py-3 dark:border-shell-600">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
         <Link href="/" className="font-display shrink-0 text-sm font-semibold text-foreground">
           {CONTENT.brand.name}
         </Link>

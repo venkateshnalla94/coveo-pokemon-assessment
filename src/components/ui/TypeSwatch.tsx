@@ -1,15 +1,26 @@
-import { getTypeColor, getTypeTextColor } from "@/coveo/typeColors";
+import { getTypeColor } from "@/coveo/typeColors";
 
 export interface TypeSwatchProps {
-  /** A Pokemon type name (e.g. "Fire") — resolves its own color via getTypeColor(), same source as Chip. */
+  /** A Pokemon type name (e.g. "Fire") — resolves both its color (for the selected-state ring) and its icon file from the same source as Chip/BrowseByType. */
   label: string;
   selected: boolean;
 }
 
 /**
- * A 24px color swatch inside a 32px hit target (v4 plan §6), for facet
- * values whose color has real meaning (Pokemon type). Selected state is a
- * 2px ring in the type color plus a check mark inside the swatch.
+ * A 24px type-icon swatch inside a 32px hit target (v4 plan §6), for facet
+ * values whose color has real meaning (Pokemon type, and — since a
+ * weakness/resistance value is itself a type name — the Weaknesses/
+ * Resistances facets too). Used by `AutomaticFacets.tsx`.
+ *
+ * Renders the same real downloaded type-icon SVG `BrowseByType.tsx` uses
+ * (`public/art/types/`, MIT-licensed) rather than a plain CSS-colored
+ * circle — each icon file is already a self-contained colored circle badge,
+ * so no separate background-color fill is drawn here; the swatch just adds
+ * the selected-state ring around it. This replaced a flat color-only
+ * swatch + checkmark: the checkmark is dropped now that the circle carries
+ * real icon content the checkmark would otherwise sit on top of — the ring
+ * alone (plus the native checkbox's own state) still makes selection
+ * unambiguous.
  *
  * Decorative only (`aria-hidden`) — always paired by the caller with a
  * native `<input type="checkbox">` (visually hidden, not replaced) and the
@@ -29,30 +40,18 @@ export function TypeSwatch({ label, selected }: TypeSwatchProps) {
     return null;
   }
 
-  const checkColor = getTypeTextColor(label);
-
   return (
     <span aria-hidden="true" className="flex h-8 w-8 shrink-0 items-center justify-center">
       <span
-        className="flex h-6 w-6 items-center justify-center rounded-full"
+        className="flex h-6 w-6 shrink-0 items-center justify-center overflow-hidden rounded-full"
         style={{
-          backgroundColor: color,
           boxShadow: selected
             ? `0 0 0 2px var(--surface), 0 0 0 4px ${color}`
             : "0 0 0 1px rgba(0, 0, 0, 0.12)",
         }}
       >
-        {selected && (
-          <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" aria-hidden="true">
-            <path
-              d="M3.5 8.5l3 3 6-7"
-              stroke={checkColor}
-              strokeWidth={2}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        )}
+        {/* eslint-disable-next-line @next/next/no-img-element -- same posture as BrowseByType.tsx: small local SVG, next/image's optimizer requires dangerouslyAllowSVG for local SVGs */}
+        <img src={`/art/types/${label.toLowerCase()}.svg`} alt="" className="h-full w-full" />
       </span>
     </span>
   );

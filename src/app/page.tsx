@@ -55,7 +55,7 @@ export default function Home() {
   }, [engine, querySummary]);
 
   return (
-    <div className="mx-auto flex max-w-2xl flex-col items-center px-6 py-24 text-center">
+    <div className="mx-auto flex max-w-7xl flex-col items-center px-6 py-24 text-center">
       <div className="mb-8 w-full">
         <ImageSlot name="homeBanner" ratio="16/5" label="Home hero banner" />
       </div>

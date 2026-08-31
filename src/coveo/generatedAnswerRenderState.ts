@@ -17,18 +17,30 @@ import type { GeneratedAnswerState } from "@coveo/headless";
  * component had no way to tell them apart to drive the scan-cursor/reveal
  * treatment. This is one new arm added to the existing union, not a second
  * state machine (v4 plan §1).
+ *
+ * `error` (ADR-0016) is a genuine controller-reported failure on a
+ * controller that IS enabled and visible — distinct from `isEnabled`/
+ * `isVisible` being false, which stays `hidden` exactly as before (an org
+ * without RGA enabled should never look like a broken search). A request
+ * that started and failed is a different, real situation worth telling the
+ * user about.
  */
 export type GeneratedAnswerRenderState =
   | { status: "hidden" }
   | { status: "loading" }
   | { status: "streaming"; answer: string }
-  | { status: "answer"; answer: string };
+  | { status: "answer"; answer: string }
+  | { status: "error" };
 
 export function deriveGeneratedAnswerRenderState(
   state: GeneratedAnswerState | undefined,
 ): GeneratedAnswerRenderState {
-  if (!state || !state.isEnabled || !state.isVisible || state.error) {
+  if (!state || !state.isEnabled || !state.isVisible) {
     return { status: "hidden" };
+  }
+
+  if (state.error) {
+    return { status: "error" };
   }
 
   if (state.answer) {

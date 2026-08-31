@@ -24,7 +24,7 @@ export function CompareTray() {
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-40 border-t border-black/10 bg-white p-3 shadow-lg dark:border-white/15 dark:bg-black">
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-3 px-3">
+      <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-3 px-3">
         <span className="text-xs font-semibold uppercase tracking-wide text-black/60 dark:text-white/60">
           {CONTENT.compare.trayLabel}
         </span>

@@ -4,8 +4,10 @@ import useEmblaCarousel from "embla-carousel-react";
 import Image from "next/image";
 import Link from "next/link";
 import type { CSSProperties } from "react";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { CarouselArrowButton } from "@/components/ui/CarouselArrowButton";
 import { Chip } from "@/components/ui/Chip";
+import { useCarouselArrows } from "@/components/ui/useCarouselArrows";
 import { CONTENT } from "@/content/pokedex";
 import type { PokemonStats } from "@/coveo/mapPokemonResult";
 import { STAT_ORDER } from "@/coveo/pokemonStats";
@@ -51,35 +53,11 @@ type SimilarState =
 export function SimilarPokemon({ pokemonName, pokemonTypes }: SimilarPokemonProps) {
   const [state, setState] = useState<SimilarState>({ status: "loading" });
   const [emblaRef, emblaApi] = useEmblaCarousel({ align: "start", dragFree: true });
-  const [canScrollPrev, setCanScrollPrev] = useState(false);
-  const [canScrollNext, setCanScrollNext] = useState(false);
-
   // Arrow buttons alongside embla's own drag/swipe (kept — a touch/trackpad
   // user still expects to drag a carousel; the arrows are for anyone who
   // wouldn't otherwise discover that, mouse-wheel or keyboard users
-  // included). Re-synced on every `select`/`reInit` embla emits, not just on
-  // mount, so button disabled-state tracks the real scroll position (e.g.
-  // "next" grays out once the last card is reached).
-  useEffect(() => {
-    if (!emblaApi) return;
-
-    const syncButtons = () => {
-      setCanScrollPrev(emblaApi.canScrollPrev());
-      setCanScrollNext(emblaApi.canScrollNext());
-    };
-
-    syncButtons();
-    emblaApi.on("select", syncButtons);
-    emblaApi.on("reInit", syncButtons);
-
-    return () => {
-      emblaApi.off("select", syncButtons);
-      emblaApi.off("reInit", syncButtons);
-    };
-  }, [emblaApi]);
-
-  const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
-  const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
+  // included).
+  const { canScrollPrev, canScrollNext, scrollPrev, scrollNext } = useCarouselArrows(emblaApi);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -177,48 +155,6 @@ export function SimilarPokemon({ pokemonName, pokemonTypes }: SimilarPokemonProp
         </div>
       </div>
     </div>
-  );
-}
-
-/**
- * Plain hand-drawn chevrons, not an icon library — matches
- * `docs/EXECUTION-PLAN-marketing-assets.md` §5.2's existing rule for this
- * repo (`PokeballGlyph.tsx`'s posture): no new icon dependency for a couple
- * of small glyphs.
- */
-function CarouselArrowButton({
-  direction,
-  label,
-  disabled,
-  onClick,
-}: {
-  direction: "prev" | "next";
-  label: string;
-  disabled: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      aria-label={label}
-      disabled={disabled}
-      onClick={onClick}
-      className="flex h-8 w-8 items-center justify-center rounded-full border border-shell-100 text-foreground transition-opacity disabled:opacity-30 dark:border-shell-600"
-    >
-      <svg
-        viewBox="0 0 24 24"
-        width="16"
-        height="16"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-      >
-        {direction === "prev" ? <path d="M15 18l-6-6 6-6" /> : <path d="M9 18l6-6-6-6" />}
-      </svg>
-    </button>
   );
 }
 

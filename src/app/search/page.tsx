@@ -37,7 +37,7 @@ function SearchPageContent() {
   const configured = isCoveoConfigured();
 
   return (
-    <div className="mx-auto max-w-6xl px-6 py-10">
+    <div className="mx-auto max-w-7xl px-6 py-10">
       {configured && <SearchUrlSync />}
       <div className="mb-6">
         <SearchBox />
@@ -47,9 +47,15 @@ function SearchPageContent() {
       ) : (
         <div className="grid grid-cols-1 gap-8 md:grid-cols-[200px_1fr]">
           <FacetRail>
+            {/* AutomaticFacets leads the rail (Type, then Generation — see
+                its own field-order-priority comment — then whichever other
+                fields Coveo's generator selected), with the two manual
+                facets after: neither is eligible for automatic generation
+                (FacetSpeed is numeric; FacetAbilities needs facet-search),
+                so they can't be folded into that same ordering. */}
+            <AutomaticFacets />
             <FacetSpeed />
             <FacetAbilities />
-            <AutomaticFacets />
           </FacetRail>
           <main>
             <SearchSummaryBar />

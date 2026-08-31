@@ -123,59 +123,87 @@ export function AskAboutPokemon({ pokemonName, pokemonTypes }: AskAboutPokemonPr
         </button>
       </div>
 
-      {state.status === "error" && (
-        <p className="mt-3 text-sm text-red-600 dark:text-red-400">{state.message}</p>
-      )}
+      {/* Persistent-wrapper contract (docs/EXECUTION-PLAN-async-ui-states.md
+          §2/§3): this results region now exists in the DOM from "idle"
+          onward (collapsed to zero height via data-open="false"), instead
+          of not existing at all until a response landed — that's the "tiny
+          box... then whole PDP moves" complaint this doc exists to fix. */}
+      <div className="async-panel mt-3" data-open={state.status !== "idle" ? "true" : "false"}>
+        <div>
+          {state.status === "loading" && <PassageSkeleton />}
 
-      {state.status === "success" && state.passages.length === 0 && (
-        <p className="mt-3 text-sm text-black/50 dark:text-white/50">
-          {CONTENT.pdp.noPassagesFound}
-        </p>
-      )}
+          {state.status === "error" && (
+            <p className="text-sm text-red-600 dark:text-red-400">{state.message}</p>
+          )}
 
-      {state.status === "success" && state.passages.length > 0 && (
-        // Direct-child `<li>`s under this exact aria-label — pinned by
-        // tests/e2e/ask-about-pokemon.spec.ts's `[aria-label="Passages"] >
-        // li` selector. No wrapper element goes between them (v4 plan §8).
-        <ol aria-label="Passages" className="mt-4 flex flex-col gap-3">
-          {state.passages.map((passage, index) => (
-            <li
-              // `filter: '@pokemonname=="..."'` scopes every request to one
-              // document, so passage.document.primaryid is identical across
-              // all returned passages (they're chunks of that one page) —
-              // keying on it alone produced React's real duplicate-key
-              // warning, confirmed live via a walkthrough of Charizard's
-              // "Ask about this Pokemon". The index makes each chunk's key
-              // unique; safe here since the list is replaced wholesale on
-              // every new ask, never patched in place.
-              key={`${passage.document.primaryid}-${index}`}
-              className="passage-card p-3 text-sm"
-              data-has-type={Boolean(typeColor)}
-              style={{ ...typeVars, animationDelay: `${index * 90}ms` }}
-            >
-              <div className="mb-1 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 font-mono text-[10px] text-shell-400">
-                <span>{CONTENT.pdp.passageLabel(index + 1)}</span>
-                <span>{CONTENT.pdp.relevanceLabel((passage.relevanceScore * 100).toFixed(1))}</span>
-              </div>
-              {/* document.title/primaryid come back from /api/passages but
-                  weren't rendered anywhere before this pass (v4 plan §8).
-                  No `uri` field on the payload, so this is attribution text,
-                  not a link — same "⟶ retrieved from:" scan-tag motif as
-                  RGA's citations (GeneratedAnswer.tsx), for one consistent
-                  attribution language across both AI surfaces. */}
-              <p className="mb-2 flex items-center gap-1.5 font-mono text-[10px] text-shell-400">
-                <span aria-hidden="true">&#10230;</span>
-                <span>
-                  {CONTENT.answer.citationPrefix} {passage.document.title}
-                </span>
-              </p>
-              <div className="max-h-48 overflow-y-auto">
-                <PokemonMarkdown text={passage.text} />
-              </div>
-            </li>
-          ))}
-        </ol>
-      )}
+          {state.status === "success" && state.passages.length === 0 && (
+            <p className="text-sm text-black/50 dark:text-white/50">
+              {CONTENT.pdp.noPassagesFound}
+            </p>
+          )}
+
+          {state.status === "success" && state.passages.length > 0 && (
+            // Direct-child `<li>`s under this exact aria-label — pinned by
+            // tests/e2e/ask-about-pokemon.spec.ts's `[aria-label="Passages"] >
+            // li` selector. No wrapper element goes between them (v4 plan §8).
+            <ol aria-label="Passages" className="flex flex-col gap-3">
+              {state.passages.map((passage, index) => (
+                <li
+                  // `filter: '@pokemonname=="..."'` scopes every request to one
+                  // document, so passage.document.primaryid is identical across
+                  // all returned passages (they're chunks of that one page) —
+                  // keying on it alone produced React's real duplicate-key
+                  // warning, confirmed live via a walkthrough of Charizard's
+                  // "Ask about this Pokemon". The index makes each chunk's key
+                  // unique; safe here since the list is replaced wholesale on
+                  // every new ask, never patched in place.
+                  key={`${passage.document.primaryid}-${index}`}
+                  className="passage-card p-3 text-sm"
+                  data-has-type={Boolean(typeColor)}
+                  style={{ ...typeVars, animationDelay: `${index * 90}ms` }}
+                >
+                  <div className="mb-1 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 font-mono text-[10px] text-shell-400">
+                    <span>{CONTENT.pdp.passageLabel(index + 1)}</span>
+                    <span>{CONTENT.pdp.relevanceLabel((passage.relevanceScore * 100).toFixed(1))}</span>
+                  </div>
+                  {/* document.title/primaryid come back from /api/passages but
+                      weren't rendered anywhere before this pass (v4 plan §8).
+                      No `uri` field on the payload, so this is attribution text,
+                      not a link — same "⟶ retrieved from:" scan-tag motif as
+                      RGA's citations (GeneratedAnswer.tsx), for one consistent
+                      attribution language across both AI surfaces. */}
+                  <p className="mb-2 flex items-center gap-1.5 font-mono text-[10px] text-shell-400">
+                    <span aria-hidden="true">&#10230;</span>
+                    <span>
+                      {CONTENT.answer.citationPrefix} {passage.document.title}
+                    </span>
+                  </p>
+                  <div className="max-h-48 overflow-y-auto">
+                    <PokemonMarkdown text={passage.text} />
+                  </div>
+                </li>
+              ))}
+            </ol>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** One passage-card-shaped skeleton (plan §3) — sized to a typical single result, not the eventual (variable) count. */
+function PassageSkeleton() {
+  return (
+    <div className="passage-card p-3" aria-hidden="true">
+      <div className="mb-2 flex items-center justify-between gap-3">
+        <div className="h-2.5 w-16 animate-pulse rounded bg-shell-100 dark:bg-shell-600/40" />
+        <div className="h-2.5 w-20 animate-pulse rounded bg-shell-100 dark:bg-shell-600/40" />
+      </div>
+      <div className="flex flex-col gap-2">
+        <div className="h-3 w-full animate-pulse rounded bg-shell-100 dark:bg-shell-600/40" />
+        <div className="h-3 w-5/6 animate-pulse rounded bg-shell-100 dark:bg-shell-600/40" />
+        <div className="h-3 w-2/3 animate-pulse rounded bg-shell-100 dark:bg-shell-600/40" />
+      </div>
     </div>
   );
 }

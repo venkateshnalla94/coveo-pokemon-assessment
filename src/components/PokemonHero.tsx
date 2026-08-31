@@ -1,19 +1,18 @@
 import Image from "next/image";
 import type { CSSProperties } from "react";
 import { Chip } from "@/components/ui/Chip";
+import { DataList, type DataListRow } from "@/components/ui/DataList";
+import { CONTENT } from "@/content/pokedex";
 import { getTypeColor, getTypeTextColor } from "@/coveo/typeColors";
 
 /**
- * Sprite, name, dex number, type Chips, species line — see
- * docs/EXECUTION-PLAN-v4-design-system.md §9. No "Rarity"/"Level" chips:
- * those have no real pokemondb.net equivalent and stay dropped per the plan.
- *
- * The sprite renders at ~360px and overlaps the full-bleed hero band above
- * it (via a negative top margin) and the content below it (its own
- * container has no bottom clearance beyond normal flow) — see the page's
- * `mb-[-...]` breakout wrapper in pokemon/[name]/page.tsx. The dex number
- * doubles as an oversized, low-opacity mono watermark sitting behind the
- * sprite, in addition to its small printed form next to the name.
+ * Two-column commerce-PDP layout: a large sprite "packshot" panel on the
+ * left, identity + type + quick facts on the right — see
+ * docs/HANDOFF.md's PDP redesign entry for why. Supersedes the prior
+ * single-stacked-column version, which existed to let the sprite bleed
+ * (via a negative top margin) over a full-bleed photographic backdrop band
+ * rendered by the page above this component; that backdrop is gone, so
+ * there's nothing left to overlap and no negative-margin trick needed.
  */
 export interface PokemonHeroProps {
   name: string;
@@ -21,61 +20,72 @@ export interface PokemonHeroProps {
   dexNumber: string | undefined;
   types: string[];
   species: string | undefined;
+  generation: string | undefined;
+  /** `abilities[0]` — source order, not a verified primary ability; see CONTENT.pdp.abilityLabel's comment. */
+  topAbility: string | undefined;
 }
 
-export function PokemonHero({ name, imageUrl, dexNumber, types, species }: PokemonHeroProps) {
+export function PokemonHero({
+  name,
+  imageUrl,
+  dexNumber,
+  types,
+  species,
+  generation,
+  topAbility,
+}: PokemonHeroProps) {
   // Type-driven lighting (v4 plan §5/§2.3, reused here). `types[0]` is not a
   // verified "primary" type — decorative only, never labeled as such.
   const typeColors = types.map((type) => getTypeColor(type)).filter((color): color is string => Boolean(color));
   const [primaryColor, secondaryColor] = typeColors;
-  const heroVars = primaryColor
+  const isDualGlow = Boolean(primaryColor && secondaryColor && primaryColor !== secondaryColor);
+  const glowVars = primaryColor
     ? ({
         "--type-primary": primaryColor,
         "--type-secondary": secondaryColor ?? primaryColor,
       } as CSSProperties)
     : undefined;
 
+  const quickFacts: DataListRow[] = [];
+  if (generation) {
+    quickFacts.push({ label: CONTENT.pdp.profileLabels.generation, value: generation });
+  }
+  if (topAbility) {
+    quickFacts.push({ label: CONTENT.pdp.abilityLabel, value: topAbility });
+  }
+
   return (
-    <div
-      className="relative mb-8 flex flex-col items-center gap-4 px-6 text-center sm:flex-row sm:items-end sm:gap-8 sm:text-left"
-      style={heroVars}
-    >
-      <div className="relative -mt-32 flex size-55 shrink-0 items-center justify-center sm:-mt-48 sm:size-90">
-        {/* Oversized low-opacity mono watermark behind the sprite.
-            `dexNumber` arrives from the source already zero-padded to four
-            digits (e.g. "0025") — only the "#" prefix is added here, never
-            a further padStart; see mapPokemonResult's dexNumber field and
-            docs/coveo-source-spec.md's `pokemondexnumber` row. */}
+    <div className="mb-8 grid grid-cols-1 gap-8 px-6 sm:grid-cols-[minmax(0,360px)_1fr] sm:items-start">
+      {/* Packshot panel — the dominant visual element in its own column,
+          not a small card overlapping a photo. Same "trading card on a
+          light surface" idea as before (rounded, bg-surface so it's
+          correct in both themes, shadow + hairline ring), now the primary
+          presentation rather than a workaround for a clashing background. */}
+      <div
+        className="hero-packshot relative mx-auto flex aspect-square w-full max-w-90 items-center justify-center overflow-hidden rounded-2xl bg-surface shadow-xl ring-1 ring-black/5 dark:ring-white/10"
+        data-glow={primaryColor ? (isDualGlow ? "dual" : "single") : undefined}
+        style={glowVars}
+      >
         {dexNumber && (
           <span
             aria-hidden="true"
-            className="font-mono pointer-events-none absolute inset-0 flex items-center justify-center text-[7rem] font-bold text-shell-400/15 select-none sm:text-[10rem]"
+            className="font-mono pointer-events-none absolute inset-0 flex items-center justify-center text-[7rem] font-bold text-shell-400/15 select-none sm:text-[9rem]"
           >
             #{dexNumber}
           </span>
         )}
         {imageUrl && (
-          // The real indexed sprite (img.pokemondb.net) is an opaque
-          // white-background image, not a transparent cutout — against the
-          // hero band's own art (docs/EXECUTION-PLAN-marketing-assets.md)
-          // that white background read as a stray rectangle rather than a
-          // sprite. Framing it as a deliberate card (rounded, `bg-surface`
-          // so it's correct in both themes, shadow + hairline ring) turns
-          // it into an intentional "trading card" floating on the band
-          // instead of fighting the sprite's own opaque background — no
-          // attempt to hide/cut out the real image data itself.
-          <div className="absolute inset-[6%] overflow-hidden rounded-2xl bg-surface shadow-xl ring-1 ring-black/5 dark:ring-white/10">
-            <Image
-              src={imageUrl}
-              alt={name}
-              fill
-              sizes="(min-width: 640px) 360px, 220px"
-              className="object-contain p-2"
-            />
-          </div>
+          <Image
+            src={imageUrl}
+            alt={name}
+            fill
+            sizes="(min-width: 640px) 360px, 320px"
+            className="object-contain p-6"
+          />
         )}
       </div>
-      <div className="flex flex-1 flex-col items-center gap-2 pb-1 sm:items-start">
+
+      <div className="flex flex-col gap-2 text-center sm:pt-2 sm:text-left">
         {dexNumber && <p className="font-mono-label text-xs text-shell-400">#{dexNumber}</p>}
         <h1 className="font-display text-(length:--text-3xl) font-bold text-foreground">
           {name}
@@ -93,6 +103,11 @@ export function PokemonHero({ name, imageUrl, dexNumber, types, species }: Pokem
               />
             ))}
           </p>
+        )}
+        {quickFacts.length > 0 && (
+          <div className="mt-3 flex justify-center border-t border-shell-100 pt-3 dark:border-shell-600 sm:justify-start">
+            <DataList rows={quickFacts} />
+          </div>
         )}
       </div>
     </div>

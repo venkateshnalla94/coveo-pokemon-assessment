@@ -42,9 +42,16 @@ describe("deriveGeneratedAnswerRenderState", () => {
     });
   });
 
-  it("is hidden — not surfaced as an error — when the controller reports an error", () => {
+  it("is a real error state when an enabled, visible controller reports one (ADR-0016)", () => {
     const result = deriveGeneratedAnswerRenderState(
       buildState({ error: { message: "boom" } }),
+    );
+    expect(result).toEqual({ status: "error" });
+  });
+
+  it("is still hidden — not error — when the controller isn't enabled, even with an error present", () => {
+    const result = deriveGeneratedAnswerRenderState(
+      buildState({ isEnabled: false, error: { message: "boom" } }),
     );
     expect(result).toEqual({ status: "hidden" });
   });

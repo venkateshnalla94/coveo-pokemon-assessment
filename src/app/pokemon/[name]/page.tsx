@@ -19,7 +19,6 @@ import { PokemonStatPanel } from "@/components/PokemonStatPanel";
 import { SimilarPokemon } from "@/components/SimilarPokemon";
 import { TrainingPanel } from "@/components/TrainingPanel";
 import { TypeDefenses } from "@/components/TypeDefenses";
-import { ImageSlot } from "@/components/ui/ImageSlot";
 import { Tabs } from "@/components/ui/Tabs";
 import { CONTENT } from "@/content/pokedex";
 import { isCoveoConfigured } from "@/coveo/config";
@@ -102,7 +101,7 @@ export default function PokemonDetailPage() {
       : undefined;
 
   return (
-    <div className="mx-auto max-w-5xl px-6 py-10">
+    <div className="mx-auto max-w-7xl px-6 py-10">
       <Breadcrumb name={name} from={from} />
       {!configured && <CoveoConfigBanner />}
       {renderState?.status === "loading" && <p>{CONTENT.search.loadingLabel}</p>}
@@ -125,20 +124,14 @@ export default function PokemonDetailPage() {
       )}
       {item && (
         <div>
-          {/* Full-bleed hero band (v4 plan §9): breaks out of this page's
-              max-w-5xl container to the viewport's full width via the
-              standard "left-1/2 / -mx-[50vw]" trick, so the backdrop reads
-              as a band rather than a boxed image. PokemonHero's own sprite
-              then overlaps this band from below via a negative top margin. */}
-          <div className="relative left-1/2 right-1/2 mx-[-50vw] w-screen">
-            <ImageSlot name="heroBackdrop" ratio="21/9" label="PDP hero backdrop" />
-          </div>
           <PokemonHero
             name={item.name}
             imageUrl={item.imageUrl}
             dexNumber={item.dexNumber}
             types={item.types}
             species={item.species}
+            generation={item.generation}
+            topAbility={item.abilities[0]}
           />
           <PokemonStatPanel stats={item.stats} total={item.statTotal} types={item.types} />
           <Tabs
@@ -152,6 +145,7 @@ export default function PokemonDetailPage() {
                       height={item.height}
                       weight={item.weight}
                       species={item.species}
+                      generation={item.generation}
                       eggGroups={item.breeding.eggGroups}
                       eggCycles={item.breeding.eggCycles}
                       catchRate={item.training.catchRate}

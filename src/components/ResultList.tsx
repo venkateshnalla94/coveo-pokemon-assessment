@@ -40,7 +40,23 @@ export function ResultList() {
 
   switch (renderState.status) {
     case "loading":
-      return <p className="text-sm text-black/50 dark:text-white/50">{CONTENT.search.loadingLabel}</p>;
+      // Same grid shape as "success" (docs/EXECUTION-PLAN-async-ui-states.md
+      // §3) — placeholder tiles roughly matching ResultCard's box (sprite
+      // square + two text lines), so loading -> success swaps tile content
+      // rather than the grid itself reflowing.
+      return (
+        <>
+          <span className="sr-only">{CONTENT.search.loadingLabel}</span>
+          <ul
+            aria-hidden="true"
+            className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5"
+          >
+            {Array.from({ length: 8 }).map((_, index) => (
+              <ResultCardSkeleton key={index} />
+            ))}
+          </ul>
+        </>
+      );
     case "error":
       return (
         <p className="text-sm text-red-600 dark:text-red-400">{renderState.error.userMessage}</p>
@@ -58,7 +74,7 @@ export function ResultList() {
       );
     case "success":
       return (
-        <ul aria-label="Search results" className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4">
+        <ul aria-label="Search results" className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5">
           {/* deriveSearchRenderState maps state.results 1:1, in order, into
               renderState.items — zipping by index here to recover the raw
               Result (needed for buildInteractiveResult) without changing the
@@ -206,6 +222,17 @@ function ResultCard({
         />
         {CONTENT.compare.trayLabel}
       </label>
+    </li>
+  );
+}
+
+/** Sprite-square + two text lines, roughly ResultCard's box (plan §3). */
+function ResultCardSkeleton() {
+  return (
+    <li className="bg-surface p-3" aria-hidden="true">
+      <div className="aspect-square w-full animate-pulse rounded-md bg-shell-100 dark:bg-shell-600/40" />
+      <div className="mt-3 h-3 w-3/4 animate-pulse rounded bg-shell-100 dark:bg-shell-600/40" />
+      <div className="mt-2 h-3 w-1/2 animate-pulse rounded bg-shell-100 dark:bg-shell-600/40" />
     </li>
   );
 }

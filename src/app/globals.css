@@ -272,6 +272,44 @@ body {
   }
 }
 
+/*
+ * PDP hero "packshot" panel — the same oklab color-mix glow recipe as
+ * `.result-tile[data-glow]` above, reused (not literally shared) as a
+ * static tint: this panel is never interactive, so it carries none of
+ * `.result-tile`'s hover/focus transform or opacity-doubling behavior.
+ * Gives the sprite panel real visual interest without the full-bleed
+ * backdrop photo the panel used to sit on top of (dropped — see
+ * docs/HANDOFF.md's PDP redesign entry).
+ */
+.hero-packshot {
+  position: relative;
+  isolation: isolate;
+}
+.hero-packshot[data-glow="single"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: radial-gradient(
+    120% 90% at 50% 30%,
+    color-mix(in oklab, var(--type-primary) 26%, transparent),
+    transparent 70%
+  );
+}
+.hero-packshot[data-glow="dual"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: linear-gradient(
+    135deg,
+    color-mix(in oklab, var(--type-primary) 22%, transparent),
+    color-mix(in oklab, var(--type-secondary, var(--type-primary)) 22%, transparent)
+  );
+}
+
 /* Required, not optional (v4 plan §4): no rotation, no spin. The loading/
    settle motion is replaced with an opacity pulse on the button only.
    `!important` is deliberate here, not a specificity shortcut taken out of

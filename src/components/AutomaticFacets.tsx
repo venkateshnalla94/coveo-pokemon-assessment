@@ -22,6 +22,23 @@ const CHIP_FIELDS = new Set<string>([
 ]);
 
 /**
+ * Display-order pin for whichever fields Coveo's automatic facet generator
+ * happens to select this query — Type first, then Generation, everything
+ * else after in whatever order the generator returned (a stable sort keeps
+ * their relative order, since `desiredCount`/relevance ranking is real
+ * signal worth keeping for the fields we don't have an opinion on).
+ * `AutomaticFacetGeneratorOptions` has no `fields`/order option of its own
+ * (confirmed against the installed `@coveo/headless` types) — this is a
+ * client-side display concern only, not a request to Coveo, and doesn't
+ * change which fields the generator selects or reverse ADR-0011's decision
+ * to let it choose them.
+ */
+const FIELD_ORDER_PRIORITY: Record<string, number> = {
+  [POKEMON_FIELDS.type]: 0,
+  [POKEMON_FIELDS.generation]: 1,
+};
+
+/**
  * Coveo's real Automatic Facet Generation (`buildAutomaticFacetGenerator`),
  * replacing 5 hand-built Facet components (Type/Generation/EggGroups/
  * Weaknesses/Resistances) — see
@@ -44,10 +61,14 @@ export function AutomaticFacets() {
     }),
   );
   const state = useControllerState(generator) ?? generator.state;
+  const orderedFacets = [...state.automaticFacets].sort(
+    (a, b) =>
+      (FIELD_ORDER_PRIORITY[a.state.field] ?? 2) - (FIELD_ORDER_PRIORITY[b.state.field] ?? 2),
+  );
 
   return (
     <>
-      {state.automaticFacets.map((facet) => (
+      {orderedFacets.map((facet) => (
         <AutomaticFacetFieldset key={facet.state.field} facet={facet} />
       ))}
     </>

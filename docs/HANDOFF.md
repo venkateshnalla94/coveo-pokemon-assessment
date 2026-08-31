@@ -1,6 +1,6 @@
 # Session handoff — Coveo org build status
 
-Updated 2026-08-31, twentieth session. Phase v2.3 is fully built (seventh session). The tenth session closed v3.1 (sort break) and most of v3.3 (search page data), plus a facet-architecture change (Automatic Facet Generation). The eleventh session did most of v3.2 (branching evolution chain + evolution images) and most of v3.4 (RGA/CPR content-exclusion diagnosis and rules). The twelfth session gave the user the full remaining v3.2/v3.4 console sequence. The thirteenth session executed Batch 2 (chrome restyle + Pokeball search bar). The fourteenth session executed Batch 3 (result tiles + facet type-swatches). The fifteenth session executed Batch 4 (PDP restyle). The sixteenth session executed Batch 5 (RGA scan reveal + scanline citations, passage-retrieval restyle). The seventeenth session executed Batch 6, closing out the v4 design pass entirely (motion/a11y audit + ADR-0013). The eighteenth session did the manual walkthrough + two missing e2e specs, found and fixed two real bugs, then shipped the Vercel deploy (live at https://coveo-pokemon-assessment.vercel.app/). The nineteenth session scoped four follow-up execution-plan docs (see below) and executed Doc 3's original scope (real marketing assets + icon-based Browse-by-type) — that code sat uncommitted until this session. **This (twentieth) session committed Doc 3's shipped code, resolved Doc 1's open Analytics-volume decision (Branch B) and enabled+verified ART, then built item 1 of 3 (the PDP Similar Pokemon carousel, Doc 2) including a manual-testing UX-fix follow-up (whole-card click, hover pop, scroll arrows) — see "Twentieth session" below for all of it.** What's left project-wide: items 2-3 of the three-item build order (home hero carousel + PDP Highlights from Doc 3 §5; the rest of Doc 4's async contract on `GeneratedAnswer`/`AskAboutPokemon`/`ResultList`), the two presentation decks, and the Phase 0 email/booking (**deadline 2026-09-06** — user confirmed sending it 2026-08-31, not independently verified as sent) — summarized in "What's next" below. The prior sessions' handoff content is folded into this one; treat this file as the current snapshot, not an addendum.
+Updated 2026-08-31, twenty-first session. Phase v2.3 is fully built (seventh session). The tenth session closed v3.1 (sort break) and most of v3.3 (search page data), plus a facet-architecture change (Automatic Facet Generation). The eleventh session did most of v3.2 (branching evolution chain + evolution images) and most of v3.4 (RGA/CPR content-exclusion diagnosis and rules). The twelfth session gave the user the full remaining v3.2/v3.4 console sequence. The thirteenth session executed Batch 2 (chrome restyle + Pokeball search bar). The fourteenth session executed Batch 3 (result tiles + facet type-swatches). The fifteenth session executed Batch 4 (PDP restyle). The sixteenth session executed Batch 5 (RGA scan reveal + scanline citations, passage-retrieval restyle). The seventeenth session executed Batch 6, closing out the v4 design pass entirely (motion/a11y audit + ADR-0013). The eighteenth session did the manual walkthrough + two missing e2e specs, found and fixed two real bugs, then shipped the Vercel deploy (live at https://coveo-pokemon-assessment.vercel.app/). The nineteenth session scoped four follow-up execution-plan docs (see below) and executed Doc 3's original scope (real marketing assets + icon-based Browse-by-type) — that code sat uncommitted until the twentieth session. The twentieth session committed Doc 3's shipped code, resolved Doc 1's open Analytics-volume decision (Branch B) and enabled+verified ART, then built item 1 of 3 (the PDP Similar Pokemon carousel, Doc 2) including a manual-testing UX-fix follow-up (whole-card click, hover pop, scroll arrows). **This (twenty-first) session built items 2 and 3 of the three-item build order — home hero carousel + PDP Highlights (Doc 3 §5), and the async idle/loading/success/error contract on `GeneratedAnswer`/`AskAboutPokemon`/`ResultList` (Doc 4) — closing out all four follow-up execution docs from the nineteenth session, then (same session, after live user review) reworked the hero/PDP/Highlights UI it had just shipped: un-carouseled the home hero in favor of a carousel Browse-by-type, widened Home/Search/PDP to match the header's container width, dropped the PDP's full-bleed backdrop photo for a commerce-style two-column hero, and deleted `PdpHighlights` in favor of folding its one genuinely new field (generation) into the existing Overview tab and Hero — then, after a second round of live feedback, replaced the search page's flat-color facet swatches (Type/Weaknesses/Resistances) with the same real type-icon art the home page's Browse-by-type strip uses, and reordered the facet rail to lead with Type, then Generation, then the rest. See "Twenty-first session" and both "Twenty-first session, continued" entries below for all of it.** What's left project-wide: the two presentation decks, and confirming whether the Phase 0 email/booking + off-cycle ML-rebuild request actually got sent (**deadline 2026-09-06** — user indicated sending both 2026-08-31, still not independently verified) — summarized in "What's next" below. The prior sessions' handoff content is folded into this one; treat this file as the current snapshot, not an addendum.
 
 ## Twentieth session — committed Doc 3, resolved the ML-recommendations decision (Branch B), enabling ART (in progress)
 
@@ -158,6 +158,263 @@ plus a new test asserting the arrow buttons only render once there's more
 than one card.
 
 Commit `8b13f9a`.
+
+## Twenty-first session — home hero carousel + PDP Highlights (Doc 3 §5), async UI-states contract (Doc 4)
+
+Built items 2 and 3 of the three-item build order (item 1, the PDP Similar
+Pokemon carousel, shipped last session). Re-read
+`docs/temp/insiprations/{Home,pdp}/`'s six real reference screenshots
+directly before building, per Doc 3 §5's own note that its prose summary is
+lossy — confirmed the summary was accurate (Sleep Country hero carousel with
+visible prev/next arrows and overlay copy+CTA; Sephora "Highlights" row of
+small icon-circle + label callouts directly below the hero).
+
+**Home hero carousel** (`src/components/HeroCarousel.tsx`, new) — supersedes
+the single static `homeBanner` `ImageSlot` on `src/app/page.tsx`.
+`embla-carousel-react` (already a dependency, added last session for
+`SimilarPokemon.tsx`) backs it, same posture: hand-drawn chevron arrow
+buttons (no icon library), dot indicators synced to `emblaApi`'s
+`select`/`reInit` events. Three slides, each promoting a real,
+already-shipped feature rather than a sale/promo (this app has no commerce):
+"Search the full Pokedex" (anchors to `#pokedex-search`, a plain `<a href>`
+scroll — no ref plumbing needed), "Compare up to 4 Pokemon" (links to
+`/compare`), "Ask about any Pokemon" (links to `/search`, since no single
+Pokemon is a natural target from the home page — Doc 3 §5.1's own
+fallback). **Scope decision, not in the doc**: all three slides reuse the
+one already-downloaded `home-banner.webp` as background (differentiated by
+overlay copy/CTA only) rather than sourcing three separate crops — avoided
+a second image-compositing pass for decorative background art given the
+no-fabricated-data rule only governs Pokemon facts, not marketing imagery.
+Slide 1's body interpolates the real indexed total (`QuerySummary` state,
+already fetched on mount) via the same pattern the dropped
+`indexedCountSuffix` used — that dead CONTENT entry was removed since
+nothing else referenced it once the plain subtitle paragraph no longer
+needed it.
+
+**PDP "Highlights" row** (`src/components/PdpHighlights.tsx`, new) — a
+Sephora-style grid of icon-circle + label callouts mounted directly below
+`PokemonHero`, above `PokemonStatPanel`, built entirely from `PokemonItem`
+fields the page already has (no new Coveo query, so the async-states
+contract below doesn't apply to it — it's synchronous). Four real fields:
+primary type (reuses `TypeSwatch`, the same component the type facet
+already uses, per Doc 3 §5.2's explicit instruction), top ability
+(`item.abilities[0]`), egg group (`item.breeding.eggGroups[0]`),
+generation. **The reference's catch-rate-derived "Rare"/"Common" tier
+callout was dropped, using the doc's own escape hatch**: Nintendo has never
+published an official catch-rate tier boundary, and picking cutoffs
+ourselves would present an invented classification as if it were real
+data — exactly what `CLAUDE.md`'s no-fabricated-data rule prohibits.
+Documented inline in the component's own comment so a future session
+doesn't re-propose the same bucketing without re-deriving why it was
+skipped. Icons: the type swatch plus three hand-drawn SVG glyphs (ability,
+egg, generation) matching `PokeballGlyph.tsx`'s thin-stroke posture — no
+icon library.
+
+**Async idle/loading/success/error contract** (Doc 4) applied to all three
+remaining components, reusing the `.async-panel` CSS from last session
+(`src/app/globals.css`, first shipped for `SimilarPokemon.tsx`) rather than
+redefining it:
+
+- **`GeneratedAnswer.tsx`**: no longer `return null`s for its hidden state —
+  the `.async-panel` wrapper stays mounted across every status, collapsed to
+  zero height via `data-open="false"`. Loading gained a real 3-bar
+  `animate-pulse` skeleton alongside the existing `ScanSequence` label. **A
+  new "error" status was added to `deriveGeneratedAnswerRenderState`
+  (`src/coveo/generatedAnswerRenderState.ts`) — this reverses part of a
+  previously documented decision, so it's captured in
+  `docs/adr/0016-generated-answer-error-state.md`**, not just a code
+  comment, per `CLAUDE.md`'s ADR rule. The prior version folded every
+  `state.error` into `hidden` (reasoning: RGA is org-gated, an absent
+  feature shouldn't look like a broken search); this session split that —
+  `isEnabled`/`isVisible` false still folds to `hidden` unchanged, but
+  `state.error` on an otherwise-enabled-and-visible controller is now a
+  genuine "couldn't retrieve" state, since that's a real request failure,
+  not a missing feature. The existing test asserting error→hidden was
+  updated (renamed, new expectation) rather than deleted, plus a new test
+  pinning that not-enabled still wins over a stray error.
+- **`AskAboutPokemon.tsx`**: the results region (previously absent from the
+  DOM entirely until a response landed — the "tiny box... then whole PDP
+  moves" complaint Doc 4 exists to fix) is now wrapped in `.async-panel`
+  from "idle" onward, open on loading/error/success. Added a one-passage-
+  shaped skeleton (`PassageSkeleton`, reusing the real `.passage-card` CSS
+  class) for the loading state, which previously rendered nothing at all
+  while the request was in flight.
+- **`ResultList.tsx`**: the loading branch was plain text; now renders the
+  same `grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4` shape as
+  success, with 8 placeholder tiles (sprite-square + two skeleton text
+  lines) so loading→success swaps tile content, not grid shape. The old
+  loading text is kept as an `sr-only` announcement rather than dropped
+  outright. `empty`/`error` stay their own distinct layouts, unchanged.
+
+**Verification, all real**: `npm run lint`, `npm run typecheck` clean.
+`npm test` — 221/221 (34 files, up from 208/31 — added
+`HeroCarousel.test.tsx`, `PdpHighlights.test.tsx`, `AskAboutPokemon.test.tsx`
+new, extended `generatedAnswerRenderState.test.ts`). `npm run test:coverage`
+— 99.33% statements, unchanged (its `TESTABLE_ROOTS` guard only covers
+`src/coveo/*` and API routes, not components — see
+`docs/standards-adoption.md` #12 — so component test files are additive,
+not gate-enforced). `npm run build` succeeds, all routes list correctly.
+Manual: a Playwright script driven against the running dev server (not just
+unit tests) confirmed live on `localhost:3000` — home hero carousel renders
+all three slides, arrow/dot navigation works, the "Start searching" CTA's
+`#pokedex-search` anchor actually scrolls to the search box; PDP Highlights
+renders all four real fields on Eevee (Normal / Run Away / Field / Generation
+1); `/search?q=char` still renders its results list correctly; asking a
+question on Eevee's PDP shows "Asking..." immediately (the new loading
+state) before resolving to real passages. Zero console errors across all
+of the above. Screenshots reviewed directly, not just asserted programmatically.
+
+## Twenty-first session, continued — hero/PDP redesign after live user review
+
+User manual-reviewed the hero carousel/PDP Highlights work above and found
+four real problems, worked through in plan mode before any code changed:
+the carousel belonged on Browse-by-type, not the home hero; Home/Search/PDP
+all capped their content narrower than the header, wasting real width on
+anything bigger than a small laptop; the PDP's full-bleed backdrop photo
+didn't read as a commerce product shot; and `PdpHighlights`' circular
+icon-in-circle badges reused this app's *only* other use of that shape —
+`TypeSwatch`/`BrowseByType`'s clickable filter pins — so they looked
+clickable when they weren't (three of its four fields also just duplicated
+info already visible in the Hero/tabs). Full plan (judgment calls stated
+with reasoning) at the approved plan file, condensed here:
+
+**Container width**: `max-w-6xl` → `max-w-7xl` (1152px → 1280px), applied
+consistently to `AppHeader`, Home, `/search`, `/compare`, `CompareTray`
+(all were already 6xl) and PDP (was the one outlier at `max-w-5xl`) — one
+shared constant, not a one-off bump on the pages that were called out.
+
+**Home hero reverted to a static banner** — `HeroCarousel.tsx` deleted
+entirely, `src/app/page.tsx` back to its pre-session `ImageSlot` +
+subtitle-with-real-indexed-count form (`CONTENT.home.indexedCountSuffix`
+re-added), just spanning the wider container. The 3-slide Search/Compare/
+Ask promo copy from last session's carousel was dropped rather than kept
+as static cards — nothing in the ask wanted that content to survive, and
+the page's own doc-comment already commits to staying minimal.
+
+**Browse-by-type became the carousel** (`src/components/BrowseByType.tsx`)
+— same `embla-carousel-react` mechanism `SimilarPokemon.tsx` established
+first (`align: "start"`, `dragFree: true`, chevron arrows with
+`canScrollPrev`/`canScrollNext`-synced disabled state), replacing the
+native `overflow-x-auto` strip. Real click-through per type unchanged.
+Since this made two real carousels with identical arrow-button/scroll-state
+logic, extracted the shared bits into **new**
+`src/components/ui/CarouselArrowButton.tsx` and
+`src/components/ui/useCarouselArrows.ts`; `SimilarPokemon.tsx` switched to
+both instead of its own inlined copies — pure de-duplication, no behavior
+change.
+
+**PDP redesign, commerce-style**: deleted the full-bleed `heroBackdrop`
+breakout entirely (the `-mx-[50vw]` viewport-breakout wrapper +
+`ImageSlot` in `pokemon/[name]/page.tsx`), plus the now-orphaned
+`CONTENT.art.heroBackdrop` entry and `public/art/hero-backdrop.webp` file.
+`PokemonHero.tsx` is now a two-column grid (`grid-cols-1
+sm:grid-cols-[minmax(0,360px)_1fr]`) — a dominant sprite "packshot" panel
+on the left (the prior small overlapping "trading card" treatment, now the
+primary element in its own column instead of a workaround for a clashing
+photo backdrop; no more negative-margin overlap trick since there's
+nothing left to overlap), identity + type + quick facts on the right. The
+packshot panel keeps real visual interest via a **new**, static (non-hover)
+variant of the existing oklab color-mix glow recipe
+(`.hero-packshot[data-glow]` in `globals.css`, distinct from
+`.result-tile[data-glow]` since this panel is never interactive).
+
+**`PdpHighlights.tsx` deleted outright**, not reskinned — judgment call:
+type/ability/egg-group were already visible elsewhere (Hero's type Chips;
+Abilities and Overview tabs), only `generation` was genuinely new.
+`generation` folded into `PokemonProfilePanel`'s existing `DataList`
+(Overview tab, new prop, new row right after Species) — same non-
+interactive `dt`/`dd` styling already used for height/weight/egg groups,
+zero pill-shaped anything. A compact 2-row `DataList` (Generation +
+`abilities[0]`, labeled plainly "Ability" not "Top ability" — source
+order, not a verified primary, same caveat this codebase already applies
+to `types[0]`) sits directly in the Hero's right column too, so at-a-glance
+info survives without a tab click, using `DataList`'s proven non-clickable
+visual language instead of the circular-badge one that caused the
+complaint. `tests/unit/components/PdpHighlights.test.tsx` deleted with the
+component; `tests/unit/components/HeroCarousel.test.tsx` deleted with
+`HeroCarousel.tsx`.
+
+**`ResultList.tsx` grid gained an `xl:grid-cols-5` step** (both the success
+grid and the loading skeleton, kept identical as they already were) — one
+more tile per row on wide viewports instead of just bigger tiles, using the
+width the container bump freed up.
+
+**No ADR for any of this** — visual/layout decisions, same category as the
+v4 restyle batches (none of which got their own ADR either), not the kind
+of lasting technical-architecture call ADRs in this repo are reserved for.
+
+**Verification, all real**: `npm run lint`, `npm run typecheck` clean.
+`npm test` — 216/216 (33 files: net -7 from deleting `HeroCarousel.test.tsx`/
+`PdpHighlights.test.tsx`, +1 new `BrowseByType.test.tsx`). `npm run
+test:coverage` unchanged (99.33%, its guard doesn't cover components).
+`npm run build` succeeds. Manual: a Playwright script against the running
+dev server confirmed live — Home shows the static (non-sliding) banner with
+the real "1,025 Pokemon indexed" count, Browse-by-type's prev/next arrows
+actually scroll the strip (Normal drops off the left edge, Dark/Steel
+scroll into view); PDP shows the two-column hero with no backdrop image,
+Generation ("Generation 1") and Ability ("Run Away") visible under Eevee's
+name without a tab click, Generation also present in the Overview tab's
+spec sheet. Zero console errors. Screenshots reviewed directly (not just
+asserted programmatically) — the PDP hero screenshot in particular was
+checked against the "does this read like a commerce product shot" bar the
+feedback set.
+
+One `impeccable` design-hook finding accepted as a sanctioned exception:
+`PokemonHero.tsx`'s dex-number watermark font-size (9rem) is a resize of
+the same oversized-watermark treatment already accepted at 7rem/10rem in
+an earlier session (config.json's `design-system-font-size` ignore-list) —
+persisted via `hook-admin.mjs ignore-value`, not silently overridden.
+
+## Twenty-first session, continued — facet icons + facet order
+
+Same session, one more round of live feedback on `/search`: the Type/
+Weaknesses/Resistances facets' flat color-only swatches read as generic
+color pills rather than tying into the same icon language the home page's
+Browse-by-type strip already established, and the facet order should lead
+with Pokemon Type, then Generation, then whatever else.
+
+**`TypeSwatch.tsx`** (used by `AutomaticFacets.tsx` for the three
+type-driven facets) now renders the same real downloaded type-icon SVG
+`BrowseByType.tsx` uses (`public/art/types/`), not a plain CSS-colored
+circle — each icon file is already a self-contained colored circle badge,
+so there's no separate fill to draw. The inline checkmark SVG that used to
+mark a selected value was dropped: with a real icon now occupying the
+circle, a checkmark on top of it would obscure the icon rather than add
+information, and the existing selected-state ring (plus the native
+checkbox, unchanged) already makes selection unambiguous on its own.
+
+**Facet order**: `AutomaticFacets.tsx` gained a `FIELD_ORDER_PRIORITY`
+client-side sort — Type first, Generation second, everything else after in
+whatever order Coveo's automatic facet generator returned it (a stable
+sort, so the fields we have no opinion on keep their relevance-ranked
+order). Checked `AutomaticFacetGeneratorOptions` in the installed
+`@coveo/headless` types first, per this project's Coveo-docs-first rule:
+it only exposes `desiredCount`/`numberOfValues`, no field/order control, so
+pinning order has to happen at render time, not via a generator option —
+this doesn't request anything different from Coveo, doesn't touch which
+fields the generator selects, and isn't a reversal of ADR-0011's decision
+to let it choose them, so no new ADR. Also moved `<AutomaticFacets />`
+above `<FacetSpeed />`/`<FacetAbilities />` in `src/app/search/page.tsx`'s
+facet rail — those two are the only facets ineligible for automatic
+generation (Speed is numeric; Abilities needs facet-search), so without
+this move Type/Generation would still have rendered below them despite
+leading within the automatic group.
+
+**Verification, all real**: `npm run lint`, `npm run typecheck` clean.
+`npm test` — 217/217 (added a new `AutomaticFacets.test.tsx` case asserting
+the Type-then-Generation-then-rest order with a mixed-field fixture).
+`npm run test:coverage` unchanged (99.33%). `npm run build` succeeds.
+Manual: Playwright against the running dev server on the live org,
+`/search?q=char` — confirmed real fieldset legend order top-to-bottom
+(`Pokemon Type`, `Genration`, `Weakness aganist`, `Resistance against`,
+`Egg Groups`, `Speed`, `Abilities` — the org's own field labels, typos and
+all), and the Type facet's swatches render as real colored type-icon badges
+with a visible selection ring after toggling one on. Zero console errors.
+
+**Not this session's concern, flagged for later**: the live org's field
+labels have real typos ("Genration", "Weakness aganist") — a Coveo admin
+console fix (Fields page), not app code; noted here rather than silently
+worked around.
 
 ## Nineteenth session — scoped four follow-up execution plans (no implementation yet)
 
@@ -738,31 +995,28 @@ Built interactively, one field group at a time, with the user driving the actual
 
 ## What's next (in priority order)
 
-**As of the twentieth session, the real current priority list is:**
+**As of the twenty-first session, the real current priority list is:**
 
-1. **Item 2 of the three-item build order**: home hero carousel + PDP
-   "Highlights" section, `docs/EXECUTION-PLAN-marketing-assets.md` §5. No
-   open decisions — ready to execute. Re-open `docs/temp/insiprations/` for
-   the actual reference screenshots before building, per that doc's own
-   note (a prose summary is lossy).
-2. **Item 3**: apply the rest of `docs/EXECUTION-PLAN-async-ui-states.md`'s
-   idle/loading/success/error contract to `GeneratedAnswer.tsx`,
-   `AskAboutPokemon.tsx`, and `ResultList.tsx` — the `.async-panel` CSS
-   already exists in `src/app/globals.css` (added for `SimilarPokemon.tsx`,
-   its first consumer), so this is applying an established pattern, not
-   inventing one.
-3. **Both presentation decks** (Advanced tier) — still not started, see
-   item 4 in the older numbered list below, which still applies.
-4. **Phase 0 email + presentation-slot booking** (deadline 2026-09-06) and
-   the off-cycle RGA/Semantic-Encoder/CPR model-rebuild request — user
-   indicated sending both 2026-08-31 (today, at time of writing); **not
-   independently verified as sent this session** — confirm status before
-   assuming either is done.
+1. **Both presentation decks** (Advanced tier) — still not started:
+   `presentation/topic1-technical-deepdive.md` and
+   `presentation/topic2-escalation-recovery.md`. See item 4 in the older
+   numbered list below, which still applies.
+2. **Confirm the Phase 0 email + presentation-slot booking** (deadline
+   2026-09-06) and the off-cycle RGA/Semantic-Encoder/CPR model-rebuild
+   request actually went out — user indicated sending both 2026-08-31;
+   **still not independently verified as sent** across two sessions now.
+   Ask the user directly rather than assuming from stated intent.
 
-The numbered list immediately below predates the nineteenth/twentieth
-sessions and is largely historical (most of its own items are marked
-done/superseded inline) — kept for the operational detail in items 0/4/5
-(the ML-rebuild trail and the Phase 0 email context), not as the live
+All four nineteenth-session follow-up execution docs are now closed:
+Doc 1 (ML recommendations, Branch B + ART) and Doc 2 (Similar Pokemon
+carousel) in the twentieth session; Doc 3 (marketing assets, including its
+§5 home hero carousel + PDP Highlights) and Doc 4 (async UI states) in this
+(twenty-first) session — see "Twenty-first session" below.
+
+The numbered list immediately below predates the nineteenth/twentieth/
+twenty-first sessions and is largely historical (most of its own items are
+marked done/superseded inline) — kept for the operational detail in items
+0/4/5 (the ML-rebuild trail and the Phase 0 email context), not as the live
 priority order.
 
 Phase v2.3 is done as of the seventh session — the v2 roadmap (`docs/EXECUTION-PLAN-v2.md`) is now fully closed. **New this session: `docs/EXECUTION-PLAN-v3.md`** — a separate, independent track opened by live usage, four phases, pick any one:

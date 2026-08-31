@@ -11,6 +11,7 @@ export interface PokemonProfilePanelProps {
   height: string | undefined;
   weight: string | undefined;
   species: string | undefined;
+  generation: string | undefined;
   eggGroups: string[];
   eggCycles: string | undefined;
   catchRate: string | undefined;
@@ -21,6 +22,7 @@ export function PokemonProfilePanel({
   height,
   weight,
   species,
+  generation,
   eggGroups,
   eggCycles,
   catchRate,
@@ -30,6 +32,7 @@ export function PokemonProfilePanel({
     <DataList
       rows={[
         { label: CONTENT.pdp.profileLabels.species, value: species },
+        { label: CONTENT.pdp.profileLabels.generation, value: generation },
         { label: CONTENT.pdp.profileLabels.height, value: height },
         { label: CONTENT.pdp.profileLabels.weight, value: weight },
         {

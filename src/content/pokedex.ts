@@ -30,6 +30,8 @@ export const CONTENT = {
     heroSubtitle: "Search every Pokemon indexed from pokemondb.net, powered by Coveo.",
     indexedCountSuffix: (total: number) => ` ${total.toLocaleString()} Pokemon indexed.`,
     browseByTypeHeading: "Browse by type",
+    browseByTypePrevLabel: "Previous types",
+    browseByTypeNextLabel: "Next types",
   },
 
   search: {
@@ -72,6 +74,7 @@ export const CONTENT = {
     },
     profileLabels: {
       species: "Species",
+      generation: "Generation",
       height: "Height",
       weight: "Weight",
       eggGroups: "Egg groups",
@@ -115,6 +118,12 @@ export const CONTENT = {
     similarViewLabel: "View Pokemon",
     similarPrevLabel: "Previous similar Pokemon",
     similarNextLabel: "Next similar Pokemon",
+    // Singular, used only for the Hero's compact quick-facts row — plural
+    // "Abilities" (sectionHeadings.abilities) is the full-list heading on
+    // the Abilities tab. Deliberately not "Top ability": `abilities[0]` is
+    // source order, not a verified primary (same caveat this codebase
+    // already applies to `types[0]` — see ResultList.tsx/PokemonHero.tsx).
+    abilityLabel: "Ability",
   },
 
   answer: {
@@ -123,6 +132,7 @@ export const CONTENT = {
     // this stays sentence case here.
     panelLabel: "Pokedex entry",
     loadingLabel: "Generating answer...",
+    errorMessage: "Couldn't generate an answer right now.",
     citationPrefix: "retrieved from:",
     feedbackUp: "This answer was helpful",
     feedbackDown: "This answer was not helpful",
@@ -150,7 +160,6 @@ export const CONTENT = {
   },
 
   art: {
-    heroBackdrop: "/art/hero-backdrop.webp" as string | undefined,
     homeBanner: "/art/home-banner.webp" as string | undefined,
     emptySearch: "/art/empty-search.webp" as string | undefined,
   },
