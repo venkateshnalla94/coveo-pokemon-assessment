@@ -16,3 +16,18 @@ export function buildTypeSearchHref(type: string): string {
   const escapedType = type.replace(/"/g, '\\"');
   return `/search?aq=${encodeURIComponent(`@${POKEMON_FIELDS.type}=="${escapedType}"`)}`;
 }
+
+const TYPE_AQ_PATTERN = new RegExp(`^@${POKEMON_FIELDS.type}=="(.*)"$`);
+
+/**
+ * Inverse of buildTypeSearchHref's `aq` expression, for display only (e.g. a
+ * breadcrumb chip showing which category-browse filter is active) — doesn't
+ * change the URL/state mechanism itself.
+ */
+export function parseTypeFromAq(aq: string | undefined): string | null {
+  if (!aq) {
+    return null;
+  }
+  const match = aq.match(TYPE_AQ_PATTERN);
+  return match ? match[1].replace(/\\"/g, '"') : null;
+}

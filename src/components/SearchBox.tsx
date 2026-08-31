@@ -5,6 +5,7 @@ import { type KeyboardEvent, useEffect, useId, useRef, useState } from "react";
 import { ConfigRequiredDialog } from "@/components/ConfigRequiredDialog";
 import { PokeballGlyph, type PokeballGlyphState } from "@/components/ui/PokeballGlyph";
 import { CONTENT } from "@/content/pokedex";
+import { clearBrowseByTypeFilter } from "@/coveo/advancedSearchQuery";
 import { isCoveoConfigured } from "@/coveo/config";
 import { getSearchEngine } from "@/coveo/engine";
 import { useControllerState } from "@/coveo/useControllerState";
@@ -166,6 +167,10 @@ export function SearchBox({ onNavigate, initialQuery }: SearchBoxProps) {
       onNavigate(suggestionValue);
       return;
     }
+    // An explicit new query supersedes any category-browse `aq` filter still
+    // set from a home page pill link — see docs/adr/0011 and
+    // src/coveo/advancedSearchQuery.ts.
+    clearBrowseByTypeFilter(getSearchEngine());
     searchBox?.selectSuggestion(suggestionValue);
   }
 
@@ -183,6 +188,9 @@ export function SearchBox({ onNavigate, initialQuery }: SearchBoxProps) {
       }
       return;
     }
+    // Same as selectSuggestion() above: dropping a stale category-browse
+    // filter on an explicit new search.
+    clearBrowseByTypeFilter(getSearchEngine());
     searchBox.submit();
   }
 

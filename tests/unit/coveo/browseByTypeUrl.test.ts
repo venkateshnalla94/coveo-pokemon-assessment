@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildTypeSearchHref } from "@/coveo/browseByTypeUrl";
+import { buildTypeSearchHref, parseTypeFromAq } from "@/coveo/browseByTypeUrl";
 
 describe("buildTypeSearchHref", () => {
   it("uses an aq exact-match expression, not a facet-scoped f-<id> param", () => {
@@ -17,5 +17,24 @@ describe("buildTypeSearchHref", () => {
     const query = href.split("?")[1];
     const [key] = query.split("=");
     expect(key).toBe("aq");
+  });
+});
+
+describe("parseTypeFromAq", () => {
+  it("recovers the type value from an aq expression built by buildTypeSearchHref", () => {
+    expect(parseTypeFromAq('@pokemontype=="Fire"')).toBe("Fire");
+  });
+
+  it("unescapes a double quote inside the type value", () => {
+    expect(parseTypeFromAq('@pokemontype=="Fire\\"Type"')).toBe('Fire"Type');
+  });
+
+  it("returns null for an empty or undefined aq", () => {
+    expect(parseTypeFromAq(undefined)).toBeNull();
+    expect(parseTypeFromAq("")).toBeNull();
+  });
+
+  it("returns null for an aq expression on a different field", () => {
+    expect(parseTypeFromAq('@pokemonname=="Pikachu"')).toBeNull();
   });
 });

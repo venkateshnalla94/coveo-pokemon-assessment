@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { SearchBoxState } from "@coveo/headless";
 
-const { searchBoxMock } = vi.hoisted(() => {
+const { searchBoxMock, engineMock, updateAdvancedSearchQueriesMock } = vi.hoisted(() => {
   const searchBoxMock: {
     state: SearchBoxState;
     subscribe: (listener: () => void) => () => void;
@@ -27,11 +27,16 @@ const { searchBoxMock } = vi.hoisted(() => {
     showSuggestions: vi.fn(),
     clear: vi.fn(),
   };
-  return { searchBoxMock };
+  const updateAdvancedSearchQueriesMock = vi.fn((payload: { aq: string }) => ({
+    type: "advancedSearchQueries/update",
+    payload,
+  }));
+  const engineMock = { dispatch: vi.fn() };
+  return { searchBoxMock, engineMock, updateAdvancedSearchQueriesMock };
 });
 
 vi.mock("@/coveo/engine", () => ({
-  getSearchEngine: vi.fn(() => ({})),
+  getSearchEngine: vi.fn(() => engineMock),
 }));
 
 vi.mock("@/coveo/config", () => ({
@@ -40,6 +45,9 @@ vi.mock("@/coveo/config", () => ({
 
 vi.mock("@coveo/headless", () => ({
   buildSearchBox: vi.fn(() => searchBoxMock),
+  loadAdvancedSearchQueryActions: vi.fn(() => ({
+    updateAdvancedSearchQueries: updateAdvancedSearchQueriesMock,
+  })),
 }));
 
 import { SearchBox } from "@/components/SearchBox";
@@ -61,6 +69,8 @@ describe("SearchBox — typeahead keyboard traversal", () => {
     searchBoxMock.selectSuggestion.mockClear();
     searchBoxMock.submit.mockClear();
     searchBoxMock.showSuggestions.mockClear();
+    engineMock.dispatch.mockClear();
+    updateAdvancedSearchQueriesMock.mockClear();
   });
 
   it("renders the input as a combobox collapsed until focused", () => {
@@ -160,6 +170,20 @@ describe("SearchBox — typeahead keyboard traversal", () => {
     expect(searchBoxMock.selectSuggestion).not.toHaveBeenCalled();
   });
 
+  it("submitting a query clears any stale category-browse aq filter first", async () => {
+    const user = userEvent.setup();
+    render(<SearchBox />);
+    const input = screen.getByRole("combobox");
+    await user.click(input);
+
+    await user.keyboard("{Enter}");
+
+    expect(updateAdvancedSearchQueriesMock).toHaveBeenCalledWith({ aq: "" });
+    expect(engineMock.dispatch.mock.invocationCallOrder[0]).toBeLessThan(
+      searchBoxMock.submit.mock.invocationCallOrder[0],
+    );
+  });
+
   it("clicking a suggestion selects it via mouse, using onMouseDown to survive the blur race", async () => {
     const user = userEvent.setup();
     render(<SearchBox />);
@@ -167,6 +191,16 @@ describe("SearchBox — typeahead keyboard traversal", () => {
 
     await user.click(screen.getByText("charizard"));
     expect(searchBoxMock.selectSuggestion).toHaveBeenCalledWith("charizard");
+  });
+
+  it("selecting a suggestion also clears any stale category-browse aq filter first", async () => {
+    const user = userEvent.setup();
+    render(<SearchBox />);
+    await user.click(screen.getByRole("combobox"));
+
+    await user.click(screen.getByText("charizard"));
+
+    expect(updateAdvancedSearchQueriesMock).toHaveBeenCalledWith({ aq: "" });
   });
 
   it("typing calls searchBox.updateText with the new value", async () => {
