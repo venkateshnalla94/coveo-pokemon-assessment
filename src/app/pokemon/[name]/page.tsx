@@ -101,10 +101,10 @@ export default function PokemonDetailPage() {
       : undefined;
 
   return (
-    <div className="mx-auto max-w-7xl px-6 py-10">
+    <div className="mx-auto w-full max-w-7xl px-6 py-10">
       <Breadcrumb name={name} from={from} />
       {!configured && <CoveoConfigBanner />}
-      {renderState?.status === "loading" && <p>{CONTENT.search.loadingLabel}</p>}
+      {renderState?.status === "loading" && <PokemonDetailSkeleton />}
       {renderState?.status === "error" && (
         <p className="text-sm text-red-600 dark:text-red-400">{renderState.error.userMessage}</p>
       )}
@@ -199,5 +199,52 @@ export default function PokemonDetailPage() {
         </div>
       )}
     </div>
+  );
+}
+
+/**
+ * Mirrors PokemonHero + PokemonStatPanel + Tabs' own box shapes (region
+ * spacing, wrapper classes) so the loading -> loaded swap doesn't reflow the
+ * page — same intent as ResultCardSkeleton (ResultList.tsx) and
+ * AnswerSkeleton (GeneratedAnswer.tsx), which this follows for visual
+ * consistency (animate-pulse, not a separate shimmer treatment).
+ */
+function PokemonDetailSkeleton() {
+  return (
+    <>
+      <span className="sr-only">{CONTENT.search.loadingLabel}</span>
+      <div aria-hidden="true">
+        <div className="mb-8 grid grid-cols-1 gap-8 px-6 sm:grid-cols-[minmax(0,360px)_1fr] sm:items-start">
+          <div className="mx-auto aspect-square w-full max-w-90 animate-pulse rounded-2xl bg-shell-100 dark:bg-shell-600/40" />
+          <div className="flex flex-col gap-3 sm:pt-2">
+            <div className="h-3 w-16 animate-pulse rounded bg-shell-100 dark:bg-shell-600/40" />
+            <div className="h-8 w-2/3 animate-pulse rounded bg-shell-100 dark:bg-shell-600/40" />
+            <div className="h-4 w-1/3 animate-pulse rounded bg-shell-100 dark:bg-shell-600/40" />
+            <div className="mt-1 flex gap-1.5">
+              <div className="h-6 w-16 animate-pulse rounded-full bg-shell-100 dark:bg-shell-600/40" />
+              <div className="h-6 w-16 animate-pulse rounded-full bg-shell-100 dark:bg-shell-600/40" />
+            </div>
+            <div className="mt-3 h-10 w-1/2 animate-pulse rounded bg-shell-100 border-t border-shell-100 pt-3 dark:border-shell-600 dark:bg-shell-600/40" />
+          </div>
+        </div>
+
+        <div className="mb-6 flex flex-col gap-2 rounded-lg border border-shell-100 bg-surface p-4 dark:border-shell-600">
+          <div className="mb-1 h-3 w-20 animate-pulse rounded bg-shell-100 dark:bg-shell-600/40" />
+          {Array.from({ length: 6 }).map((_, index) => (
+            <div key={index} className="h-3 w-full animate-pulse rounded bg-shell-100 dark:bg-shell-600/40" />
+          ))}
+          <div className="mt-1 h-4 w-24 animate-pulse rounded bg-shell-100 border-t border-shell-100 pt-2 dark:border-shell-600 dark:bg-shell-600/40" />
+        </div>
+
+        <div>
+          <div className="flex gap-1 border-b border-shell-100 pb-2 dark:border-shell-600">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <div key={index} className="h-4 w-20 animate-pulse rounded bg-shell-100 dark:bg-shell-600/40" />
+            ))}
+          </div>
+          <div className="mt-3 h-40 w-full animate-pulse rounded bg-shell-100 dark:bg-shell-600/40" />
+        </div>
+      </div>
+    </>
   );
 }

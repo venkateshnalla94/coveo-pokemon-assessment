@@ -90,6 +90,19 @@
   }
 }
 
+/*
+ * Always reserves the vertical scrollbar's track width, whether or not the
+ * page is currently tall enough to need one. Without this, going from a
+ * short page (empty search results, no RGA answer, PDP loading skeleton) to
+ * a tall one (a full results grid, an RGA answer, the loaded PDP) toggles
+ * the scrollbar on/off, which changes the viewport's available width and
+ * shifts every `mx-auto`-centered section sideways — read by users as the
+ * page "shrinking" and "moving" between states.
+ */
+html {
+  scrollbar-gutter: stable;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);

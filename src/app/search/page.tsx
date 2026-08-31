@@ -37,7 +37,7 @@ function SearchPageContent() {
   const configured = isCoveoConfigured();
 
   return (
-    <div className="mx-auto max-w-7xl px-6 py-10">
+    <div className="mx-auto w-full max-w-7xl px-6 py-10">
       {configured && <SearchUrlSync />}
       <div className="mb-6">
         <SearchBox />
