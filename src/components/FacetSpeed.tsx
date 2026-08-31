@@ -16,7 +16,7 @@ import { useControllerState } from "@/coveo/useControllerState";
  * Depends on `pokemonspeed` being an Integer field with facet support
  * enabled in the org — confirmed already done per docs/HANDOFF.md.
  */
-export function FacetSpeed() {
+export function FacetSpeed({ collapsible }: { collapsible?: boolean } = {}) {
   const [facet] = useState(() =>
     buildNumericFacet(getSearchEngine(), {
       options: {
@@ -39,13 +39,9 @@ export function FacetSpeed() {
     return null;
   }
 
-  return (
-    <fieldset className="mb-6">
-      <legend className="mb-2 text-sm font-semibold uppercase tracking-wide text-black/60 dark:text-white/60">
-        {CONTENT.search.facetLabels.speed}
-      </legend>
-      <ul className="space-y-1">
-        {state.values.map((value) => {
+  const valueList = (
+    <ul className="space-y-1">
+      {state.values.map((value) => {
           const label =
             SPEED_RANGES.find((r) => r.range.start === value.start && r.range.end === value.end)
               ?.label ?? `${value.start}-${value.end}`;
@@ -65,7 +61,26 @@ export function FacetSpeed() {
             </li>
           );
         })}
-      </ul>
+    </ul>
+  );
+
+  return (
+    <fieldset className="mb-6">
+      {collapsible ? (
+        <details open>
+          <summary className="mb-2 cursor-pointer text-sm font-semibold uppercase tracking-wide text-black/60 marker:text-black/40 dark:text-white/60 dark:marker:text-white/40">
+            {CONTENT.search.facetLabels.speed}
+          </summary>
+          {valueList}
+        </details>
+      ) : (
+        <>
+          <legend className="mb-2 text-sm font-semibold uppercase tracking-wide text-black/60 dark:text-white/60">
+            {CONTENT.search.facetLabels.speed}
+          </legend>
+          {valueList}
+        </>
+      )}
     </fieldset>
   );
 }

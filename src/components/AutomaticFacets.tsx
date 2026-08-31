@@ -54,7 +54,7 @@ const FIELD_ORDER_PRIORITY: Record<string, number> = {
  * render against a never-stable identity, the exact infinite-loop class
  * `useControllerState`'s own doc comment warns about.
  */
-export function AutomaticFacets() {
+export function AutomaticFacets({ collapsible }: { collapsible?: boolean } = {}) {
   const [generator] = useState(() =>
     buildAutomaticFacetGenerator(getSearchEngine(), {
       options: { desiredCount: 6, numberOfValues: 10 },
@@ -69,13 +69,20 @@ export function AutomaticFacets() {
   return (
     <>
       {orderedFacets.map((facet) => (
-        <AutomaticFacetFieldset key={facet.state.field} facet={facet} />
+        <AutomaticFacetFieldset key={facet.state.field} facet={facet} collapsible={collapsible} />
       ))}
     </>
   );
 }
 
-function AutomaticFacetFieldset({ facet }: { facet: AutomaticFacet }) {
+function AutomaticFacetFieldset({
+  facet,
+  collapsible,
+}: {
+  facet: AutomaticFacet;
+  /** See Facet.tsx's `collapsible` doc comment — same contract. */
+  collapsible?: boolean;
+}) {
   const { field, label, values } = facet.state;
   const useChip = CHIP_FIELDS.has(field);
 
@@ -83,12 +90,8 @@ function AutomaticFacetFieldset({ facet }: { facet: AutomaticFacet }) {
     return null;
   }
 
-  return (
-    <fieldset className="mb-6">
-      <legend className="mb-2 text-sm font-semibold uppercase tracking-wide text-black/60 dark:text-white/60">
-        {label}
-      </legend>
-      <ul className="space-y-1">
+  const valueList = (
+    <ul className="space-y-1">
         {values.map((value) => (
           <li key={value.value}>
             <label className="flex cursor-pointer items-center justify-between gap-2 text-sm">
@@ -132,6 +135,25 @@ function AutomaticFacetFieldset({ facet }: { facet: AutomaticFacet }) {
           </li>
         ))}
       </ul>
+  );
+
+  return (
+    <fieldset className="mb-6">
+      {collapsible ? (
+        <details open>
+          <summary className="mb-2 cursor-pointer text-sm font-semibold uppercase tracking-wide text-black/60 marker:text-black/40 dark:text-white/60 dark:marker:text-white/40">
+            {label}
+          </summary>
+          {valueList}
+        </details>
+      ) : (
+        <>
+          <legend className="mb-2 text-sm font-semibold uppercase tracking-wide text-black/60 dark:text-white/60">
+            {label}
+          </legend>
+          {valueList}
+        </>
+      )}
     </fieldset>
   );
 }

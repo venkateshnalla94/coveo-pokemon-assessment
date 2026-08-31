@@ -52,6 +52,8 @@ export const CONTENT = {
     removeFilterLabel: (value: string) => `Remove filter ${value}`,
     resultsSummary: (firstResult: number, lastResult: number, total: number) =>
       `Results ${firstResult}-${lastResult} of ${total}`,
+    filtersLabel: "Filters",
+    filtersCloseLabel: "Close filters",
     didYouMeanPrompt: "Did you mean",
     noResultsForPrefix: "No results for",
     showingResultsForPrefix: "Showing results for",

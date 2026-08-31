@@ -29,9 +29,17 @@ interface FacetProps {
    * checkbox rendering below is shared either way.
    */
   searchable?: boolean;
+  /**
+   * Wraps the value list in a native `<details>`/`<summary>` accordion,
+   * open by default. Only ever passed `true` from `FilterDrawer`'s
+   * mobile/tablet copy of this facet — `FacetRail`'s desktop copy always
+   * omits it, so desktop markup is byte-identical to before this prop
+   * existed (docs/EXECUTION-PLAN-responsive-ui.md §2).
+   */
+  collapsible?: boolean;
 }
 
-export function Facet({ field, label, renderValue, searchable }: FacetProps) {
+export function Facet({ field, label, renderValue, searchable, collapsible }: FacetProps) {
   // Explicit `id: field` (matching what Headless would default to anyway)
   // instead of leaving `id` unset. The shared `engine` singleton persists
   // for the whole SPA session, so a Facet component unmounting (e.g.
@@ -53,11 +61,14 @@ export function Facet({ field, label, renderValue, searchable }: FacetProps) {
     return null;
   }
 
-  return (
-    <fieldset className="mb-6">
-      <legend className="mb-2 text-sm font-semibold uppercase tracking-wide text-black/60 dark:text-white/60">
-        {label}
-      </legend>
+  const legend = (
+    <legend className="mb-2 text-sm font-semibold uppercase tracking-wide text-black/60 dark:text-white/60">
+      {label}
+    </legend>
+  );
+
+  const body = (
+    <>
       {searchable && (
         <input
           type="text"
@@ -114,6 +125,24 @@ export function Facet({ field, label, renderValue, searchable }: FacetProps) {
             </li>
           ))}
         </ul>
+      )}
+    </>
+  );
+
+  return (
+    <fieldset className="mb-6">
+      {collapsible ? (
+        <details open>
+          <summary className="mb-2 cursor-pointer text-sm font-semibold uppercase tracking-wide text-black/60 marker:text-black/40 dark:text-white/60 dark:marker:text-white/40">
+            {label}
+          </summary>
+          {body}
+        </details>
+      ) : (
+        <>
+          {legend}
+          {body}
+        </>
       )}
     </fieldset>
   );

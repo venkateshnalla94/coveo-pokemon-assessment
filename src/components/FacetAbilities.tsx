@@ -10,6 +10,13 @@ import { POKEMON_FIELDS } from "@/coveo/fields";
  * `searchable` variant (facet-search, not a plain list) rather than a
  * second parallel facet component — see docs/EXECUTION-PLAN-v2.3-frontend.md §5.
  */
-export function FacetAbilities() {
-  return <Facet field={POKEMON_FIELDS.abilities} label={CONTENT.search.facetLabels.abilities} searchable />;
+export function FacetAbilities({ collapsible }: { collapsible?: boolean } = {}) {
+  return (
+    <Facet
+      field={POKEMON_FIELDS.abilities}
+      label={CONTENT.search.facetLabels.abilities}
+      searchable
+      collapsible={collapsible}
+    />
+  );
 }

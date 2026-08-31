@@ -126,7 +126,7 @@ function ComparePageContent() {
           <table className="w-full min-w-[480px] border-collapse text-sm">
             <thead>
               <tr>
-                <th className="border-b border-shell-100 p-2 text-left font-semibold text-foreground dark:border-shell-600">
+                <th className="sticky left-0 z-10 border-b border-shell-100 bg-surface p-2 text-left font-semibold text-foreground dark:border-shell-600">
                   &nbsp;
                 </th>
                 {items.map((item) => (
@@ -141,7 +141,7 @@ function ComparePageContent() {
             </thead>
             <tbody>
               <tr>
-                <th className="p-2 text-left font-normal text-shell-400">
+                <th className="sticky left-0 z-10 bg-surface p-2 text-left font-normal text-shell-400">
                   {CONTENT.compare.rowLabels.type}
                 </th>
                 {items.map((item) => (
@@ -155,7 +155,7 @@ function ComparePageContent() {
                 ))}
               </tr>
               <tr>
-                <th className="p-2 text-left font-normal text-shell-400">
+                <th className="sticky left-0 z-10 bg-surface p-2 text-left font-normal text-shell-400">
                   {CONTENT.compare.rowLabels.height}
                 </th>
                 {items.map((item) => (
@@ -165,7 +165,7 @@ function ComparePageContent() {
                 ))}
               </tr>
               <tr>
-                <th className="p-2 text-left font-normal text-shell-400">
+                <th className="sticky left-0 z-10 bg-surface p-2 text-left font-normal text-shell-400">
                   {CONTENT.compare.rowLabels.weight}
                 </th>
                 {items.map((item) => (
@@ -175,7 +175,7 @@ function ComparePageContent() {
                 ))}
               </tr>
               <tr>
-                <th className="p-2 text-left font-normal text-shell-400">
+                <th className="sticky left-0 z-10 bg-surface p-2 text-left font-normal text-shell-400">
                   {CONTENT.compare.rowLabels.abilities}
                 </th>
                 {items.map((item) => (
@@ -194,7 +194,7 @@ function ComparePageContent() {
               </tr>
               {STAT_ORDER.map(({ key, label }) => (
                 <tr key={key}>
-                  <th className="border-t border-shell-100 p-2 text-left font-normal text-shell-400 dark:border-shell-600">
+                  <th className="sticky left-0 z-10 border-t border-shell-100 bg-surface p-2 text-left font-normal text-shell-400 dark:border-shell-600">
                     {label}
                   </th>
                   {items.map((item) => (
@@ -205,7 +205,7 @@ function ComparePageContent() {
                 </tr>
               ))}
               <tr>
-                <th className="border-t border-shell-100 p-2 text-left font-semibold text-foreground dark:border-shell-600">
+                <th className="sticky left-0 z-10 border-t border-shell-100 bg-surface p-2 text-left font-semibold text-foreground dark:border-shell-600">
                   {CONTENT.compare.rowLabels.total}
                 </th>
                 {items.map((item) => (

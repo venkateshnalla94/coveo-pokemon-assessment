@@ -1,6 +1,10 @@
 "use client";
 
-import { buildQuerySummary, loadSearchActions, loadSearchAnalyticsActions } from "@coveo/headless";
+import {
+  buildQuerySummary,
+  loadSearchActions,
+  loadSearchAnalyticsActions,
+} from "@coveo/headless";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { BrowseByType } from "@/components/BrowseByType";
@@ -40,7 +44,9 @@ export default function Home() {
   const configured = isCoveoConfigured();
 
   const [engine] = useState(() => (configured ? getSearchEngine() : undefined));
-  const [querySummary] = useState(() => (engine ? buildQuerySummary(engine) : undefined));
+  const [querySummary] = useState(() =>
+    engine ? buildQuerySummary(engine) : undefined,
+  );
   const summaryState = useControllerState(querySummary);
   const hasSearched = useRef(false);
 
@@ -55,15 +61,21 @@ export default function Home() {
   }, [engine, querySummary]);
 
   return (
-    <div className="mx-auto flex max-w-7xl flex-col items-center px-6 py-24 text-center">
+    <div className="mx-auto flex max-w-7xl flex-col items-center px-6 py-12 text-center sm:py-16 md:py-24">
       <div className="mb-8 w-full">
         <ImageSlot name="homeBanner" ratio="16/5" label="Home hero banner" />
       </div>
       <p className="mb-8 text-shell-400">
         {CONTENT.home.heroSubtitle}
-        {summaryState && summaryState.hasResults && CONTENT.home.indexedCountSuffix(summaryState.total)}
+        {summaryState &&
+          summaryState.hasResults &&
+          CONTENT.home.indexedCountSuffix(summaryState.total)}
       </p>
-      <SearchBox onNavigate={(query) => router.push(`/search?q=${encodeURIComponent(query)}`)} />
+      <SearchBox
+        onNavigate={(query) =>
+          router.push(`/search?q=${encodeURIComponent(query)}`)
+        }
+      />
       <div className="mt-12 w-full">
         <BrowseByType />
       </div>

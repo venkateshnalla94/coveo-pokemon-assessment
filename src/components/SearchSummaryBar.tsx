@@ -8,6 +8,7 @@ import {
   loadSearchAnalyticsActions,
 } from "@coveo/headless";
 import { useEffect, useState } from "react";
+import { FilterDrawer } from "@/components/FilterDrawer";
 import { Chip } from "@/components/ui/Chip";
 import { CONTENT } from "@/content/pokedex";
 import { clearBrowseByTypeFilter } from "@/coveo/advancedSearchQuery";
@@ -57,6 +58,12 @@ export function SearchSummaryBar() {
   const activeSortOption =
     SORT_OPTIONS.find((option) => sort.isSortedBy(option.criterion)) ?? SORT_OPTIONS[0];
 
+  const activeFilterCount =
+    breadcrumbState.facetBreadcrumbs.length +
+    breadcrumbState.numericFacetBreadcrumbs.length +
+    breadcrumbState.automaticFacetBreadcrumbs.length +
+    (activeTypeFilter ? 1 : 0);
+
   return (
     <div className="mb-4 flex flex-col gap-2">
       <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-black/60 dark:text-white/60">
@@ -65,8 +72,10 @@ export function SearchSummaryBar() {
             ? CONTENT.search.resultsSummary(summaryState.firstResult, summaryState.lastResult, summaryState.total)
             : null}
         </p>
-        <label className="flex items-center gap-2">
-          {CONTENT.search.sortByLabel}
+        <div className="flex items-center gap-3">
+          <FilterDrawer activeFilterCount={activeFilterCount} />
+          <label className="flex items-center gap-2">
+            {CONTENT.search.sortByLabel}
           <select
             value={activeSortOption.id}
             onChange={(e) => {
@@ -104,7 +113,8 @@ export function SearchSummaryBar() {
               </option>
             ))}
           </select>
-        </label>
+          </label>
+        </div>
       </div>
 
       {sortWarning && (

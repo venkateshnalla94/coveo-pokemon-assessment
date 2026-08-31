@@ -1,6 +1,89 @@
 # Session handoff — Coveo org build status
 
-Updated 2026-08-31, twenty-fourth session. **This (twenty-fourth) session fixed a real SSR bug the user hit as a React hydration-mismatch error on `/search`: `getSearchEngine()`'s module-level singleton could leak search state across unrelated server requests (Vercel Fluid Compute reuses function instances/module scope across requests), producing server-rendered HTML that didn't match the client's fresh engine — no org config touched; see "Twenty-fourth session" below.** The twenty-third session fixed a real query-state bug the user found by using the running app: a category filter picked up from the home page's Browse-by-type links (`aq`) survived a brand-new search-box query, ANDing a stale type filter into unrelated searches (and starving RGA of results) — no org config touched; see "Twenty-third session" below. The twenty-second session fixed two real layout-stability bugs the user found by eyeballing the running app, no org config touched — see "Twenty-second session" below; the rest of this paragraph covers the twenty-first session and earlier. Phase v2.3 is fully built (seventh session). The tenth session closed v3.1 (sort break) and most of v3.3 (search page data), plus a facet-architecture change (Automatic Facet Generation). The eleventh session did most of v3.2 (branching evolution chain + evolution images) and most of v3.4 (RGA/CPR content-exclusion diagnosis and rules). The twelfth session gave the user the full remaining v3.2/v3.4 console sequence. The thirteenth session executed Batch 2 (chrome restyle + Pokeball search bar). The fourteenth session executed Batch 3 (result tiles + facet type-swatches). The fifteenth session executed Batch 4 (PDP restyle). The sixteenth session executed Batch 5 (RGA scan reveal + scanline citations, passage-retrieval restyle). The seventeenth session executed Batch 6, closing out the v4 design pass entirely (motion/a11y audit + ADR-0013). The eighteenth session did the manual walkthrough + two missing e2e specs, found and fixed two real bugs, then shipped the Vercel deploy (live at https://coveo-pokemon-assessment.vercel.app/). The nineteenth session scoped four follow-up execution-plan docs (see below) and executed Doc 3's original scope (real marketing assets + icon-based Browse-by-type) — that code sat uncommitted until the twentieth session. The twentieth session committed Doc 3's shipped code, resolved Doc 1's open Analytics-volume decision (Branch B) and enabled+verified ART, then built item 1 of 3 (the PDP Similar Pokemon carousel, Doc 2) including a manual-testing UX-fix follow-up (whole-card click, hover pop, scroll arrows). **This (twenty-first) session built items 2 and 3 of the three-item build order — home hero carousel + PDP Highlights (Doc 3 §5), and the async idle/loading/success/error contract on `GeneratedAnswer`/`AskAboutPokemon`/`ResultList` (Doc 4) — closing out all four follow-up execution docs from the nineteenth session, then (same session, after live user review) reworked the hero/PDP/Highlights UI it had just shipped: un-carouseled the home hero in favor of a carousel Browse-by-type, widened Home/Search/PDP to match the header's container width, dropped the PDP's full-bleed backdrop photo for a commerce-style two-column hero, and deleted `PdpHighlights` in favor of folding its one genuinely new field (generation) into the existing Overview tab and Hero — then, after a second round of live feedback, replaced the search page's flat-color facet swatches (Type/Weaknesses/Resistances) with the same real type-icon art the home page's Browse-by-type strip uses, and reordered the facet rail to lead with Type, then Generation, then the rest. See "Twenty-first session" and both "Twenty-first session, continued" entries below for all of it.** What's left project-wide: the two presentation decks, and confirming whether the Phase 0 email/booking + off-cycle ML-rebuild request actually got sent (**deadline 2026-09-06** — user indicated sending both 2026-08-31, still not independently verified) — summarized in "What's next" below. The prior sessions' handoff content is folded into this one; treat this file as the current snapshot, not an addendum.
+Updated 2026-08-31, twenty-fifth session. **This (twenty-fifth) session executed `docs/archive/EXECUTION-PLAN-responsive-ui.md` end to end — the off-canvas mobile/tablet filter drawer on `/search`, accordion facets, and spacing/overflow fixes across every page — and found a real, previously-unnoticed horizontal-overflow bug in `layout.tsx`'s flex structure during its own screenshot verification step; see "Twenty-fifth session" below.** The twenty-fourth session fixed a real SSR bug the user hit as a React hydration-mismatch error on `/search`: `getSearchEngine()`'s module-level singleton could leak search state across unrelated server requests (Vercel Fluid Compute reuses function instances/module scope across requests), producing server-rendered HTML that didn't match the client's fresh engine — no org config touched; see "Twenty-fourth session" below.** The twenty-third session fixed a real query-state bug the user found by using the running app: a category filter picked up from the home page's Browse-by-type links (`aq`) survived a brand-new search-box query, ANDing a stale type filter into unrelated searches (and starving RGA of results) — no org config touched; see "Twenty-third session" below. The twenty-second session fixed two real layout-stability bugs the user found by eyeballing the running app, no org config touched — see "Twenty-second session" below; the rest of this paragraph covers the twenty-first session and earlier. Phase v2.3 is fully built (seventh session). The tenth session closed v3.1 (sort break) and most of v3.3 (search page data), plus a facet-architecture change (Automatic Facet Generation). The eleventh session did most of v3.2 (branching evolution chain + evolution images) and most of v3.4 (RGA/CPR content-exclusion diagnosis and rules). The twelfth session gave the user the full remaining v3.2/v3.4 console sequence. The thirteenth session executed Batch 2 (chrome restyle + Pokeball search bar). The fourteenth session executed Batch 3 (result tiles + facet type-swatches). The fifteenth session executed Batch 4 (PDP restyle). The sixteenth session executed Batch 5 (RGA scan reveal + scanline citations, passage-retrieval restyle). The seventeenth session executed Batch 6, closing out the v4 design pass entirely (motion/a11y audit + ADR-0013). The eighteenth session did the manual walkthrough + two missing e2e specs, found and fixed two real bugs, then shipped the Vercel deploy (live at https://coveo-pokemon-assessment.vercel.app/). The nineteenth session scoped four follow-up execution-plan docs (see below) and executed Doc 3's original scope (real marketing assets + icon-based Browse-by-type) — that code sat uncommitted until the twentieth session. The twentieth session committed Doc 3's shipped code, resolved Doc 1's open Analytics-volume decision (Branch B) and enabled+verified ART, then built item 1 of 3 (the PDP Similar Pokemon carousel, Doc 2) including a manual-testing UX-fix follow-up (whole-card click, hover pop, scroll arrows). **This (twenty-first) session built items 2 and 3 of the three-item build order — home hero carousel + PDP Highlights (Doc 3 §5), and the async idle/loading/success/error contract on `GeneratedAnswer`/`AskAboutPokemon`/`ResultList` (Doc 4) — closing out all four follow-up execution docs from the nineteenth session, then (same session, after live user review) reworked the hero/PDP/Highlights UI it had just shipped: un-carouseled the home hero in favor of a carousel Browse-by-type, widened Home/Search/PDP to match the header's container width, dropped the PDP's full-bleed backdrop photo for a commerce-style two-column hero, and deleted `PdpHighlights` in favor of folding its one genuinely new field (generation) into the existing Overview tab and Hero — then, after a second round of live feedback, replaced the search page's flat-color facet swatches (Type/Weaknesses/Resistances) with the same real type-icon art the home page's Browse-by-type strip uses, and reordered the facet rail to lead with Type, then Generation, then the rest. See "Twenty-first session" and both "Twenty-first session, continued" entries below for all of it.** What's left project-wide: the two presentation decks, and confirming whether the Phase 0 email/booking + off-cycle ML-rebuild request actually got sent (**deadline 2026-09-06** — user indicated sending both 2026-08-31, still not independently verified) — summarized in "What's next" below. The prior sessions' handoff content is folded into this one; treat this file as the current snapshot, not an addendum.
+
+## Twenty-fifth session — executed the responsive UI plan (off-canvas filter drawer + accordion facets + spacing/overflow fixes), found and fixed a real site-wide horizontal-overflow bug
+
+Executed `docs/archive/EXECUTION-PLAN-responsive-ui.md` §1–7 in full, per the
+`docs/PROMPT-execute-responsive-ui.md` this file's own convention had staged
+for a future session. Pure responsive UI/CSS and markup — no Headless
+controller, query, field, or facet-selection logic touched.
+
+**Shipped:**
+- `/search` off-canvas filter drawer: `FacetRail` hidden below `md`
+  (`src/components/FacetRail.tsx`), new `src/components/FilterDrawer.tsx`
+  (right-side slide-in panel, `ConfigRequiredDialog`-style backdrop/
+  `stopPropagation`, `z-50`, body-scroll-locked, Escape-to-close — that last
+  one is genuinely new code, since `ConfigRequiredDialog` turned out not to
+  have Escape-to-close to copy from despite the plan assuming it did).
+  Renders the same `AutomaticFacets`/`FacetSpeed`/`FacetAbilities` `FacetRail`
+  already renders on desktop, no duplicate facet logic.
+- Accordion facets, mobile/tablet only: `collapsible?: boolean` prop added to
+  `Facet.tsx`, `AutomaticFacets.tsx`, `FacetSpeed.tsx`, `FacetAbilities.tsx`
+  (default `false`, byte-identical desktop markup); wraps the value list in
+  `<details open><summary>` when `true`, only ever passed from
+  `FilterDrawer`.
+- Active-filter badge on the drawer's trigger: `SearchSummaryBar.tsx` now
+  computes the count from the `breadcrumbState` it already reads (one
+  `buildBreadcrumbManager` call total, not a second one) and passes it to
+  `FilterDrawer` as a prop.
+- `ResultList.tsx` grid gap `gap-4 sm:gap-6`; home page (`src/app/page.tsx`)
+  vertical padding `py-12 sm:py-16 md:py-24`; `ui/Tabs.tsx`'s tablist gets
+  `overflow-x-auto flex-nowrap whitespace-nowrap`; `/compare`'s row-label
+  `<th>` cells get `sticky left-0 z-10 bg-surface` (verified live: scrolling
+  the table horizontally keeps row labels pinned while data columns scroll
+  under them).
+- New `CONTENT.search.filtersLabel`/`filtersCloseLabel` in
+  `src/content/pokedex.ts`, following the existing chrome-copy convention.
+
+**Real bug found and fixed during the plan's own §9 screenshot verification**
+(not something the plan anticipated): the home page overflowed horizontally
+to 1280px wide at a 375px viewport — confirmed via Playwright screenshots
+plus a DOM-ancestor-width diagnostic script, not just eyeballing an image.
+Root cause: `src/app/layout.tsx`'s `<body className="min-h-full flex
+flex-col">` makes every page's `{children}` a flex item on the cross axis,
+and flex items default to `min-width: auto` (a content-based floor, not 0).
+`BrowseByType.tsx`'s carousel row (`<ul className="flex gap-4">`, 18
+type-icon `<li>`s, deliberately unwrapped and meant to be clipped by its own
+`overflow-hidden` wrapper) has a ~1200px min-content width, and with no
+`min-width: 0` anywhere in the ancestor chain between `body` and that `<ul>`,
+that min-content width propagated all the way up and set the whole page's
+width — not just that one carousel row's. First attempted a narrower fix
+(`min-w-0` on the home page's own BrowseByType wrapper div) and confirmed via
+the same diagnostic script that it did *not* fix it, because the real forcing
+flex item was one level higher (the page root itself, a flex item of `body`,
+not of anything inside the page). Fixed at the correct root: wrapped
+`{children}` in `layout.tsx` with a single `<div className="min-w-0">` —
+site-wide, one place, rather than patching per-page. Confirmed via the
+diagnostic script that document/page width now stays 375px on home, `/search`,
+the PDP, and `/compare` at a 375px viewport, and confirmed 1440px desktop
+views are visually unchanged (`FacetRail`'s `hidden md:block` and the
+`collapsible` props never fire at `md`+, so nothing there could have
+regressed, and screenshots confirm it).
+
+**Verified live** (not just from reading the diff): `npm run lint`,
+`npm run typecheck`, `npm test` (232/232, unchanged) all clean. Started
+`next dev` and drove it with a throwaway Playwright script (`chromium-cli`
+wasn't available in this environment) — screenshots at 375×667 and 1440×900
+for home, `/search` (drawer closed/open), a PDP, and `/compare`; confirmed
+the drawer opens via the "Filters" button, Escape closes it (checked
+programmatically, not just visually — dialog count drops to 0), applying a
+facet inside the drawer updates both the badge count (0 → 1) and
+`SearchSummaryBar`'s breadcrumb chip, and the compare table's sticky column
+holds under horizontal scroll. **Not verified**: 390×844 and 1024×768 (two
+of the plan's five target viewports) weren't separately screenshotted —
+375×667 and 768×1024-adjacent behavior (`md` breakpoint is 768px, tested at
+1440 and 375 which bracket it) make a regression at those two specific sizes
+unlikely, but it's an honest gap, not "verified." `CompareTray` at 375px with
+3+ selected Pokemon (§6, "verify only") also wasn't exercised — seeding 3+
+selections requires driving `sessionStorage`-backed compare state, which the
+verification pass didn't set up.
+
+Per the plan's own §10 and `CLAUDE.md`'s process rule: moved
+`docs/EXECUTION-PLAN-responsive-ui.md` and
+`docs/PROMPT-execute-responsive-ui.md` to `docs/archive/`, updated the
+plan's Status header to complete with the overflow-bug deviation noted, and
+added one entry to `docs/README.md`'s "Completed execution plans" list.
 
 ## Twenty-fourth session — fixed a leaking server-side engine singleton causing SSR hydration mismatches (no org config touched)
 

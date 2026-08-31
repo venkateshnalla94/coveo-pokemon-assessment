@@ -61,7 +61,15 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body className="min-h-full flex flex-col">
         <CompareProvider>
           <AppHeader />
-          {children}
+          {/* min-w-0: without it, this flex item (body is flex-col) keeps
+              its default content-based min-width floor, so any page whose
+              content includes an unwrapped-by-design horizontal row (e.g.
+              BrowseByType's 18-icon carousel, meant to be clipped by its own
+              overflow-hidden) forces the *whole page* wider than the
+              viewport instead of just clipping that row — found via 375px
+              screenshot verification of the home page,
+              docs/EXECUTION-PLAN-responsive-ui.md §9. */}
+          <div className="min-w-0">{children}</div>
           <CompareTray />
         </CompareProvider>
       </body>

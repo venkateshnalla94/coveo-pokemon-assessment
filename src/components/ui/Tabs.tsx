@@ -68,7 +68,10 @@ export function Tabs({ tabs }: TabsProps) {
 
   return (
     <div>
-      <div role="tablist" className="flex gap-1 border-b border-shell-100 dark:border-shell-600">
+      <div
+        role="tablist"
+        className="flex flex-nowrap gap-1 overflow-x-auto border-b border-shell-100 whitespace-nowrap dark:border-shell-600"
+      >
         {tabs.map((tab) => {
           const selected = tab.id === activeTab?.id;
           return (

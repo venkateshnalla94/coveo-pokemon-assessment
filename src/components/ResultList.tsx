@@ -49,7 +49,7 @@ export function ResultList() {
           <span className="sr-only">{CONTENT.search.loadingLabel}</span>
           <ul
             aria-hidden="true"
-            className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5"
+            className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 md:grid-cols-4 xl:grid-cols-5"
           >
             {Array.from({ length: 8 }).map((_, index) => (
               <ResultCardSkeleton key={index} />
@@ -74,7 +74,7 @@ export function ResultList() {
       );
     case "success":
       return (
-        <ul aria-label="Search results" className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5">
+        <ul aria-label="Search results" className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 md:grid-cols-4 xl:grid-cols-5">
           {/* deriveSearchRenderState maps state.results 1:1, in order, into
               renderState.items — zipping by index here to recover the raw
               Result (needed for buildInteractiveResult) without changing the
