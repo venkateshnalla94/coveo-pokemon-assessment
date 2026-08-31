@@ -210,21 +210,22 @@ section).
 
 ## Layout
 
-Single-column, centered, max-width-constrained containers, with one
-deliberate exception. Home (`/`) centers a narrow column (`max-w-2xl`);
-`/search` widens to `max-w-6xl` with a 200px facet rail + fluid main column
-above `md`; the PDP (`/pokemon/[name]`) widens to `max-w-5xl` with a
-full-bleed hero band breaking out to viewport width above the constrained
-content below it (batch 4, §9). The result grid steps 2 → 3 → 4 columns
-across `base → sm → md`. Horizontal page padding is a flat 24px (`px-6`) at
-every breakpoint.
+Single-column, centered, max-width-constrained containers — one width, `max-w-7xl`,
+used uniformly across Home, `/search`, `/compare`, and the PDP (`/pokemon/[name]`),
+matching `AppHeader`'s and `CompareTray`'s own container width (widened from an
+earlier per-page scheme of `max-w-2xl`/`max-w-6xl`/`max-w-5xl`, and the PDP's
+full-bleed hero band — see below — was removed in the same pass; see
+`docs/adr/0017-home-hero-reverted-to-static-banner-pdp-highlights-folded-in.md`).
+`/search` adds a 200px facet rail + fluid main column above `md` inside that
+shared width. The result grid steps 2 → 3 → 4 columns across `base → sm → md`.
+Horizontal page padding is a flat 24px (`px-6`) at every breakpoint.
 
 ### Named Rules
 
 **The Constrained Column Rule.** Every page is a centered, max-width column,
-never full-bleed — except the PDP hero band, the one deliberate, scoped
-exception. Width varies by page purpose, but the centering and the cap are
-constant everywhere else.
+never full-bleed. This used to carry one scoped exception — the PDP's
+full-bleed hero backdrop band — which was removed (ADR-0017); there is no
+full-bleed content anywhere in the app today.
 
 ## Elevation & Depth
 
@@ -263,9 +264,14 @@ built:
   and scanline citation tags (`⟶ retrieved from: ...`) instead of a numbered
   citation list.
 - **PDP** (`PokemonHero.tsx`, `PokemonStatPanel.tsx`, `EvolutionChain.tsx`,
-  `TypeDefenses.tsx`, `AskAboutPokemon.tsx`) — the widened hero band, a
+  `TypeDefenses.tsx`, `AskAboutPokemon.tsx`, `SimilarPokemon.tsx`) — a
   type-colored `StatBar` fill, swatch-paired weakness/resistance lists, a
-  horizontal evolution stage row, and type-tinted passage cards.
+  horizontal evolution stage row, type-tinted passage cards, and a
+  type-glow-lit Similar Pokemon carousel. `PokemonHero.tsx` is a two-column
+  "commerce packshot" layout (large sprite panel left, identity/types/quick-facts
+  right) — see the Layout section above; the v4-pass full-bleed hero band this
+  bullet originally described was replaced by that layout (ADR-0017), not a
+  v4-pass deliverable still in place.
 - **Global focus ring and motion/a11y audit** (batch 6) — a `:focus-visible`
   rule using `--signal-red`, a sibling-selector fix so the type-facet
   swatch's visually-hidden checkbox still shows a visible ring, and
@@ -274,13 +280,21 @@ built:
   seventeenth-session section.
 
 `src/components/ui/ImageSlot.tsx` is new this pass: a named, ratio-locked
-image slot (`<ImageSlot name="heroBackdrop" ratio="21/9" label="..." />`)
-that renders a real image once `CONTENT.art[name]` points at a file under
-`public/art/`, or a labeled dashed placeholder frame at the correct
-aspect ratio otherwise — so page layout is correct before any art exists.
-Four slots are wired in this pass (PDP hero backdrop 21:9, home hero banner
-16:5, empty-search illustration 1:1, type-facet section header 4:1); all
-four currently render as placeholders, since no art files exist yet.
+image slot (`<ImageSlot name="..." ratio="..." label="..." />`) that renders
+a real image once `CONTENT.art[name]` points at a file under `public/art/`,
+or a labeled dashed placeholder frame at the correct aspect ratio otherwise —
+so page layout is correct before any art exists. Four slots were originally
+wired in this pass (PDP hero backdrop 21:9, home hero banner 16:5,
+empty-search illustration 1:1, type-facet section header 4:1), all rendering
+as placeholders since no art existed yet. As of the marketing-assets pass
+(`docs/EXECUTION-PLAN-marketing-assets.md`) and the home-hero/PDP-hero rework
+(ADR-0017), two slots remain: `homeBanner` and `emptySearch`, both now
+rendering real downloaded art (`public/art/*.webp`) instead of placeholders.
+The PDP hero backdrop slot was removed along with the full-bleed backdrop
+band it was for (ADR-0017); the type-facet section header slot is also gone
+— the facet rail and `BrowseByType` ended up using real type-icon art
+directly (`public/art/types/`) rather than a slot-based banner image, so
+that slot was never filled and no longer exists in `CONTENT.art`.
 
 ## Do's and Don'ts
 

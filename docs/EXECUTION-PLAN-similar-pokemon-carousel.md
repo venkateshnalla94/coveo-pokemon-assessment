@@ -1,9 +1,10 @@
 # Execution Plan — Similar/Recommended Pokemon Carousel
 
-Status: **not started — data source depends on
-`docs/EXECUTION-PLAN-ml-recommendations.md`'s open decision.** This doc specs
-the UI and consumption contract so it can be built the moment that decision
-lands, without re-deriving the design.
+Status: **complete.** Built in the twentieth session once
+`docs/EXECUTION-PLAN-ml-recommendations.md`'s decision landed (Branch B). See
+`docs/HANDOFF.md`'s twentieth-session entry for what shipped, and the
+twenty-first session's follow-up UX fixes (whole-card click, hover pop,
+scroll arrows).
 
 Scope: a PDP carousel surfacing other Pokemon related to the one being
 viewed. No Coveo org config changes (that's entirely the other doc's scope).

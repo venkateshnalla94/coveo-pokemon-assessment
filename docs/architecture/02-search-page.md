@@ -13,9 +13,9 @@ graph TD
     SUS["SearchUrlSync (renders nothing — URL⇄state only)"]
     SB["SearchBox (no initialQuery on this route)"]
     FR["FacetRail"]
+    AF["AutomaticFacets (Type, Generation, then whichever else the generator picks)"]
     FSp["FacetSpeed (numeric, manual)"]
     FA["FacetAbilities (searchable, manual)"]
-    AF["AutomaticFacets (Type/Generation/EggGroups/Weaknesses/Resistances)"]
     SSB["SearchSummaryBar"]
     DYM["DidYouMean"]
     GA["GeneratedAnswer"]
@@ -26,9 +26,9 @@ graph TD
     SPC --> SUS
     SPC --> SB
     SPC --> FR
+    FR --> AF
     FR --> FSp
     FR --> FA
-    FR --> AF
     SPC --> SSB
     SPC --> DYM
     SPC --> GA
@@ -36,7 +36,7 @@ graph TD
     SPC --> Pg
 ```
 
-As of `docs/adr/0011-automatic-facet-generation-on-search-page.md`, 5 of the 7 facets on this page (`Type`, `Generation`, `Egg Groups`, `Weaknesses`, `Resistances`) come from one `AutomaticFacets` component built on Coveo's real Automatic Facet Generation, not 5 separate hand-built `Facet.tsx` wrappers. `FacetSpeed` (numeric — Automatic Facet Generation is STRING-only) and `FacetAbilities` (needs facet-search, which automatic facets don't support) remain individually hand-built.
+As of `docs/adr/0011-automatic-facet-generation-on-search-page.md`, 5 of the 7 facets on this page (`Type`, `Generation`, `Egg Groups`, `Weaknesses`, `Resistances`) come from one `AutomaticFacets` component built on Coveo's real Automatic Facet Generation, not 5 separate hand-built `Facet.tsx` wrappers. `FacetSpeed` (numeric — Automatic Facet Generation is STRING-only) and `FacetAbilities` (needs facet-search, which automatic facets don't support) remain individually hand-built. `AutomaticFacets` leads `FacetRail`'s DOM order (Type first, then Generation, then whichever other fields the generator selects), with the two manual facets after — reordered from an earlier version that put the manual facets first, per [ADR-0018](../adr/0018-search-facet-filter-ux-corrections.md). Its `Type`/`Weaknesses`/`Resistances` values render through `TypeSwatch.tsx`, using the same real type-icon SVG art as `BrowseByType` and result cards (a selected-state ring instead of the checkmark a flat color swatch used to need), same ADR.
 
 The `Suspense` wrapper around `SearchPageContent` exists because both `SearchUrlSync` and `ResultList` call `useSearchParams()` — a real Next.js requirement (missing-suspense-with-csr-bailout), not a stylistic choice.
 
@@ -84,6 +84,12 @@ sequenceDiagram
 `buildUrlManager`'s constructor synchronously dispatches `restoreSearchParameters` from the current URL. A `SearchBox` controller seeds its own typed value from `engine.state.query.q` **at construction time**. Because `<SearchUrlSync>` appears before `<SearchBox>` in `SearchPageContent`'s JSX, its controller constructs first, so by the time `SearchBox` constructs and reads that engine state, the URL's `q` param is already there — no `initialQuery` prop is passed to `<SearchBox>` on this route (unlike the home page, which does pass one for its own redirect-then-seed flow). Reorder these two components and this silently breaks: query text from a deep-linked URL would stop restoring into the visible search box.
 
 This is also the origin of the crash story: `SearchBox` is *also* mounted persistently in `AppHeader` (compact version, on `/pokemon/[name]` only, not `/search` — so it doesn't collide here — but the general hazard of a controller notifying an already-rendering sibling is what forced the `useControllerState`/`useSyncExternalStore` migration described in the [system overview](00-system-overview.md#usecontrollerstate--the-one-hand-rolled-piece-of-infrastructure)).
+
+## The `aq` category-filter breadcrumb — a fourth thing `SearchSummaryBar` tracks
+
+`BrowseByType`'s links pre-filter `/search` via a raw `aq` (advanced query) expression, not a facet (see [home page](01-home-page.md) and ADR-0011) — no Headless controller owns that slice of engine state, so `breadcrumbManager`'s three breadcrumb arrays never included it. `SearchSummaryBar.tsx` subscribes to `engine.state.advancedSearchQueries?.aq` directly (`engine.subscribe`, not a controller) and renders a `"Type: <value>" ×` chip when it's set, using `parseTypeFromAq` (`src/coveo/browseByTypeUrl.ts`) to recover a display label from the raw expression. Its `×` and the row's "Clear all" both call `clearBrowseByTypeFilter(engine)` (`src/coveo/advancedSearchQuery.ts`) before the facet-breadcrumb clear, so both land in one Search API request instead of two.
+
+This exists to close a real bug (twenty-third session, [ADR-0018](../adr/0018-search-facet-filter-ux-corrections.md)): typing a new query after landing via a `BrowseByType` link used to silently AND it with the stale `aq` filter forever, since `SearchBox.tsx`'s `submit()`/`selectSuggestion()` only touch `state.query.q`. Both `SearchBox.tsx` methods now call `clearBrowseByTypeFilter` before dispatching a new query, on top of this breadcrumb-visibility fix.
 
 ## Sort options and Speed ranges — explicit, index-backed constants
 

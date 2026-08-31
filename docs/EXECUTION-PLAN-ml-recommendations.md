@@ -1,8 +1,9 @@
 # Execution Plan — ML Recommendations, ART, and the Similar/Recommended/Popular Decision
 
-Status: **blocked on a live console check.** Nothing in this doc gets built
-until the "Open decision" section below is resolved against the org's real
-Analytics data — not assumed, not estimated.
+Status: **resolved.** Branch B was chosen (usage volume too low for CR to
+be honest); ART was enabled and verified. See `docs/HANDOFF.md`'s
+twentieth-session entry for the console changes made and the decision
+record.
 
 Scope: which Coveo ML capability (if any) backs three requested surfaces —
 "Similar," "Recommended," and "Popular" Pokemon — plus a standalone

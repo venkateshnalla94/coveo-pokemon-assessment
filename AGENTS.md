@@ -38,9 +38,12 @@ npm run test:e2e     # playwright e2e suite
 - `src/coveo/searchRenderState.ts` — discriminated-union render state (`loading`/`error`/`empty`/`success`)
 - `src/app/api/token/route.ts` — server-side search token minting ("server" auth mode only)
 - `src/app/api/passages/route.ts` — Passage Retrieval proxy, uses `COVEO_API_KEY` (not `COVEO_ML_API_KEY` — see `docs/adr/0008-passage-retrieval-needs-execute-query-not-content-preview.md`)
+- `src/app/api/similar/route.ts` — deterministic same-type query backing the PDP's Similar Pokemon carousel (`docs/adr/0014`, `docs/adr/0015`)
 - `src/components/SearchBox.tsx` — search input + typeahead (single controller covers both; see `.claude/skills/headless-search-page`)
-- `src/components/FacetType.tsx`, `FacetGeneration.tsx` — facet controllers
+- `src/components/AutomaticFacets.tsx` — Type/Generation/Egg Groups/Weaknesses/Resistances, via Coveo's real Automatic Facet Generation, not per-field facet components (`docs/adr/0011`)
+- `src/components/FacetSpeed.tsx`, `FacetAbilities.tsx` — the two facets kept manual (numeric, and facet-search respectively)
 - `src/components/ResultList.tsx` — result grid with images and type chips
+- `src/components/SimilarPokemon.tsx` — PDP "Similar Pokemon" carousel, calls `/api/similar`
 - `src/app/pokemon/[name]/page.tsx` — Pokemon detail page
 
 ## Current status

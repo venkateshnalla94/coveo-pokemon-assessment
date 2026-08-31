@@ -20,7 +20,9 @@ Previously, `src/coveo/sortOptions.ts` had removed "Name A-Z" entirely after liv
 
 ## 4. Deferred features (already scoped, not silent gaps)
 
-Per the v2.3 plan's own §9 and `docs/HANDOFF.md`: a "Similar Creatures"/RelatedPokemon tab (needs a second query source on a single-engine page — an architectural decision, not a small addition), the full branching evolution chain (Eevee-style — the source extraction only captures the first branch in document order, a documented crawler-selector limitation, not a frontend gap), an Evolution Stage facet (needs a new Inline Page Extension), and a Habitat facet (no honest small-vocabulary source field exists to back one). All of these were deliberately scoped out rather than overlooked — worth naming to an audience so "why isn't X built" has a real answer on hand.
+Per the v2.3 plan's own §9 and `docs/HANDOFF.md`: the full branching evolution chain (Eevee-style — the source extraction only captures the first branch in document order, a documented crawler-selector limitation, not a frontend gap), an Evolution Stage facet (needs a new Inline Page Extension), and a Habitat facet (no honest small-vocabulary source field exists to back one). All of these were deliberately scoped out rather than overlooked — worth naming to an audience so "why isn't X built" has a real answer on hand.
+
+**Resolved, no longer deferred:** the "Similar Creatures"/RelatedPokemon tab this item used to list as deferred shipped in the twentieth session as `SimilarPokemon.tsx`, a carousel backed by a new `/api/similar` route rather than a second query source sharing the page's main engine — exactly the architectural workaround this item predicted would be needed. See ADR-0014 (which ML capability, if any, backs it) and ADR-0015 (why a server route).
 
 ## 5. Two auth-mode code paths maintained side by side — an org/licensing constraint, not an app design choice
 
@@ -48,4 +50,4 @@ Every manual `buildFacet`/`buildNumericFacet` call on this persistent, page-life
 
 ## Out of scope for this list
 
-Vercel deployment, the two presentation decks, and the Phase 0 org-enablement email are real open items (`docs/HANDOFF.md` "What's next") but are delivery/operations tasks, not architecture gaps — they're intentionally not repeated here.
+The two presentation decks and confirming the Phase 0 org-enablement email/off-cycle ML-rebuild request were sent are real open items (`docs/HANDOFF.md` "What's next") but are delivery/operations tasks, not architecture gaps — they're intentionally not repeated here. (Vercel deployment, previously listed here as open, has been live since the eighteenth session.)

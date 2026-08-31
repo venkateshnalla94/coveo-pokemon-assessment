@@ -45,6 +45,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# private interview prep notes — not for a public repo
+docs/presentation_guidence.md
+
 # claude code / copilot tooling (not part of the app)
 .claude/skills/impeccable/
 .github/skills/impeccable/

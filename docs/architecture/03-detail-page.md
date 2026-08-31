@@ -8,12 +8,13 @@ Source: `src/app/pokemon/[name]/page.tsx`
 graph TD
     PDP["PokemonDetailPage ('use client')"]
     BC["Breadcrumb (Home / Search results / Name)"]
-    Hero["PokemonHero (image, name, dex#, types, species)"]
+    Hero["PokemonHero (two-column packshot: image left, name/dex#/types/species/generation/top ability right)"]
     Stats["PokemonStatPanel (6 StatBars + total)"]
     Tabs["Tabs (plain client state, NOT Headless's buildTab)"]
-    Ov["Overview tab → PokemonProfilePanel + TrainingPanel"]
+    Ov["Overview tab → PokemonProfilePanel (incl. generation) + TrainingPanel"]
     Ab["Abilities tab → AbilityList + TypeDefenses"]
     Ev["Evolution tab → EvolutionChain"]
+    Sim["SimilarPokemon (carousel, /api/similar)"]
     Ask["AskAboutPokemon (Passage Retrieval)"]
 
     PDP --> BC
@@ -23,8 +24,13 @@ graph TD
     Tabs --> Ov
     Tabs --> Ab
     Tabs --> Ev
+    PDP --> Sim
     PDP --> Ask
 ```
+
+`PokemonHero` is a two-column "commerce packshot" layout (large sprite panel left, identity/types/quick-facts right), not a single stacked column overlapping a full-bleed backdrop photo as an earlier version had. A separate `PdpHighlights` component that briefly existed alongside that backdrop was deleted the same session — its one genuinely new field, `generation`, folded into `PokemonHero`'s quick-facts row and `PokemonProfilePanel` instead of getting its own section. See [ADR-0017](../adr/0017-home-hero-reverted-to-static-banner-pdp-highlights-folded-in.md).
+
+`SimilarPokemon` (below the tabs, above `AskAboutPokemon`) is a carousel of same-type Pokemon backed by `/api/similar` — a deterministic Search API v2 query, not a Content Recommendation model (ADR-0014 resolved that decision; ADR-0015 explains why the query runs through a server route rather than a second client-side engine). Built to the idle/loading/success/error state contract from `docs/EXECUTION-PLAN-async-ui-states.md`, same as `AskAboutPokemon` below it — see that doc and ADR-0016 for the pattern shared across both.
 
 ## Controllers and the exact-match query strategy
 

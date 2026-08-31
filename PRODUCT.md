@@ -29,7 +29,8 @@ Not a commercial product — a working proof of a Coveo-powered search integrati
 ## Capabilities and Constraints
 
 - Essential: index pokemondb.net (Pokemon pages only), Type facet, Generation facet, Pokemon image in each result — all verified working end to end against the live org.
-- Advanced: the Pokemon detail page is built and verified. Coveo RGA (generative answer) and Query Suggest-powered typeahead are not built yet (sequencing, not an access blocker — see `docs/HANDOFF.md`).
+- Intermediate/Advanced: the Pokemon detail page, Query Suggest-powered typeahead, and Coveo RGA (Generated Answer) are all built and verified against the live org — see `docs/HANDOFF.md` for build history.
+- Bonus: Passage Retrieval ("Ask about this Pokemon" on the PDP) and a Similar Pokemon carousel are also built and verified.
 - No server-side proxy or rate-limiting layer exists by design — Headless calls the Coveo Search API directly from the browser with a public, privilege-scoped search token (see docs/adr/0004-no-server-layer.md).
 - Images: only `img.pokemondb.net` is allow-listed in CSP/`next.config.ts` `images.remotePatterns` — any other image source needs that allow-list extended.
 - `strict: true` TypeScript; a type error is a build failure.
@@ -43,7 +44,7 @@ Not a commercial product — a working proof of a Coveo-powered search integrati
 
 - `docs/Pokemon Challenge (Pre-Sales) - 2026.txt` — the assessment's actual requirements.
 - pokemondb.net itself — the crawl target and the implicit visual/content reference for what's being indexed.
-- Live Coveo search results, facet values, and Pokemon images exist and are verified — use real observed data (e.g. screenshots in `docs/temp/`) as the reference, never fabricate example results, Pokemon data, or generated-answer text. RGA output doesn't exist yet (not built) — don't design against invented sample answers for it either. The unconfigured/empty states remain first-class, real states to design for (a visitor without env vars set still hits them).
+- Live Coveo search results, facet values, Pokemon images, and RGA answers all exist and are verified — use real observed data (e.g. screenshots in `docs/temp/`) as the reference, never fabricate example results, Pokemon data, or generated-answer text. The unconfigured/empty states remain first-class, real states to design for (a visitor without env vars set still hits them).
 
 ## Product Principles
 
