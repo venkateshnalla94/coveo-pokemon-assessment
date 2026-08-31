@@ -48,7 +48,16 @@ if (typeof window !== "undefined" && !("__pokemonConsoleErrorFiltered" in window
  * must check isCoveoConfigured() first.
  */
 export function getSearchEngine(): SearchEngine {
-  if (engine) {
+  // The module-level singleton below is only safe to reuse in the browser.
+  // This function still runs during SSR of these "use client" components,
+  // and Next.js (Fluid Compute in particular) can reuse this module's scope
+  // across multiple, unrelated requests on the server — so returning a
+  // cached `engine` there would leak one request's search results into
+  // another request's initial HTML, and desync from the client's fresh
+  // engine on hydration. Server calls always build a throwaway engine
+  // instead; only the browser gets the shared, reused instance the rest of
+  // this file's comments describe.
+  if (typeof window !== "undefined" && engine) {
     return engine;
   }
 
@@ -93,7 +102,7 @@ export function getSearchEngine(): SearchEngine {
           renewAccessToken: async () => config.accessToken as string,
         };
 
-  engine = buildSearchEngine({
+  const newEngine = buildSearchEngine({
     configuration: {
       organizationId: config.organizationId,
       accessToken,
@@ -117,9 +126,15 @@ export function getSearchEngine(): SearchEngine {
   // these fields straight off `raw`, so without this registration every
   // Pokemon image, type chip, and generation renders as missing, with no
   // error anywhere to point at why.
-  engine.dispatch(loadFieldActions(engine).registerFieldsToInclude(Object.values(POKEMON_FIELDS)));
+  newEngine.dispatch(
+    loadFieldActions(newEngine).registerFieldsToInclude(Object.values(POKEMON_FIELDS)),
+  );
 
-  return engine;
+  if (typeof window !== "undefined") {
+    engine = newEngine;
+  }
+
+  return newEngine;
 }
 
 /**
