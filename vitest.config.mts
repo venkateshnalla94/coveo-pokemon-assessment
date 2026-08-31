@@ -49,6 +49,7 @@ export default defineConfig({
         "src/coveo/typeColors.ts",
         "src/app/api/token/route.ts",
         "src/app/api/passages/route.ts",
+        "src/app/api/similar/route.ts",
       ],
       thresholds: {
         statements: 80,

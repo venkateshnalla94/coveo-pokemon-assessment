@@ -16,6 +16,7 @@ import { EvolutionChain } from "@/components/EvolutionChain";
 import { PokemonHero } from "@/components/PokemonHero";
 import { PokemonProfilePanel } from "@/components/PokemonProfilePanel";
 import { PokemonStatPanel } from "@/components/PokemonStatPanel";
+import { SimilarPokemon } from "@/components/SimilarPokemon";
 import { TrainingPanel } from "@/components/TrainingPanel";
 import { TypeDefenses } from "@/components/TypeDefenses";
 import { ImageSlot } from "@/components/ui/ImageSlot";
@@ -192,6 +193,12 @@ export default function PokemonDetailPage() {
               },
             ]}
           />
+          {/* Keyed by name, not just relying on the effect's own deps, so a
+              Pokemon-to-Pokemon navigation remounts this component fresh —
+              its internal state resets to "loading" via useState's own
+              initializer rather than a synchronous setState inside the
+              effect (see SimilarPokemon.tsx's comment on why). */}
+          <SimilarPokemon key={item.name} pokemonName={item.name} pokemonTypes={item.types} />
           <aside>
             <AskAboutPokemon pokemonName={item.name} pokemonTypes={item.types} />
           </aside>

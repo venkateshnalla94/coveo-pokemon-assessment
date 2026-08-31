@@ -1,6 +1,131 @@
 # Session handoff — Coveo org build status
 
-Updated 2026-08-30, nineteenth session (planning only — no code, no org config touched). Phase v2.3 is fully built (seventh session). The tenth session closed v3.1 (sort break) and most of v3.3 (search page data), plus a facet-architecture change (Automatic Facet Generation). The eleventh session did most of v3.2 (branching evolution chain + evolution images) and most of v3.4 (RGA/CPR content-exclusion diagnosis and rules). The twelfth session gave the user the full remaining v3.2/v3.4 console sequence. The thirteenth session executed Batch 2 (chrome restyle + Pokeball search bar). The fourteenth session executed Batch 3 (result tiles + facet type-swatches). The fifteenth session executed Batch 4 (PDP restyle). The sixteenth session executed Batch 5 (RGA scan reveal + scanline citations, passage-retrieval restyle). The seventeenth session executed Batch 6, closing out the v4 design pass entirely (motion/a11y audit + ADR-0013). The eighteenth session did the manual walkthrough + two missing e2e specs, found and fixed two real bugs, then shipped the Vercel deploy (live at https://coveo-pokemon-assessment.vercel.app/). **This (nineteenth) session scoped four follow-up feature areas the user raised (PDP similar/recommended Pokemon, other Coveo ML models, the still-placeholder `ImageSlot`s, and real layout shift on `GeneratedAnswer`/`AskAboutPokemon`) into four new execution-plan docs, after a plan-mode discussion that changed the original approach twice based on user direction** — see "Nineteenth session" below for what's in each doc and what's still genuinely open. What's left project-wide: the two presentation decks, the Phase 0 email/booking (**deadline 2026-09-06** — user confirmed sending it 2026-08-31), and now the four new execution docs' work itself — summarized in "What's next" below. The prior sessions' handoff content is folded into this one; treat this file as the current snapshot, not an addendum.
+Updated 2026-08-31, twentieth session. Phase v2.3 is fully built (seventh session). The tenth session closed v3.1 (sort break) and most of v3.3 (search page data), plus a facet-architecture change (Automatic Facet Generation). The eleventh session did most of v3.2 (branching evolution chain + evolution images) and most of v3.4 (RGA/CPR content-exclusion diagnosis and rules). The twelfth session gave the user the full remaining v3.2/v3.4 console sequence. The thirteenth session executed Batch 2 (chrome restyle + Pokeball search bar). The fourteenth session executed Batch 3 (result tiles + facet type-swatches). The fifteenth session executed Batch 4 (PDP restyle). The sixteenth session executed Batch 5 (RGA scan reveal + scanline citations, passage-retrieval restyle). The seventeenth session executed Batch 6, closing out the v4 design pass entirely (motion/a11y audit + ADR-0013). The eighteenth session did the manual walkthrough + two missing e2e specs, found and fixed two real bugs, then shipped the Vercel deploy (live at https://coveo-pokemon-assessment.vercel.app/). The nineteenth session scoped four follow-up execution-plan docs (see below) and executed Doc 3's original scope (real marketing assets + icon-based Browse-by-type) — that code sat uncommitted until this session. **This (twentieth) session committed Doc 3's shipped code, resolved Doc 1's open Analytics-volume decision (Branch B — see "Twentieth session" below), and is mid-flight on enabling ART.** What's left project-wide: the two presentation decks, the Phase 0 email/booking (**deadline 2026-09-06** — user confirmed sending it 2026-08-31), and the four execution docs' remaining work — summarized in "What's next" below. The prior sessions' handoff content is folded into this one; treat this file as the current snapshot, not an addendum.
+
+## Twentieth session — committed Doc 3, resolved the ML-recommendations decision (Branch B), enabling ART (in progress)
+
+Opened by committing Doc 3's still-uncommitted shipped code from the nineteenth
+session (`src/components/BrowseByType.tsx`, `src/components/PokemonHero.tsx`,
+`src/content/pokedex.ts`, `public/art/`) — hooks (lint, typecheck, coverage
+guard, 193/193 tests) all passed clean, commit `bce2b69`.
+
+**Analytics check (Doc 1's blocking open decision, resolved)**: live Coveo
+admin console, Analytics → Reports → Summary → Open → Edit → Activity tab —
+**1,200 search events, all-time** (since org creation). Coveo's own docs
+(`docs.coveo.com/en/3399`, direct fetch) put the CR-model reliability
+threshold at ~10,000 queries — two orders of magnitude above this org's real
+volume. Decision: **Branch B** — "Similar" only, as a deterministic same-type
+Search API query (no CR model, no `/api/recommendations` route), documented
+in new `docs/adr/0014-recommendation-strategy.md`. This unblocks
+`docs/EXECUTION-PLAN-similar-pokemon-carousel.md` to proceed on its
+`/api/similar` route as the sole data source.
+
+**ART (independent of the branch decision, recommended regardless per Doc 1)
+— model creation started, not yet Active.** Console: AI and ML → Models →
+Add model → "Automatic Relevance Tuning" card → Next → Data period (3mo
+default) → Next → commerce events off → Next → no dataset filters → Next →
+named `Pokedex ART` → Start building. **Not yet associated with the
+`Pokedex` query pipeline** — that's a separate step (Query Pipelines →
+`Pokedex` → Edit components → Machine learning tab → Associate model) that
+has to wait until the model's Status column shows Active (~30 min per
+`docs.coveo.com/en/3397`).
+
+**Update, same session**: `Pokedex ART` reached Active status and was
+associated with the `Pokedex` pipeline (Query Pipelines → `Pokedex` → Edit
+components → Machine learning tab → Associate model → model `Pokedex ART`,
+no condition, default advanced configuration). **Confirmed live via the
+Relevance Inspector**, not just a console assumption — the "Automatic
+Relevance Tuning" panel for `Pokedex ART` shows real learned boosts already:
+Pikachu (2500), Charizard (790), Eevee (480), Tadbulb (360), Greninja (360).
+ART is genuinely active and influencing ranking. **ART is fully done —
+model built, associated, and verified.**
+
+### External docs.coveo.com pages read this session
+
+All fetched directly (not WebSearch-only), per `CLAUDE.md`'s docs-first rule:
+
+- `docs.coveo.com/en/1674` (Administration Console reports) — nav path to
+  Usage Analytics. Matched: Analytics → Reports.
+- `docs.coveo.com/en/1559` (Review trends from Summary dashboard) — exact
+  steps to read historical query count. Matched: Analytics → Reports →
+  Summary → Open → Edit → Activity tab, Search Event Count.
+- `docs.coveo.com/en/1013` (ART glossary) — baseline ART definition. Thin
+  page, no creation steps; pointed to `/en/3384`.
+- `docs.coveo.com/en/l1ca1038` (Associate an ART model with a pipeline) —
+  association steps. Matched: Query Pipelines → pipeline → Edit components →
+  Machine learning tab → Associate model.
+- `docs.coveo.com/en/3384` (About ART) — overview confirmation only, no
+  creation steps; pointed to `/en/3397`.
+- `docs.coveo.com/en/3397` (Create and manage an ART model) — actual
+  creation steps and prerequisites. **New finding, not in the execution-plan
+  doc**: ART's real prerequisite is only ~100 search/click events and ~55
+  visits/day — far lower than CR's 10,000-query bar, and almost certainly
+  already cleared by this org's 1,200 events. Console path confirmed as
+  **AI and ML → Models**, not "Analytics → Models."
+- `docs.coveo.com/en/1886` (CR implementation overview) — confirmed CR needs
+  its own dedicated query pipeline, must never share `Default` (or any other
+  interface routed to `Default` breaks). Not acted on this session since
+  Branch B was chosen, but worth remembering if the decision is ever
+  revisited.
+- `docs.coveo.com/en/3399` (Create and manage a CR model) — confirmed the
+  10,000-query figure verbatim ("a usage analytics dataset of 10,000 queries
+  or more typically allows a Coveo ML model to provide very relevant
+  recommendations") and CR creation steps, for the record even though Branch
+  B means these aren't executed this session.
+
+## Twentieth session, continued — built `/api/similar` + `SimilarPokemon` carousel (Doc 2, item 1 of 3)
+
+With Doc 1 resolved (Branch B, ART live), built the first of the three
+remaining items: the PDP "Similar Pokemon" carousel from
+`docs/EXECUTION-PLAN-similar-pokemon-carousel.md`, to its full spec including
+the idle/loading/success/error contract from
+`docs/EXECUTION-PLAN-async-ui-states.md` (built in from day one, not as a
+follow-up, per that doc's own instruction).
+
+**New**: `src/app/api/similar/route.ts` (calls Search API v2 directly with a
+`@pokemontype==(...) AND @pokemonname<>"..."` filter, `numberOfResults: 6`,
+same `resolveServerCoveoConfig()`/rate-limit pattern as `/api/passages`) and
+`src/components/SimilarPokemon.tsx` (embla-carousel-react — first UI library
+in this repo beyond `@coveo/headless`/Next — real card data: sprite, name,
+dex number, type chips, a genuine "Strong in: X, Y" line from the Pokemon's
+own two highest stats, no price/rating since Pokemon have no equivalent).
+Mounted between `Tabs` and `AskAboutPokemon` on the PDP.
+
+**`docs/adr/0014-recommendation-strategy.md`** (Branch B decision, written
+earlier this session) and **`docs/adr/0015-similar-pokemon-server-route.md`**
+(new — explains why `/api/similar` is a third server-route exception to
+ADR-0004 for a *different* reason than `/api/token`/`/api/passages`: it needs
+no privileged credential, a plain client-side `fetch()` would work fine
+security-wise, but routing it server-side avoids a second Headless
+controller/engine clobbering the PDP's shared-engine query state).
+
+**`.async-panel` CSS (grid `0fr`→`1fr` collapse/expand + reduced-motion
+override) added to `src/app/globals.css`** — didn't exist yet; this carousel
+is its first consumer, ready for `GeneratedAnswer`/`AskAboutPokemon`/
+`ResultList` to reuse when Doc 4's remaining work happens.
+
+**One real pre-existing bug found and fixed, unrelated to this feature**: a
+literal NUL byte had sat inside `mapPokemonResult.ts`'s `zipEvolutionTargets`
+dedup-key template literal (`` `${name}\0${imageUrl}` `` instead of a space)
+since commit `8464fe0` (eleventh session) — invisible in editors/Read output,
+which is why `git diff` had silently shown that file as "Binary files
+differ" for nine sessions without anyone investigating why. Found while
+reviewing this session's diff to that file (the carousel work exported
+`asString` from it). Fixed in its own commit, same dedup semantics, verified
+207/207 tests still pass.
+
+**Verification, all real**: `npm run lint`, `npm run typecheck` clean.
+`npm test` — 207/207 (31 files). `npm run test:coverage` — 99.33%
+statements/99.32% lines, `/api/similar/route.ts` itself 100%
+statements/functions/lines. `npm run build` succeeds, `/api/similar` listed
+as a dynamic route. Manual: Playwright against the running dev server on
+`/pokemon/Eevee` confirmed the carousel renders below Tabs, above "Ask about
+Eevee," with six genuinely same-type (Normal), non-self Pokemon and no
+console errors.
+
+**Not done this session**: items 2 (home hero carousel + PDP Highlights,
+Doc 3 §5) and 3 (rest of Doc 4 — `GeneratedAnswer`/`AskAboutPokemon`/
+`ResultList`) of the three-item build order are still open.
 
 ## Nineteenth session — scoped four follow-up execution plans (no implementation yet)
 

@@ -487,6 +487,38 @@ body {
 }
 
 /*
+ * Async idle/loading/success/error contract
+ * (docs/EXECUTION-PLAN-async-ui-states.md). Every Coveo-or-own-API-backed
+ * component keeps one persistent wrapper mounted across all four states —
+ * no `return null`, no conditional mount/unmount — and toggles
+ * `data-open="true"/"false"` on it instead. Declarative CSS-grid
+ * collapse/expand, no JS height measurement: a `0fr` row collapses the
+ * content to zero height without `display: none` (which would skip the
+ * animation entirely), and `overflow: hidden` on the direct child clips
+ * content that would otherwise still take layout space at `0fr`.
+ *
+ * First consumer is SimilarPokemon.tsx; GeneratedAnswer.tsx and
+ * AskAboutPokemon.tsx are follow-up work (see that plan doc's §3) that
+ * should reuse this class rather than each defining their own.
+ */
+.async-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 260ms ease;
+}
+.async-panel[data-open="true"] {
+  grid-template-rows: 1fr;
+}
+.async-panel > * {
+  overflow: hidden;
+}
+@media (prefers-reduced-motion: reduce) {
+  .async-panel {
+    transition: none;
+  }
+}
+
+/*
  * Global focus ring (v4 plan §3.2) — the second of --signal-red's exactly-
  * two permitted uses (the Pokeball glyph, above, is the first). A single
  * `:focus-visible` rule rather than a per-component ring utility, so every

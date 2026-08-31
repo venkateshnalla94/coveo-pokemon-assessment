@@ -107,6 +107,12 @@ export const CONTENT = {
     noPassagesFound: "No relevant passages found for that question.",
     passageLabel: (index: number) => `Passage ${index}`,
     relevanceLabel: (percent: string) => `Relevance: ${percent}%`,
+    similarHeading: (name: string) => `Similar to ${name}`,
+    similarLoadingLabel: "Loading similar Pokemon...",
+    similarErrorMessage: "Couldn't load similar Pokemon right now.",
+    similarEmptyMessage: (name: string) => `No similar Pokemon found for ${name}.`,
+    similarStrongInPrefix: "Strong in:",
+    similarViewLabel: "View Pokemon",
   },
 
   answer: {
