@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CONTENT } from "@/content/pokedex";
+import { resolveServerCoveoConfig } from "@/coveo/config";
 import { fetchPokemonMetadata } from "@/coveo/serverPokemonLookup";
 import { SITE_URL } from "@/siteUrl";
 import PokemonDetailPageClient from "./PokemonDetailPageClient";
@@ -53,21 +54,33 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
  * "not found" render branch stays as a safety net for the rarer case where
  * this lookup succeeds but the client's own exact-match re-check doesn't
  * (see that component's own comment on why the re-check exists).
+ *
+ * `fetchPokemonMetadata` returns null both for a genuine no-match and for an
+ * unconfigured server (no COVEO_API_KEY/org id — every CI run, fork, and
+ * preview build without `.env.local`). Only the first case should 404: an
+ * unconfigured server has no way to know whether the name is real, and must
+ * fall through to the client component so it can still render the
+ * "Home / <name>" Breadcrumb and CoveoConfigBanner, same as `/` and
+ * `/search` do when unconfigured.
  */
 export default async function PokemonDetailPage({ params }: PageProps) {
   const { name } = await params;
   const pokemon = await fetchPokemonMetadata(decodeURIComponent(name));
+  const serverConfig = resolveServerCoveoConfig();
+  const serverConfigured = Boolean(serverConfig.organizationId && serverConfig.apiKey);
 
-  if (!pokemon) {
+  if (!pokemon && serverConfigured) {
     notFound();
   }
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(buildBreadcrumbJsonLd(pokemon.name)) }}
-      />
+      {pokemon && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(buildBreadcrumbJsonLd(pokemon.name)) }}
+        />
+      )}
       <PokemonDetailPageClient />
     </>
   );
