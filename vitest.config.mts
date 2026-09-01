@@ -47,6 +47,7 @@ export default defineConfig({
         "src/coveo/searchRenderState.ts",
         "src/coveo/config.ts",
         "src/coveo/typeColors.ts",
+        "src/coveo/serverPokemonLookup.ts",
         "src/app/api/token/route.ts",
         "src/app/api/passages/route.ts",
         "src/app/api/similar/route.ts",

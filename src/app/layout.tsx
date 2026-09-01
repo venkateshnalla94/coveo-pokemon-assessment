@@ -6,6 +6,7 @@ import { CompareProvider } from "@/components/compare/CompareProvider";
 import { CompareTray } from "@/components/compare/CompareTray";
 import { CONTENT } from "@/content/pokedex";
 import { typeCssVariables } from "@/coveo/typeColors";
+import { SITE_URL } from "@/siteUrl";
 import "./globals.css";
 
 // Display face — page/section headings, Pokemon names, tab labels. Only
@@ -39,9 +40,28 @@ const plexMono = IBM_Plex_Mono({
   weight: ["400", "500"],
 });
 
+// Real marketing asset (Doc 3, twentieth session), not a fabricated
+// placeholder — used as the default og:image/twitter:image for any route
+// that doesn't set its own (e.g. a PDP overrides this with the Pokemon's
+// own sprite).
+const DEFAULT_SOCIAL_IMAGES = CONTENT.art.homeBanner ? [CONTENT.art.homeBanner] : undefined;
+
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: CONTENT.brand.name,
   description: CONTENT.brand.tagline,
+  openGraph: {
+    title: CONTENT.brand.name,
+    description: CONTENT.brand.tagline,
+    images: DEFAULT_SOCIAL_IMAGES,
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: CONTENT.brand.name,
+    description: CONTENT.brand.tagline,
+    images: DEFAULT_SOCIAL_IMAGES,
+  },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

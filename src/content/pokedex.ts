@@ -165,4 +165,21 @@ export const CONTENT = {
     homeBanner: "/art/home-banner.webp" as string | undefined,
     emptySearch: "/art/empty-search.webp" as string | undefined,
   },
+
+  /**
+   * Per-route <title>/description overrides — see
+   * docs/EXECUTION-PLAN-seo.md Phase 1. `titlePrefix` is composed with
+   * CONTENT.brand.name by the route's layout.tsx, not duplicated here.
+   */
+  seo: {
+    search: {
+      titlePrefix: "Search Pokemon",
+      description:
+        "Search and filter every Pokemon indexed from pokemondb.net by type, generation, abilities, and more.",
+    },
+    compare: {
+      titlePrefix: "Compare Pokemon",
+      description: "Compare base stats, types, and abilities for up to four Pokemon side by side.",
+    },
+  },
 } as const;
