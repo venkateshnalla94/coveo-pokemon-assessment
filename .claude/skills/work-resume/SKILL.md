@@ -8,9 +8,7 @@ description: Resume pending project work for one bounded task per session — fr
 Runs one session's worth of project work end to end, then stops — deliberately, so
 a session never tries to burn through the whole backlog and blow its context
 budget. One task (or one user-approved batch) in, one clean handoff out, every
-time. This is the mechanism behind the `docs/PROMPT-execute-*.md` pattern
-already used in this repo (e.g. `docs/PROMPT-execute-responsive-ui.md`) —
-this skill both consumes that pattern and produces the next one.
+time.
 
 ## 0. Pick the task source
 
@@ -84,7 +82,7 @@ ADR already permits it, no fabricated Pokemon data.
 
 ## 5. Close out the paperwork
 
-Do all four, in order, before ending the session:
+Do all three, in order, before ending the session:
 
 1. **Update the execution plan doc** (the one from step 0, or create one if
    none existed) with what fraction of its scope is now done, and the doc
@@ -103,16 +101,17 @@ Do all four, in order, before ending the session:
 3. **Log docs read** in HANDOFF.md's docs-read section for the session, even
    if step 5.2's entry already mentions some inline — keep the dedicated log
    section current so a future session can grep it.
-4. **Write the next-session prompt.** Create (or overwrite)
-   `docs/PROMPT-<short-task-slug>.md` following the exact pattern of
-   `docs/PROMPT-execute-responsive-ui.md`: a short framing paragraph (what to
-   read first, that it's a plain prompt doc since this repo has no
-   `.claude/commands/`), then a pasteable block that names the next single
-   task (or the next user-approved batch) — not the whole remaining backlog —
-   telling the next session exactly what to read, what's already decided
-   (don't re-litigate), and what "done" looks like. This is the mechanism
-   that keeps each future session scoped to one task's worth of context
-   instead of re-deriving everything from a sprawling backlog.
+
+Then, in the chat response itself (not a file), give the user a ready-to-paste
+prompt for the next session: what to read first (HANDOFF.md's new entry, and
+the plan doc if one exists), a pasteable block naming the next single task
+(or the next user-approved batch) — not the whole remaining backlog — stating
+what's already decided (don't re-litigate) and what "done" looks like. This
+is the mechanism that keeps each future session scoped to one task's worth of
+context instead of re-deriving everything from a sprawling backlog. Don't
+write this to a `docs/PROMPT-*.md` file — HANDOFF.md and the plan doc are
+already the durable record; the prompt itself is disposable and belongs in
+the conversation, not as a new file to maintain each session.
 
 ## Why this shape
 
