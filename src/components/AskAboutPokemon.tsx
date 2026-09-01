@@ -162,7 +162,7 @@ export function AskAboutPokemon({ pokemonName, pokemonTypes }: AskAboutPokemonPr
                   data-has-type={Boolean(typeColor)}
                   style={{ ...typeVars, animationDelay: `${index * 90}ms` }}
                 >
-                  <div className="mb-1 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 font-mono text-[10px] text-shell-400">
+                  <div className="mb-1 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 font-mono text-[10px] text-shell-500">
                     <span>{CONTENT.pdp.passageLabel(index + 1)}</span>
                     <span>{CONTENT.pdp.relevanceLabel((passage.relevanceScore * 100).toFixed(1))}</span>
                   </div>
@@ -172,7 +172,7 @@ export function AskAboutPokemon({ pokemonName, pokemonTypes }: AskAboutPokemonPr
                       not a link — same "⟶ retrieved from:" scan-tag motif as
                       RGA's citations (GeneratedAnswer.tsx), for one consistent
                       attribution language across both AI surfaces. */}
-                  <p className="mb-2 flex items-center gap-1.5 font-mono text-[10px] text-shell-400">
+                  <p className="mb-2 flex items-center gap-1.5 font-mono text-[10px] text-shell-500">
                     <span aria-hidden="true">&#10230;</span>
                     <span>
                       {CONTENT.answer.citationPrefix} {passage.document.title}

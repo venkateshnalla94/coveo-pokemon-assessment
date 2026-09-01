@@ -1,6 +1,6 @@
 # Coveo Pokemon Challenge — Execution Plan: A11y Remediation
 
-**Status: Phase 1 done, Phase 2 (color contrast) not started.** Scoped thirtieth session (a11y-scan-finding writeup), expanded with a full audit run the thirty-first session, Phase 1 executed the thirty-second session. Tracks the four real, pre-existing violations `tests/e2e/a11y-scan.spec.ts` found and allowlisted rather than fixed (`docs/archive/EXECUTION-PLAN-quick-improvements.md`'s Phase 2), plus `docs/HANDOFF.md`'s "Thirtieth session" entry.
+**Status: complete.** Scoped thirtieth session (a11y-scan-finding writeup), expanded with a full audit run the thirty-first session, Phase 1 executed the thirty-second session, Phase 2 executed the thirty-third session. Tracks the four real, pre-existing violations `tests/e2e/a11y-scan.spec.ts` found and allowlisted rather than fixed (`docs/archive/EXECUTION-PLAN-quick-improvements.md`'s Phase 2), plus `docs/HANDOFF.md`'s "Thirtieth session" entry.
 
 ## Context
 
@@ -49,16 +49,23 @@ Home: 4 nodes (`.mb-8.w-full`, a `<p>`, an `<h2>`, `.mt-12 > .w-full > .overflow
 - **The actual PDP finding was a test bug, not a markup bug**: `tests/e2e/a11y-scan.spec.ts`'s PDP test never waited for the async search-based content to resolve before calling `analyze()` (unlike its `/search` test, which already waited on `.result-tile`), so axe was scanning the loading skeleton — which has no landmark or heading — not the real page. Fixed by adding `await expect(page.locator("h1")).toBeVisible()` before the scan, matching the `/search` test's pattern.
 - `KNOWN_PRE_EXISTING_RULE_IDS` in `tests/e2e/a11y-scan.spec.ts` now only contains `"color-contrast"`.
 
-## Phase 2 — color contrast
+## Phase 2 — color contrast — done, thirty-third session
 
-- [ ] Decide the token fix shape (see Finding 1's two sub-decisions) — this needs a quick live contrast check against both light and dark backgrounds before picking values, not a guess.
-- [ ] Apply the fix (token edit and/or usage-site swap) across every flagged call site.
-- [ ] Re-run with `color-contrast` re-enabled to confirm it clears on all four routes, light and dark.
+- [x] Decide the token fix shape (see Finding 1's two sub-decisions) — this needs a quick live contrast check against both light and dark backgrounds before picking values, not a guess.
+- [x] Apply the fix (token edit and/or usage-site swap) across every flagged call site.
+- [x] Re-run with `color-contrast` re-enabled to confirm it clears on all four routes, light and dark.
 
-## Verification — run before calling this plan done
+**Decisions made, computed rather than guessed** (`node` script checking WCAG relative-luminance contrast against every background the flagged text actually sits on):
 
-- [ ] Remove entries from `KNOWN_PRE_EXISTING_RULE_IDS` in `tests/e2e/a11y-scan.spec.ts` as each is fixed (or all four at once at the end) — the array should be empty (and probably deleted, with `disableRules()` calls removed) once both phases land.
-- [ ] `npm run test:e2e` — `a11y-scan.spec.ts` passes with no disabled rules, against a real configured org.
-- [ ] Manual visual check in both light and dark mode — a contrast fix that clears axe but looks visually broken (e.g. text too dark against its actual card background, not just the page background axe sampled) is not done.
-- [ ] `npm run lint`, `npm run typecheck`, `npm test` clean.
-- [ ] Update `docs/HANDOFF.md` with a session entry (this changes app-visible behavior: color tokens, heading structure, DOM landmarks).
+- **`--shell-400` stays untouched; a new `--shell-500` token was added for text only.** `--shell-400` (`#767d8e`) has three non-text consumers in this file — `.stat-bar-fill`'s fill color, `.evo-stage[data-current]`'s ring, `.pokedex-cursor`'s blink — all decorative, where contrast rules don't apply and darkening the shared variable would have been an unrelated visual change to those. Computed contrast also showed `--shell-400` fails in **both** color schemes, not just light as assumed going in: 3.78:1 on `--shell-050` (light) and 3.90:1 on `--shell-800` (dark surface, the actual dark-mode background most of this text sits on) — `--shell-400` itself is never redefined per scheme, so both needed a fix, not just light.
+- **`--shell-500` values**: `#616777` in `:root` (5.19:1 against `--shell-050`, 5.65:1 against `--shell-000`, the two light backgrounds text sits on), overridden to `#8e94a3` inside the existing `@media (prefers-color-scheme: dark)` block (5.95:1 against `--shell-900`, 5.29:1 against `--shell-800`). A single `text-shell-500` class works in both schemes with no `dark:` variant, since the variable itself flips.
+- **`text-black/40`/`dark:text-white/40` replaced with `text-shell-500` at every real-text call site** (facet-value counts, facet no-matches text, the image-placeholder label) — decision was "token entirely," not a higher opacity value, so this muted-text style has one definition instead of two systems. The four "×" close-button call sites (`SearchSummaryBar`, `FilterDrawer`, `CompareTray`) kept their `hover:text-black dark:hover:text-white` full-contrast hover state, only the resting-state opacity swapped. The `marker:text-black/40 dark:marker:text-white/40` disclosure-triangle color (three `<summary>` elements) was left alone — decorative, not text, and not what axe flagged.
+- **One violation found by the live re-run that neither this doc's original findings nor the thirty-first session's audit had caught**: `GeneratedAnswer.tsx`'s `ScanSequence` used `text-shell-200` for the "pending" RGA step label (`searching`/`thinking`/`answering` before that step starts) — 1.49:1 against `--shell-050`, since `--shell-200` is a light-mode near-background gray. This only surfaces once a step is genuinely pending (not yet reached), which the original click-through/audit states didn't happen to catch. Fixed by collapsing `completed`/`pending` to the same `text-shell-500` (the `active` step already carries its own distinct `text-foreground underline` treatment, so the three-way visual distinction was optional, not information-bearing — no accessible-contrast tier exists between "foreground" and the muted `--shell-500` floor already established above).
+
+## Verification — done, thirty-third session
+
+- [x] Remove entries from `KNOWN_PRE_EXISTING_RULE_IDS` in `tests/e2e/a11y-scan.spec.ts` as each is fixed (or all four at once at the end) — the array should be empty (and probably deleted, with `disableRules()` calls removed) once both phases land. Deleted the array and every `disableRules()` call entirely.
+- [x] `npm run test:e2e` — `a11y-scan.spec.ts` passes with no disabled rules, against a real configured org. 4/4 pass (confirmed with `NEXT_PUBLIC_COVEO_ORGANIZATION_ID` etc. sourced from `.env.local` into the shell — the Playwright test process itself needs these env vars, not just the `next build && next start` it spawns as a webServer).
+- [x] Manual visual check in both light and dark mode — a contrast fix that clears axe but looks visually broken (e.g. text too dark against its actual card background, not just the page background axe sampled) is not done. Screenshotted all four routes at 1280×900 in both `colorScheme: "light"`/`"dark"` via a scratch Playwright script (deleted after use, not committed) — muted text reads clearly in both, no layout shift from the class swaps.
+- [x] `npm run lint`, `npm run typecheck`, `npm test` clean. Also re-ran `search.spec.ts`, `ask-about-pokemon.spec.ts`, `a11y-motion.spec.ts` (16/16) against the real org — no regressions from the class-name changes. `npm run test:coverage` unaffected (98.46%/92.05%/96.29%/98.44%, no coverage-gated file touched). `npm run build` succeeds.
+- [x] Update `docs/HANDOFF.md` with a session entry (this changes app-visible behavior: color tokens, heading structure, DOM landmarks).

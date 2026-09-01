@@ -19,6 +19,19 @@
   --shell-050: #f4f5f8;
   --shell-000: #ffffff;
 
+  /* Text-only muted gray, kept separate from --shell-400 (docs/EXECUTION-PLAN-a11y-remediation.md
+     Phase 2): --shell-400 measures 3.78:1 on --shell-050 and 3.90:1 on
+     --shell-800 as text, below WCAG AA's 4.5:1 — but it's also used
+     non-text/decoratively (StatBar fill, evo-stage current-stage ring,
+     RGA cursor blink in this file), where contrast rules don't apply and
+     darkening it would just be an unrelated visual change. --shell-500 is
+     for text only; darkened further than --shell-400 and swapped to a
+     lighter value in dark mode below, so a single `text-shell-500` class
+     (no `dark:` variant needed) clears 4.5:1 against every background this
+     app renders muted text on (verified: 5.19:1 light / 5.95:1 dark, the
+     tightest of the four background combinations checked).  */
+  --shell-500: #616777;
+
   --signal-red: #e3350d;
   --signal-glow: #ff6b4a;
 
@@ -54,6 +67,7 @@
   --color-shell-100: var(--shell-100);
   --color-shell-050: var(--shell-050);
   --color-shell-000: var(--shell-000);
+  --color-shell-500: var(--shell-500);
 
   --color-signal-red: var(--signal-red);
   --color-signal-glow: var(--signal-glow);
@@ -87,6 +101,7 @@
     --background: var(--shell-900);
     --foreground: var(--shell-100);
     --surface: var(--shell-800);
+    --shell-500: #8e94a3;
   }
 }
 

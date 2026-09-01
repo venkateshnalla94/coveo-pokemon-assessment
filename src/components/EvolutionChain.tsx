@@ -57,7 +57,7 @@ export function EvolutionChain({
 }: EvolutionChainProps) {
   if (!from && to.length === 0) {
     return (
-      <p className="text-sm text-shell-400">{CONTENT.pdp.noEvolutionData(current)}</p>
+      <p className="text-sm text-shell-500">{CONTENT.pdp.noEvolutionData(current)}</p>
     );
   }
 
@@ -80,7 +80,7 @@ export function EvolutionChain({
               {from.name}
             </Link>
           </li>
-          <li aria-hidden="true" className="font-mono-label text-shell-400">
+          <li aria-hidden="true" className="font-mono-label text-shell-500">
             &rarr;
           </li>
         </>
@@ -101,7 +101,7 @@ export function EvolutionChain({
       </li>
       {to.map((target, index) => (
         <li key={`${target.name}-${index}`} className="flex items-center gap-3">
-          <span aria-hidden="true" className="font-mono-label text-shell-400">
+          <span aria-hidden="true" className="font-mono-label text-shell-500">
             &rarr;
           </span>
           <Link

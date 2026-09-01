@@ -91,7 +91,7 @@ export function Tabs({ tabs }: TabsProps) {
               className={
                 selected
                   ? "font-mono-label border-b-2 border-signal-red px-3 py-2 text-xs text-foreground"
-                  : "font-mono-label border-b-2 border-transparent px-3 py-2 text-xs text-shell-400 hover:text-foreground"
+                  : "font-mono-label border-b-2 border-transparent px-3 py-2 text-xs text-shell-500 hover:text-foreground"
               }
             >
               {tab.label}

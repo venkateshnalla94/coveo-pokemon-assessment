@@ -37,7 +37,7 @@ export function CompareTray() {
                   type="button"
                   aria-label={CONTENT.compare.removeFromComparisonLabel(name)}
                   onClick={() => remove(name)}
-                  className="text-black/40 hover:text-black dark:text-white/40 dark:hover:text-white"
+                  className="text-shell-500 hover:text-black dark:hover:text-white"
                 >
                   &times;
                 </button>

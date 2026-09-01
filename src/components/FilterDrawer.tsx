@@ -90,7 +90,7 @@ export function FilterDrawer({ activeFilterCount }: FilterDrawerProps) {
                 type="button"
                 onClick={() => setOpen(false)}
                 aria-label={CONTENT.search.filtersCloseLabel}
-                className="text-black/40 hover:text-black dark:text-white/40 dark:hover:text-white"
+                className="text-shell-500 hover:text-black dark:hover:text-white"
               >
                 &times;
               </button>

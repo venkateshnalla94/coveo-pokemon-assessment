@@ -32,7 +32,7 @@ export function TypeDefenses({ weaknesses, resistances }: TypeDefensesProps) {
     <div className="flex flex-col gap-4">
       {weaknesses.length > 0 && (
         <div>
-          <h3 className="font-mono-label mb-2 text-xs text-shell-400">
+          <h3 className="font-mono-label mb-2 text-xs text-shell-500">
             {CONTENT.pdp.sectionHeadings.weaknesses}
           </h3>
           <p className="flex flex-wrap items-center gap-2">
@@ -47,7 +47,7 @@ export function TypeDefenses({ weaknesses, resistances }: TypeDefensesProps) {
       )}
       {resistances.length > 0 && (
         <div>
-          <h3 className="font-mono-label mb-2 text-xs text-shell-400">
+          <h3 className="font-mono-label mb-2 text-xs text-shell-500">
             {CONTENT.pdp.sectionHeadings.resistances}
           </h3>
           <p className="flex flex-wrap items-center gap-2">

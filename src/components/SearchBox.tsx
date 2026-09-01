@@ -257,7 +257,7 @@ export function SearchBox({ onNavigate, initialQuery }: SearchBoxProps) {
           }
           value={value}
           placeholder={CONTENT.search.placeholder}
-          className="search-box-input w-full bg-transparent text-foreground outline-none placeholder:text-shell-400"
+          className="search-box-input w-full bg-transparent text-foreground outline-none placeholder:text-shell-500"
           onChange={(e) => updateText(e.target.value)}
           onFocus={() => {
             setIsFocused(true);

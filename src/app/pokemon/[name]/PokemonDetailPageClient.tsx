@@ -113,12 +113,12 @@ export default function PokemonDetailPageClient() {
           was duplicated verbatim across these two branches. Both now call
           the single CONTENT.pdp.notFoundBody function. */}
       {renderState?.status === "success" && !item && (
-        <p className="text-sm text-shell-400">
+        <p className="text-sm text-shell-500">
           {CONTENT.pdp.notFoundTitle}. {CONTENT.pdp.notFoundBody(name)}
         </p>
       )}
       {renderState?.status === "empty" && (
-        <p className="text-sm text-shell-400">
+        <p className="text-sm text-shell-500">
           {CONTENT.pdp.notFoundTitle}. {CONTENT.pdp.notFoundBody(name)}
         </p>
       )}

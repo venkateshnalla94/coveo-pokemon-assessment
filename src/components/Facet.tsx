@@ -84,7 +84,7 @@ export function Facet({ field, label, renderValue, searchable, collapsible }: Fa
       {isSearching ? (
         <ul className="space-y-1">
           {state.facetSearch.values.length === 0 && (
-            <li className="text-sm text-black/40 dark:text-white/40">{CONTENT.search.facetNoMatches}</li>
+            <li className="text-sm text-shell-500">{CONTENT.search.facetNoMatches}</li>
           )}
           {state.facetSearch.values.map((result) => (
             <li key={result.rawValue}>
@@ -102,7 +102,7 @@ export function Facet({ field, label, renderValue, searchable, collapsible }: Fa
                   <input type="checkbox" checked={false} onChange={() => facet.facetSearch.select(result)} />
                   {renderValue ? renderValue(result.rawValue) : result.displayValue}
                 </span>
-                <span className="text-black/40 dark:text-white/40">{result.count}</span>
+                <span className="text-shell-500">{result.count}</span>
               </label>
             </li>
           ))}
@@ -120,7 +120,7 @@ export function Facet({ field, label, renderValue, searchable, collapsible }: Fa
                   />
                   {renderValue ? renderValue(value.value) : value.value}
                 </span>
-                <span className="text-black/40 dark:text-white/40">{value.numberOfResults}</span>
+                <span className="text-shell-500">{value.numberOfResults}</span>
               </label>
             </li>
           ))}

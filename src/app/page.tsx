@@ -66,7 +66,7 @@ export default function Home() {
       <div className="mb-8 w-full">
         <ImageSlot name="homeBanner" ratio="16/5" label="Home hero banner" />
       </div>
-      <p className="mb-8 text-shell-400">
+      <p className="mb-8 text-shell-500">
         {CONTENT.home.heroSubtitle}
         {summaryState &&
           summaryState.hasResults &&

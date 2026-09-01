@@ -18,7 +18,7 @@ export interface BreadcrumbProps {
 
 export function Breadcrumb({ name, from }: BreadcrumbProps) {
   return (
-    <nav aria-label="Breadcrumb" className="mb-6 text-sm text-shell-400">
+    <nav aria-label="Breadcrumb" className="mb-6 text-sm text-shell-500">
       <ol className="flex flex-wrap items-center gap-1">
         <li>
           <Link href="/" className="hover:underline">

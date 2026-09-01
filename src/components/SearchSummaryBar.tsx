@@ -137,7 +137,7 @@ export function SearchSummaryBar() {
                   const { logInterfaceLoad } = loadSearchAnalyticsActions(engine);
                   engine.dispatch(executeSearch(logInterfaceLoad()));
                 }}
-                className="text-black/40 hover:text-black dark:text-white/40 dark:hover:text-white"
+                className="text-shell-500 hover:text-black dark:hover:text-white"
               >
                 &times;
               </button>
@@ -151,7 +151,7 @@ export function SearchSummaryBar() {
                   type="button"
                   aria-label={CONTENT.search.removeFilterLabel(`${value.value.value}`)}
                   onClick={() => value.deselect()}
-                  className="text-black/40 hover:text-black dark:text-white/40 dark:hover:text-white"
+                  className="text-shell-500 hover:text-black dark:hover:text-white"
                 >
                   &times;
                 </button>
@@ -169,7 +169,7 @@ export function SearchSummaryBar() {
                   type="button"
                   aria-label={CONTENT.search.removeFilterLabel(`${value.value.start}-${value.value.end}`)}
                   onClick={() => value.deselect()}
-                  className="text-black/40 hover:text-black dark:text-white/40 dark:hover:text-white"
+                  className="text-shell-500 hover:text-black dark:hover:text-white"
                 >
                   &times;
                 </button>
@@ -184,7 +184,7 @@ export function SearchSummaryBar() {
                   type="button"
                   aria-label={CONTENT.search.removeFilterLabel(`${value.value.value}`)}
                   onClick={() => value.deselect()}
-                  className="text-black/40 hover:text-black dark:text-white/40 dark:hover:text-white"
+                  className="text-shell-500 hover:text-black dark:hover:text-white"
                 >
                   &times;
                 </button>

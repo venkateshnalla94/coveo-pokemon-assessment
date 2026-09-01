@@ -168,12 +168,12 @@ function ResultCard({
           <span>{item.name}</span>
           {item.dexNumber && (
             // Present at opacity 0 at rest so nothing reflows on reveal.
-            <span className="font-mono-label shrink-0 text-xs text-shell-400 opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100">
+            <span className="font-mono-label shrink-0 text-xs text-shell-500 opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100">
               #{item.dexNumber}
             </span>
           )}
         </p>
-        {item.generation && <p className="mt-1 text-xs text-shell-400">{item.generation}</p>}
+        {item.generation && <p className="mt-1 text-xs text-shell-500">{item.generation}</p>}
         {item.types.length > 0 && (
           <p className="mt-1 flex flex-wrap items-center gap-1.5">
             {item.types.map((type) => (
@@ -206,7 +206,7 @@ function ResultCard({
           </div>
         )}
         {item.abilities.length > 0 && (
-          <p className="mt-1 truncate text-xs text-shell-400">{item.abilities.join(", ")}</p>
+          <p className="mt-1 truncate text-xs text-shell-500">{item.abilities.join(", ")}</p>
         )}
       </Link>
       {/* Outside the <Link> deliberately — sitting inside it would fire

@@ -76,7 +76,7 @@ export function GeneratedAnswer() {
       content = (
         <Panel>
           <ScanSequence generationSteps={state?.generationSteps ?? []} />
-          <p className="font-mono-label text-xs text-shell-400">{CONTENT.answer.loadingLabel}</p>
+          <p className="font-mono-label text-xs text-shell-500">{CONTENT.answer.loadingLabel}</p>
           <AnswerSkeleton />
         </Panel>
       );
@@ -138,7 +138,7 @@ function AnswerSkeleton() {
 function Panel({ children }: { children: React.ReactNode }) {
   return (
     <div className="mb-6 border-t border-shell-600/40 pt-4">
-      <h2 className="font-mono-label mb-3 text-[10px] text-shell-400">
+      <h2 className="font-mono-label mb-3 text-[10px] text-shell-500">
         {CONTENT.answer.panelLabel}
       </h2>
       {children}
@@ -168,9 +168,7 @@ function ScanSequence({ generationSteps }: { generationSteps: GenerationStep[] }
               className={
                 status === "active"
                   ? "text-foreground underline decoration-shell-400 underline-offset-4"
-                  : status === "completed"
-                    ? "text-shell-400"
-                    : "text-shell-200"
+                  : "text-shell-500"
               }
             >
               {name}
@@ -331,7 +329,7 @@ function CitationTag({
         onClick={() => interactiveCitation.select()}
         data-has-type={Boolean(color)}
         style={style}
-        className="scan-citation inline-flex items-center gap-1.5 font-mono text-[10px] text-shell-400 hover:underline"
+        className="scan-citation inline-flex items-center gap-1.5 font-mono text-[10px] text-shell-500 hover:underline"
       >
         <span aria-hidden="true">&#10230;</span>
         <span>

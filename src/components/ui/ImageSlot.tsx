@@ -39,7 +39,7 @@ export function ImageSlot({ name, ratio, label }: ImageSlotProps) {
     <div
       role="img"
       aria-label={label}
-      className="flex w-full items-center justify-center rounded-md border border-dashed border-black/20 px-4 text-center text-xs uppercase tracking-wide text-black/40 dark:border-white/20 dark:text-white/40"
+      className="flex w-full items-center justify-center rounded-md border border-dashed border-black/20 px-4 text-center text-xs uppercase tracking-wide text-shell-500 dark:border-white/20"
       style={{ aspectRatio: ratio }}
     >
       {label}

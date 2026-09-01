@@ -229,7 +229,7 @@ function SimilarPokemonCard({ item }: { item: SimilarPokemonItem }) {
         <p className="font-display mt-2 flex items-baseline justify-between gap-2 text-sm font-semibold text-foreground underline decoration-transparent decoration-2 underline-offset-2 transition-colors group-hover:decoration-current group-focus-within:decoration-current">
           <span>{item.name}</span>
           {item.dexNumber && (
-            <span className="font-mono-label shrink-0 text-xs text-shell-400">
+            <span className="font-mono-label shrink-0 text-xs text-shell-500">
               #{item.dexNumber}
             </span>
           )}
@@ -248,7 +248,7 @@ function SimilarPokemonCard({ item }: { item: SimilarPokemonItem }) {
           </p>
         )}
         {highlights.length > 0 && (
-          <p className="mt-1 truncate text-xs text-shell-400">
+          <p className="mt-1 truncate text-xs text-shell-500">
             {CONTENT.pdp.similarStrongInPrefix} {highlights.join(", ")}
           </p>
         )}

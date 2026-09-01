@@ -37,14 +37,14 @@ export function PokemonStatPanel({ stats, total, types }: PokemonStatPanelProps)
       className="mb-6 flex flex-col gap-2 rounded-lg border border-shell-100 bg-surface p-4 dark:border-shell-600"
       style={statVars}
     >
-      <h2 className="font-mono-label mb-1 text-xs text-shell-400">
+      <h2 className="font-mono-label mb-1 text-xs text-shell-500">
         {CONTENT.pdp.sectionHeadings.stats}
       </h2>
       {STAT_ORDER.map(({ key, label }) => (
         <StatBar key={key} label={label} value={stats[key]} />
       ))}
       <div className="mt-1 flex items-center gap-2 border-t border-shell-100 pt-2 text-xs font-semibold text-foreground dark:border-shell-600">
-        <span className="font-mono-label w-16 shrink-0 text-shell-400">
+        <span className="font-mono-label w-16 shrink-0 text-shell-500">
           {CONTENT.pdp.statsTotalLabel}
         </span>
         <span className="font-mono tabular-nums">{total ?? "—"}</span>

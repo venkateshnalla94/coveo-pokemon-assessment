@@ -98,7 +98,7 @@ function ComparePageContent() {
 
   return (
     <main className="mx-auto w-full max-w-7xl px-6 py-10">
-      <Link href="/" className="mb-6 inline-block text-sm text-shell-400 hover:underline hover:text-foreground">
+      <Link href="/" className="mb-6 inline-block text-sm text-shell-500 hover:underline hover:text-foreground">
         {CONTENT.compare.backLinkLabel}
       </Link>
       <h1 className="font-display mb-6 text-3xl font-bold text-foreground">{CONTENT.compare.pageTitle}</h1>
@@ -106,7 +106,7 @@ function ComparePageContent() {
       {!configured && <CoveoConfigBanner />}
 
       {names.length === 0 && configured && (
-        <p className="text-sm text-shell-400">
+        <p className="text-sm text-shell-500">
           {CONTENT.compare.emptySelectionMessage}
         </p>
       )}
@@ -116,7 +116,7 @@ function ComparePageContent() {
         <p className="text-sm text-red-600 dark:text-red-400">{renderState.error.userMessage}</p>
       )}
       {renderState?.status === "empty" && names.length > 0 && (
-        <p className="text-sm text-shell-400">
+        <p className="text-sm text-shell-500">
           {CONTENT.compare.notFoundMessage}
         </p>
       )}
@@ -141,7 +141,7 @@ function ComparePageContent() {
             </thead>
             <tbody>
               <tr>
-                <th className="sticky left-0 z-10 bg-surface p-2 text-left font-normal text-shell-400">
+                <th className="sticky left-0 z-10 bg-surface p-2 text-left font-normal text-shell-500">
                   {CONTENT.compare.rowLabels.type}
                 </th>
                 {items.map((item) => (
@@ -155,7 +155,7 @@ function ComparePageContent() {
                 ))}
               </tr>
               <tr>
-                <th className="sticky left-0 z-10 bg-surface p-2 text-left font-normal text-shell-400">
+                <th className="sticky left-0 z-10 bg-surface p-2 text-left font-normal text-shell-500">
                   {CONTENT.compare.rowLabels.height}
                 </th>
                 {items.map((item) => (
@@ -165,7 +165,7 @@ function ComparePageContent() {
                 ))}
               </tr>
               <tr>
-                <th className="sticky left-0 z-10 bg-surface p-2 text-left font-normal text-shell-400">
+                <th className="sticky left-0 z-10 bg-surface p-2 text-left font-normal text-shell-500">
                   {CONTENT.compare.rowLabels.weight}
                 </th>
                 {items.map((item) => (
@@ -175,7 +175,7 @@ function ComparePageContent() {
                 ))}
               </tr>
               <tr>
-                <th className="sticky left-0 z-10 bg-surface p-2 text-left font-normal text-shell-400">
+                <th className="sticky left-0 z-10 bg-surface p-2 text-left font-normal text-shell-500">
                   {CONTENT.compare.rowLabels.abilities}
                 </th>
                 {items.map((item) => (
@@ -194,7 +194,7 @@ function ComparePageContent() {
               </tr>
               {STAT_ORDER.map(({ key, label }) => (
                 <tr key={key}>
-                  <th className="sticky left-0 z-10 border-t border-shell-100 bg-surface p-2 text-left font-normal text-shell-400 dark:border-shell-600">
+                  <th className="sticky left-0 z-10 border-t border-shell-100 bg-surface p-2 text-left font-normal text-shell-500 dark:border-shell-600">
                     {label}
                   </th>
                   {items.map((item) => (

@@ -77,7 +77,7 @@ export function BrowseByType() {
                     {/* eslint-disable-next-line @next/next/no-img-element -- small local SVG, next/image's optimizer requires dangerouslyAllowSVG for local SVGs and buys nothing for a fixed 56px icon */}
                     <img src={`/art/types/${type.toLowerCase()}.svg`} alt="" className="size-full" />
                   </span>
-                  <span className="text-[10px] font-medium uppercase tracking-wide text-shell-400">
+                  <span className="text-[10px] font-medium uppercase tracking-wide text-shell-500">
                     {type}
                   </span>
                 </Link>

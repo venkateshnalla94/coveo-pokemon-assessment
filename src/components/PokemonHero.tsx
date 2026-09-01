@@ -69,7 +69,7 @@ export function PokemonHero({
         {dexNumber && (
           <span
             aria-hidden="true"
-            className="font-mono pointer-events-none absolute inset-0 flex items-center justify-center text-[7rem] font-bold text-shell-400/15 select-none sm:text-[9rem]"
+            className="font-mono pointer-events-none absolute inset-0 flex items-center justify-center text-[7rem] font-bold text-shell-500/15 select-none sm:text-[9rem]"
           >
             #{dexNumber}
           </span>
@@ -86,11 +86,11 @@ export function PokemonHero({
       </div>
 
       <div className="flex flex-col gap-2 text-center sm:pt-2 sm:text-left">
-        {dexNumber && <p className="font-mono-label text-xs text-shell-400">#{dexNumber}</p>}
+        {dexNumber && <p className="font-mono-label text-xs text-shell-500">#{dexNumber}</p>}
         <h1 className="font-display text-(length:--text-3xl) font-bold text-foreground">
           {name}
         </h1>
-        {species && <p className="text-sm text-shell-400">{species}</p>}
+        {species && <p className="text-sm text-shell-500">{species}</p>}
         {types.length > 0 && (
           <p className="mt-1 flex flex-wrap items-center justify-center gap-1.5 sm:justify-start">
             {types.map((type) => (

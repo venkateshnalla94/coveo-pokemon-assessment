@@ -56,7 +56,7 @@ export function FacetSpeed({ collapsible }: { collapsible?: boolean } = {}) {
                   />
                   {label}
                 </span>
-                <span className="text-black/40 dark:text-white/40">{value.numberOfResults}</span>
+                <span className="text-shell-500">{value.numberOfResults}</span>
               </label>
             </li>
           );
