@@ -29,16 +29,19 @@ describe("POST /api/passages", () => {
     vi.unstubAllGlobals();
   });
 
-  it("returns 503 when the server is not configured", async () => {
+  it("returns 503 with a NOT_CONFIGURED error envelope when the server is not configured", async () => {
     vi.stubEnv("NEXT_PUBLIC_COVEO_ORGANIZATION_ID", "");
     vi.stubEnv("COVEO_API_KEY", "");
 
     const response = await POST(postRequest({ query: "how does this evolve" }));
 
     expect(response.status).toBe(503);
+    await expect(response.json()).resolves.toEqual({
+      error: { code: "NOT_CONFIGURED", message: expect.any(String) },
+    });
   });
 
-  it("returns 400 on invalid JSON body", async () => {
+  it("returns 400 with an INVALID_BODY error envelope on invalid JSON body", async () => {
     configureEnv();
     const request = new NextRequest("http://localhost/api/passages", {
       method: "POST",
@@ -49,6 +52,9 @@ describe("POST /api/passages", () => {
     const response = await POST(request);
 
     expect(response.status).toBe(400);
+    await expect(response.json()).resolves.toEqual({
+      error: { code: "INVALID_BODY", message: expect.any(String) },
+    });
   });
 
   it("returns 400 when query is missing or empty", async () => {
@@ -56,6 +62,9 @@ describe("POST /api/passages", () => {
 
     const missing = await POST(postRequest({}));
     expect(missing.status).toBe(400);
+    await expect(missing.json()).resolves.toEqual({
+      error: { code: "INVALID_BODY", message: expect.any(String) },
+    });
 
     const empty = await POST(postRequest({ query: "   " }));
     expect(empty.status).toBe(400);
@@ -131,6 +140,9 @@ describe("POST /api/passages", () => {
     const response = await POST(postRequest({ query: "evolve" }));
 
     expect(response.status).toBe(403);
+    await expect(response.json()).resolves.toEqual({
+      error: { code: "UPSTREAM_FAILURE", message: expect.any(String) },
+    });
   });
 
   it("returns 502 for any other upstream failure", async () => {
@@ -140,6 +152,9 @@ describe("POST /api/passages", () => {
     const response = await POST(postRequest({ query: "evolve" }));
 
     expect(response.status).toBe(502);
+    await expect(response.json()).resolves.toEqual({
+      error: { code: "UPSTREAM_FAILURE", message: expect.any(String) },
+    });
   });
 
   it("rate limits after RATE_LIMIT_MAX_REQUESTS requests from the same client within the window", async () => {
@@ -153,5 +168,8 @@ describe("POST /api/passages", () => {
     }
 
     expect(lastResponse!.status).toBe(429);
+    await expect(lastResponse!.json()).resolves.toEqual({
+      error: { code: "RATE_LIMITED", message: expect.any(String) },
+    });
   });
 });

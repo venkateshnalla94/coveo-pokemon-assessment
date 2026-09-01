@@ -4,6 +4,9 @@ import { resolveServerCoveoConfig } from "@/coveo/config";
 import { POKEMON_FIELDS } from "@/coveo/fields";
 import { asNumber, asString, toStringArray, type PokemonStats } from "@/coveo/mapPokemonResult";
 import { SEARCH_HUB } from "@/coveo/searchConfig";
+import { jsonError } from "@/utils/apiError";
+import { createRateLimiter } from "@/utils/apiRateLimit";
+import { requireNonEmptyString, requireNonEmptyStringArray } from "@/utils/validateRequestBody";
 
 const NUMBER_OF_RESULTS = 6;
 const MAX_TYPES = 10;
@@ -44,41 +47,21 @@ interface SimilarRequestBody {
  */
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX_REQUESTS = 20;
-const buckets = new Map<string, { count: number; windowStart: number }>();
-
-function isRateLimited(clientId: string): boolean {
-  const now = Date.now();
-  const bucket = buckets.get(clientId);
-
-  if (!bucket || now - bucket.windowStart > RATE_LIMIT_WINDOW_MS) {
-    buckets.set(clientId, { count: 1, windowStart: now });
-    return false;
-  }
-
-  bucket.count += 1;
-  return bucket.count > RATE_LIMIT_MAX_REQUESTS;
-}
-
-function isNonEmptyStringArray(value: unknown): value is string[] {
-  return (
-    Array.isArray(value) &&
-    value.length > 0 &&
-    value.every((entry) => typeof entry === "string" && entry.trim().length > 0)
-  );
-}
+const rateLimiter = createRateLimiter(RATE_LIMIT_WINDOW_MS, RATE_LIMIT_MAX_REQUESTS);
 
 export async function POST(request: NextRequest) {
   const clientId = request.headers.get("x-forwarded-for") ?? "unknown";
 
-  if (isRateLimited(clientId)) {
-    return NextResponse.json({ error: "Too many requests." }, { status: 429 });
+  if (rateLimiter.isRateLimited(clientId)) {
+    return jsonError("RATE_LIMITED", "Too many requests.", 429);
   }
 
   const config = resolveServerCoveoConfig();
   if (!config.configured || !config.organizationId || !config.apiKey) {
-    return NextResponse.json(
-      { error: "Coveo is not configured on the server (missing COVEO_API_KEY or org ID)." },
-      { status: 503 },
+    return jsonError(
+      "NOT_CONFIGURED",
+      "Coveo is not configured on the server (missing COVEO_API_KEY or org ID).",
+      503,
     );
   }
 
@@ -86,29 +69,28 @@ export async function POST(request: NextRequest) {
   try {
     body = (await request.json()) as SimilarRequestBody;
   } catch {
-    return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
+    return jsonError("INVALID_BODY", "Invalid JSON body.", 400);
   }
 
-  if (typeof body.name !== "string" || body.name.trim().length === 0) {
-    return NextResponse.json({ error: "`name` must be a non-empty string." }, { status: 400 });
+  const nameResult = requireNonEmptyString(body.name, "name");
+  if (!nameResult.ok) {
+    return jsonError("INVALID_BODY", nameResult.message, 400);
   }
-  if (!isNonEmptyStringArray(body.types)) {
-    return NextResponse.json(
-      { error: "`types` must be a non-empty array of non-empty strings." },
-      { status: 400 },
-    );
+  const typesResult = requireNonEmptyStringArray(body.types, "types");
+  if (!typesResult.ok) {
+    return jsonError("INVALID_BODY", typesResult.message, 400);
   }
 
-  const escapedName = escapeCaqlExactMatchValue(body.name);
+  const escapedName = escapeCaqlExactMatchValue(nameResult.value);
   if (escapedName === null) {
-    return NextResponse.json({ error: "`name` contains unsupported characters." }, { status: 400 });
+    return jsonError("INVALID_BODY", "`name` contains unsupported characters.", 400);
   }
 
   const escapedTypes: string[] = [];
-  for (const type of body.types.slice(0, MAX_TYPES)) {
+  for (const type of typesResult.value.slice(0, MAX_TYPES)) {
     const escaped = escapeCaqlExactMatchValue(type);
     if (escaped === null) {
-      return NextResponse.json({ error: "`types` contains unsupported characters." }, { status: 400 });
+      return jsonError("INVALID_BODY", "`types` contains unsupported characters.", 400);
     }
     escapedTypes.push(`"${escaped}"`);
   }
@@ -134,9 +116,10 @@ export async function POST(request: NextRequest) {
   );
 
   if (!upstream.ok) {
-    return NextResponse.json(
-      { error: `Coveo Search API returned ${upstream.status}` },
-      { status: upstream.status === 403 ? 403 : 502 },
+    return jsonError(
+      "UPSTREAM_FAILURE",
+      `Coveo Search API returned ${upstream.status}`,
+      upstream.status === 403 ? 403 : 502,
     );
   }
 

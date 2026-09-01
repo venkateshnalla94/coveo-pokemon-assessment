@@ -10,6 +10,7 @@ What's in this folder and why. `HANDOFF.md` is still the single source of truth 
 ## Live reference — current state, keep in sync as the app changes
 
 - `HANDOFF.md` — session-by-session build log and current-state snapshot. Read first, every session.
+- `EXECUTION-PLAN-a11y-remediation.md` — **open, not archived.** Scopes fixing the four real a11y violations `tests/e2e/a11y-scan.spec.ts` currently allowlists rather than fixes (color contrast, missing `<main>`, missing `<h1>`, unlandmarked content).
 - `plan101.md` — the org-setup build plan, status current through Stage E3.
 - `coveo-source-spec.md` — live selector/field/mapping/IPE spec for both Coveo sources; the contract between the source config and `src/coveo/fields.ts`.
 - `passage-retrieval-pov.md` — the Bonus-tier "point of view on Passage Retrieval vs. RGA" deliverable. Direct source material for Topic 1's GenAI Q&A prep.
@@ -35,6 +36,7 @@ What's in this folder and why. `HANDOFF.md` is still the single source of truth 
 - `archive/EXECUTION-PLAN-similar-pokemon-carousel.md` — the PDP carousel that consumed the ml-recommendations decision. Read together with that doc for a complete decision → build pair.
 - `archive/EXECUTION-PLAN-responsive-ui.md` — the full mobile/tablet responsive pass (off-canvas filter drawer on `/search`, accordion facets, spacing/overflow fixes across every page). Good "screenshot verification caught a real bug the spec didn't anticipate" example: a site-wide horizontal-overflow bug in `layout.tsx`'s flex structure, found and root-caused (not just patched around) during the plan's own §9 verification step.
 - `archive/EXECUTION-PLAN-seo.md` — metadata/crawlability/soft-404/structured-data fixes across every route, plus a scoped-out stretch phase (SSR body content) declined with explicit cost/benefit reasoning rather than built by default. Good "knew when to say no to more scope" example.
+- `archive/EXECUTION-PLAN-quick-improvements.md` — automated a11y scanning in e2e (axe-core), plus a `src/utils/` extraction pulling shared logic (URL fragment encoding, API rate limiting, error envelope, request validation) out of `SearchUrlSync.tsx` and the two POST API routes. Good "found real, previously-unnoticed a11y debt via new tooling, and didn't silently expand scope to fix it" example — the debt it found is its own follow-up doc (`EXECUTION-PLAN-a11y-remediation.md`, not yet archived — still open).
 - `inspiration-from-coveo-assesment.md` — patterns mined from a sibling project, each checked against what this repo actually needed (not blindly copied). Good "knew when *not* to reuse a pattern" example.
 - `mockup-ui-analysis.md` — breaks down which mockup elements had real pokemondb.net data behind them and which didn't (rejected fabricated ones like "Rarity"/"Synergy Score"). Direct evidence for the no-fabricated-data principle and for disciplined scope decisions.
 - `pokemon-data-inventory.md` — factual survey of real pokemondb.net data, feasibility-rated. The research that grounded every v2 field decision.

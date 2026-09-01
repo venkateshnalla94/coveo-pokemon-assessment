@@ -2,6 +2,9 @@ import { NextResponse, type NextRequest } from "next/server";
 import { escapeCaqlExactMatchValue } from "@/coveo/caqlExactMatch";
 import { resolveServerCoveoConfig } from "@/coveo/config";
 import { SEARCH_HUB } from "@/coveo/searchConfig";
+import { jsonError } from "@/utils/apiError";
+import { createRateLimiter } from "@/utils/apiRateLimit";
+import { optionalString, requireNonEmptyString } from "@/utils/validateRequestBody";
 
 const MAX_QUERY_LENGTH = 500;
 const MAX_PASSAGES = 3;
@@ -39,33 +42,21 @@ interface PassagesRequestBody {
  */
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX_REQUESTS = 10;
-const buckets = new Map<string, { count: number; windowStart: number }>();
-
-function isRateLimited(clientId: string): boolean {
-  const now = Date.now();
-  const bucket = buckets.get(clientId);
-
-  if (!bucket || now - bucket.windowStart > RATE_LIMIT_WINDOW_MS) {
-    buckets.set(clientId, { count: 1, windowStart: now });
-    return false;
-  }
-
-  bucket.count += 1;
-  return bucket.count > RATE_LIMIT_MAX_REQUESTS;
-}
+const rateLimiter = createRateLimiter(RATE_LIMIT_WINDOW_MS, RATE_LIMIT_MAX_REQUESTS);
 
 export async function POST(request: NextRequest) {
   const clientId = request.headers.get("x-forwarded-for") ?? "unknown";
 
-  if (isRateLimited(clientId)) {
-    return NextResponse.json({ error: "Too many requests." }, { status: 429 });
+  if (rateLimiter.isRateLimited(clientId)) {
+    return jsonError("RATE_LIMITED", "Too many requests.", 429);
   }
 
   const config = resolveServerCoveoConfig();
   if (!config.configured || !config.organizationId || !config.apiKey) {
-    return NextResponse.json(
-      { error: "Coveo is not configured on the server (missing COVEO_API_KEY or org ID)." },
-      { status: 503 },
+    return jsonError(
+      "NOT_CONFIGURED",
+      "Coveo is not configured on the server (missing COVEO_API_KEY or org ID).",
+      503,
     );
   }
 
@@ -73,26 +64,25 @@ export async function POST(request: NextRequest) {
   try {
     body = (await request.json()) as PassagesRequestBody;
   } catch {
-    return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
+    return jsonError("INVALID_BODY", "Invalid JSON body.", 400);
   }
 
-  if (typeof body.query !== "string" || body.query.trim().length === 0) {
-    return NextResponse.json({ error: "`query` must be a non-empty string." }, { status: 400 });
+  const queryResult = requireNonEmptyString(body.query, "query");
+  if (!queryResult.ok) {
+    return jsonError("INVALID_BODY", queryResult.message, 400);
   }
-  if (body.pokemonName !== undefined && typeof body.pokemonName !== "string") {
-    return NextResponse.json({ error: "`pokemonName` must be a string when provided." }, { status: 400 });
+  const pokemonNameResult = optionalString(body.pokemonName, "pokemonName");
+  if (!pokemonNameResult.ok) {
+    return jsonError("INVALID_BODY", pokemonNameResult.message, 400);
   }
 
-  const query = body.query.slice(0, MAX_QUERY_LENGTH);
+  const query = queryResult.value.slice(0, MAX_QUERY_LENGTH);
 
   let filter: string | undefined;
-  if (body.pokemonName) {
-    const escapedName = escapeCaqlExactMatchValue(body.pokemonName);
+  if (pokemonNameResult.value) {
+    const escapedName = escapeCaqlExactMatchValue(pokemonNameResult.value);
     if (escapedName === null) {
-      return NextResponse.json(
-        { error: "`pokemonName` contains unsupported characters." },
-        { status: 400 },
-      );
+      return jsonError("INVALID_BODY", "`pokemonName` contains unsupported characters.", 400);
     }
     filter = `@pokemonname=="${escapedName}"`;
   }
@@ -116,9 +106,10 @@ export async function POST(request: NextRequest) {
   );
 
   if (!upstream.ok) {
-    return NextResponse.json(
-      { error: `Coveo Passage Retrieval returned ${upstream.status}` },
-      { status: upstream.status === 403 ? 403 : 502 },
+    return jsonError(
+      "UPSTREAM_FAILURE",
+      `Coveo Passage Retrieval returned ${upstream.status}`,
+      upstream.status === 403 ? 403 : 502,
     );
   }
 
