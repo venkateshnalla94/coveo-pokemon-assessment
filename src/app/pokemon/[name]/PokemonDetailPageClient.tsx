@@ -101,7 +101,7 @@ export default function PokemonDetailPageClient() {
       : undefined;
 
   return (
-    <div className="mx-auto w-full max-w-7xl px-6 py-10">
+    <main className="mx-auto w-full max-w-7xl px-6 py-10">
       <Breadcrumb name={name} from={from} />
       {!configured && <CoveoConfigBanner />}
       {renderState?.status === "loading" && <PokemonDetailSkeleton />}
@@ -198,7 +198,7 @@ export default function PokemonDetailPageClient() {
           </aside>
         </div>
       )}
-    </div>
+    </main>
   );
 }
 

@@ -13,6 +13,7 @@ import { ResultList } from "@/components/ResultList";
 import { SearchBox } from "@/components/SearchBox";
 import { SearchSummaryBar } from "@/components/SearchSummaryBar";
 import { SearchUrlSync } from "@/components/SearchUrlSync";
+import { CONTENT } from "@/content/pokedex";
 import { isCoveoConfigured } from "@/coveo/config";
 
 /**
@@ -37,7 +38,8 @@ function SearchPageContent() {
   const configured = isCoveoConfigured();
 
   return (
-    <div className="mx-auto w-full max-w-7xl px-6 py-10">
+    <main className="mx-auto w-full max-w-7xl px-6 py-10">
+      <h1 className="sr-only">{CONTENT.seo.search.titlePrefix}</h1>
       {configured && <SearchUrlSync />}
       <div className="mb-6">
         <SearchBox />
@@ -57,15 +59,15 @@ function SearchPageContent() {
             <FacetSpeed />
             <FacetAbilities />
           </FacetRail>
-          <main>
+          <div>
             <SearchSummaryBar />
             <DidYouMean />
             <GeneratedAnswer />
             <ResultList />
             <Pager />
-          </main>
+          </div>
         </div>
       )}
-    </div>
+    </main>
   );
 }

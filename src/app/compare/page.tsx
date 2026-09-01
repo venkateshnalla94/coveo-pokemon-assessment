@@ -97,7 +97,7 @@ function ComparePageContent() {
   const items = renderState?.status === "success" ? renderState.items : [];
 
   return (
-    <div className="mx-auto w-full max-w-7xl px-6 py-10">
+    <main className="mx-auto w-full max-w-7xl px-6 py-10">
       <Link href="/" className="mb-6 inline-block text-sm text-shell-400 hover:underline hover:text-foreground">
         {CONTENT.compare.backLinkLabel}
       </Link>
@@ -218,6 +218,6 @@ function ComparePageContent() {
           </table>
         </div>
       )}
-    </div>
+    </main>
   );
 }

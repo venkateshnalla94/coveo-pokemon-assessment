@@ -12,16 +12,14 @@ import { expect, test } from "@playwright/test";
  * live Coveo org actually returning results.
  */
 /**
- * Pre-existing, confirmed-real violations found the first time this suite
- * ran against every route (twenty-ninth session): low-contrast gray text
- * (`text-shell-400`, `text-black/40`/`text-white/40`), no `<main>`
- * landmark, no top-level heading on some pages, and page content not
- * contained in any landmark region. These are genuine bugs, not scanner
- * noise, but fixing them (color tokens + page landmark structure across
- * every route) is a separate remediation pass, not part of "add scanning."
- * Tracked in docs/EXECUTION-PLAN-quick-improvements.md's follow-up.
+ * Pre-existing, confirmed-real low-contrast gray text (`text-shell-400`,
+ * `text-black/40`/`text-white/40`) found the first time this suite ran
+ * against every route (twenty-ninth session). The landmark/heading/region
+ * violations found alongside it are fixed — see
+ * docs/EXECUTION-PLAN-a11y-remediation.md Phase 1. Contrast remains tracked
+ * as that plan's Phase 2.
  */
-const KNOWN_PRE_EXISTING_RULE_IDS = ["color-contrast", "landmark-one-main", "page-has-heading-one", "region"];
+const KNOWN_PRE_EXISTING_RULE_IDS = ["color-contrast"];
 
 test.describe("automated a11y scan (configured)", () => {
   test.skip(
@@ -45,6 +43,8 @@ test.describe("automated a11y scan (configured)", () => {
 
   test("Pokemon detail page has no axe violations", async ({ page }) => {
     await page.goto("/pokemon/pikachu");
+    await expect(page.locator("h1")).toBeVisible();
+
     const results = await new AxeBuilder({ page }).disableRules(KNOWN_PRE_EXISTING_RULE_IDS).analyze();
     expect(results.violations).toEqual([]);
   });

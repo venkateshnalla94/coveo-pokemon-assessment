@@ -1,6 +1,6 @@
 # Coveo Pokemon Challenge — Execution Plan: A11y Remediation
 
-**Status: not started.** Scoped thirtieth session (a11y-scan-finding writeup) and expanded with a full audit run this session (thirty-first). Tracks the four real, pre-existing violations `tests/e2e/a11y-scan.spec.ts` found and allowlisted rather than fixed (`docs/EXECUTION-PLAN-quick-improvements.md`'s Phase 2), plus `docs/HANDOFF.md`'s "Thirtieth session" entry.
+**Status: Phase 1 done, Phase 2 (color contrast) not started.** Scoped thirtieth session (a11y-scan-finding writeup), expanded with a full audit run the thirty-first session, Phase 1 executed the thirty-second session. Tracks the four real, pre-existing violations `tests/e2e/a11y-scan.spec.ts` found and allowlisted rather than fixed (`docs/archive/EXECUTION-PLAN-quick-improvements.md`'s Phase 2), plus `docs/HANDOFF.md`'s "Thirtieth session" entry.
 
 ## Context
 
@@ -36,11 +36,18 @@ Confirmed on home, `/search`, and PDP. Not flagged on `/compare` in this run (wo
 
 Home: 4 nodes (`.mb-8.w-full`, a `<p>`, an `<h2>`, `.mt-12 > .w-full > .overflow-hidden`). PDP: 1 node (a `<span>`). `/compare`: 1 node (`.min-w-0`). Likely resolved as a side effect of #2's `<main>` wrap — verify after that fix lands rather than treating as independent work.
 
-## Phase 1 — landmark structure (`<main>` + heading levels)
+## Phase 1 — landmark structure (`<main>` + heading levels) — done, thirty-second session
 
-- [ ] Add a real `<main>` wrapping primary content on each of the four routes.
-- [ ] Fix heading levels so each route has exactly one `<h1>`.
-- [ ] Re-run the audit script/spec with `region` and `landmark-one-main` re-enabled to confirm both clear (see Verification).
+- [x] Add a real `<main>` wrapping primary content on each of the four routes.
+- [x] Fix heading levels so each route has exactly one `<h1>`.
+- [x] Re-run the audit script/spec with `region`, `landmark-one-main`, and `page-has-heading-one` re-enabled to confirm all three clear (see Verification).
+
+**What actually shipped**, differing from this doc's original assumption in one place:
+
+- `src/app/page.tsx`, `src/app/search/page.tsx`, `src/app/pokemon/[name]/PokemonDetailPageClient.tsx`, `src/app/compare/page.tsx`: each route's outer content `<div>` became a `<main>`. On `/search`, the pre-existing inner `<main>` (which only wrapped the results column, leaving the top `SearchBox` and facet rail outside any landmark — the actual cause of that route's `region` violations) was demoted to a plain `<div>` now that the new outer `<main>` covers the whole page; `FacetRail` was already a real `<aside>` landmark, no change needed there.
+- `src/app/page.tsx` and `src/app/search/page.tsx` gained a visually-hidden (`sr-only`) `<h1>` — home had no `<h1>` at all (a prior session deliberately dropped its visible one in favor of `AppHeader`'s wordmark, which is a `<Link>` not a heading), and `/search` never had one. `/compare` (`CONTENT.compare.pageTitle`) and the PDP (`PokemonHero`'s `<h1>` of the Pokemon's own name) already had real, visible `<h1>`s — this doc's assumption that PDP was missing one was wrong.
+- **The actual PDP finding was a test bug, not a markup bug**: `tests/e2e/a11y-scan.spec.ts`'s PDP test never waited for the async search-based content to resolve before calling `analyze()` (unlike its `/search` test, which already waited on `.result-tile`), so axe was scanning the loading skeleton — which has no landmark or heading — not the real page. Fixed by adding `await expect(page.locator("h1")).toBeVisible()` before the scan, matching the `/search` test's pattern.
+- `KNOWN_PRE_EXISTING_RULE_IDS` in `tests/e2e/a11y-scan.spec.ts` now only contains `"color-contrast"`.
 
 ## Phase 2 — color contrast
 
