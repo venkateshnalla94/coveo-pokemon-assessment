@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CONTENT } from "@/content/pokedex";
 import { fetchPokemonMetadata } from "@/coveo/serverPokemonLookup";
+import { SITE_URL } from "@/siteUrl";
 import PokemonDetailPageClient from "./PokemonDetailPageClient";
 
 interface PageProps {
@@ -61,5 +62,43 @@ export default async function PokemonDetailPage({ params }: PageProps) {
     notFound();
   }
 
-  return <PokemonDetailPageClient />;
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(buildBreadcrumbJsonLd(pokemon.name)) }}
+      />
+      <PokemonDetailPageClient />
+    </>
+  );
+}
+
+/**
+ * BreadcrumbList structured data (docs/EXECUTION-PLAN-seo.md Phase 2),
+ * generated from the same "Home / <Name>" trail Breadcrumb.tsx renders by
+ * default. Deliberately fixed-shape regardless of Breadcrumb.tsx's `from`
+ * prop: that prop reflects this particular visit's navigation history (did
+ * the user arrive via a search-result click), while structured data
+ * describes the page's permanent position in the site, which never
+ * includes a transient "Search results" crumb.
+ */
+function buildBreadcrumbJsonLd(pokemonName: string) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: CONTENT.pdp.breadcrumbHome,
+        item: SITE_URL,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: pokemonName,
+        item: `${SITE_URL}/pokemon/${encodeURIComponent(pokemonName)}`,
+      },
+    ],
+  };
 }
