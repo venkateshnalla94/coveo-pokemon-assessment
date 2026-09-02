@@ -6,14 +6,9 @@
   "configuration": {
     "addressPatterns": [
       {
-        "allowed": false,
-        "expression": "^https://pokemondb\\.net/pokedex/(national|all|shiny)$|^https://pokemondb\\.net/(move|type|ability|item)/.*$",
-        "patternType": "RegEx"
-      },
-      {
         "allowed": true,
-        "expression": "^https://pokemondb\\.net/pokedex/[a-z0-9%.-]+$",
-        "patternType": "RegEx"
+        "expression": "*",
+        "patternType": "Wildcard"
       }
     ],
     "documentConfig": {
@@ -727,7 +722,7 @@
       },
       "ExpandBeforeFiltering": {
         "sensitive": false,
-        "value": "true"
+        "value": "false"
       },
       "FollowAutoRedirects": {
         "sensitive": false,
@@ -771,7 +766,7 @@
       },
       "MaxCrawlDepth": {
         "sensitive": false,
-        "value": "100"
+        "value": "0"
       },
       "MaxPageSizeInBytes": {
         "sensitive": false,
@@ -791,7 +786,7 @@
       },
       "MinCrawlDelayPerDomainInMilliseconds": {
         "sensitive": false,
-        "value": "1000"
+        "value": "2000"
       },
       "QueryStringParametersToIgnore": {
         "sensitive": false,
@@ -827,7 +822,7 @@
       },
       "ScrapingConfiguration": {
         "sensitive": false,
-        "value": "[{\"name\":\"[Default Coveo web scraping configuration]\",\"exclude\":[{\"type\":\"CSS\",\"path\":\"script\"},{\"type\":\"CSS\",\"path\":\"noscript\"},{\"type\":\"CSS\",\"path\":\"iframe\"},{\"type\":\"CSS\",\"path\":\"menu\"},{\"type\":\"CSS\",\"path\":\"nav\"},{\"type\":\"CSS\",\"path\":\"header\"},{\"type\":\"CSS\",\"path\":\"footer\"},{\"type\":\"CSS\",\"path\":\"video\"},{\"type\":\"CSS\",\"path\":\"audio\"},{\"type\":\"CSS\",\"path\":\".menu\"},{\"type\":\"CSS\",\"path\":\".nav\"},{\"type\":\"CSS\",\"path\":\".navigation\"},{\"type\":\"CSS\",\"path\":\".navbar\"},{\"type\":\"CSS\",\"path\":\".nav-bar\"},{\"type\":\"CSS\",\"path\":\".head\"},{\"type\":\"CSS\",\"path\":\".header\"},{\"type\":\"CSS\",\"path\":\".foot\"},{\"type\":\"CSS\",\"path\":\".footer\"},{\"type\":\"CSS\",\"path\":\".sidebar\"},{\"type\":\"CSS\",\"path\":\".sidenav\"},{\"type\":\"CSS\",\"path\":\".banner\"},{\"type\":\"CSS\",\"path\":\".ad\"},{\"type\":\"CSS\",\"path\":\".advert\"},{\"type\":\"CSS\",\"path\":\".advertisement\"},{\"type\":\"CSS\",\"path\":\".adsbygoogle\"},{\"type\":\"CSS\",\"path\":\".popup\"},{\"type\":\"CSS\",\"path\":\".modal\"}],\"for\":{\"urls\":[\".*\"]},\"metadata\":{}},{\"name\":\"Pokemon page fields\",\"exclude\":[],\"for\":{\"urls\":[\".*\"]},\"metadata\":{\"pokemonname\":{\"type\":\"XPATH\",\"path\":\"//h1/text()\"},\"pokemondexnumber\":{\"type\":\"XPATH\",\"path\":\"((//table[@class=\\\"vitals-table\\\"])[1]//tr[th[contains(text(),\\\"National\\\")]]/td[1])[1]//text()\"},\"pokemontype\":{\"type\":\"XPATH\",\"path\":\"(//table[@class=\\\"vitals-table\\\"])[1]//tr[th[contains(.,\\\"Type\\\")]]/td//a/text()\"},\"pokemonimageurl\":{\"type\":\"XPATH\",\"path\":\"(//img[@fetchpriority=\\\"high\\\" and contains(@src,\\\"/artwork/\\\")])[1]/@src\"}}}]"
+        "value": "[{\"name\":\"[Default Coveo web scraping configuration]\",\"exclude\":[{\"type\":\"CSS\",\"path\":\"script\"},{\"type\":\"CSS\",\"path\":\"noscript\"},{\"type\":\"CSS\",\"path\":\"iframe\"},{\"type\":\"CSS\",\"path\":\"menu\"},{\"type\":\"CSS\",\"path\":\"nav\"},{\"type\":\"CSS\",\"path\":\"header\"},{\"type\":\"CSS\",\"path\":\"footer\"},{\"type\":\"CSS\",\"path\":\"video\"},{\"type\":\"CSS\",\"path\":\"audio\"},{\"type\":\"CSS\",\"path\":\".menu\"},{\"type\":\"CSS\",\"path\":\".nav\"},{\"type\":\"CSS\",\"path\":\".navigation\"},{\"type\":\"CSS\",\"path\":\".navbar\"},{\"type\":\"CSS\",\"path\":\".nav-bar\"},{\"type\":\"CSS\",\"path\":\".head\"},{\"type\":\"CSS\",\"path\":\".header\"},{\"type\":\"CSS\",\"path\":\".foot\"},{\"type\":\"CSS\",\"path\":\".footer\"},{\"type\":\"CSS\",\"path\":\".sidebar\"},{\"type\":\"CSS\",\"path\":\".sidenav\"},{\"type\":\"CSS\",\"path\":\".banner\"},{\"type\":\"CSS\",\"path\":\".ad\"},{\"type\":\"CSS\",\"path\":\".advert\"},{\"type\":\"CSS\",\"path\":\".advertisement\"},{\"type\":\"CSS\",\"path\":\".adsbygoogle\"},{\"type\":\"CSS\",\"path\":\".popup\"},{\"type\":\"CSS\",\"path\":\".modal\"},{\"type\":\"XPATH\",\"path\":\"//*[contains(@class,\\\"data-table\\\")]\"},{\"type\":\"XPATH\",\"path\":\"//*[contains(@class,\\\"type-table-pokedex\\\")]\"},{\"type\":\"XPATH\",\"path\":\"//div[@id=\\\"dex-locations\\\"]/following-sibling::div[1]\"}],\"for\":{\"urls\":[\".*\"]},\"metadata\":{}},{\"name\":\"Pokemon page fields\",\"exclude\":[],\"for\":{\"urls\":[\".*\"]},\"metadata\":{\"pokemonname\":{\"type\":\"XPATH\",\"path\":\"//h1/text()\"},\"pokemondexnumber\":{\"type\":\"XPATH\",\"path\":\"((//table[@class=\\\"vitals-table\\\"])[1]//tr[th[contains(text(),\\\"National\\\")]]/td[1])[1]//text()\"},\"pokemontype\":{\"type\":\"XPATH\",\"path\":\"(//table[@class=\\\"vitals-table\\\"])[1]//tr[th[contains(.,\\\"Type\\\")]]/td//a/text()\"},\"pokemonimageurl\":{\"type\":\"XPATH\",\"path\":\"(//img[@fetchpriority=\\\"high\\\" and contains(@src,\\\"/artwork/\\\")])[1]/@src\"},\"pokemonspecies\":{\"type\":\"XPATH\",\"path\":\"(//table[@class=\\\"vitals-table\\\"])[1]//tr[th[text()=\\\"Species\\\"]]/td/text()\"},\"pokemonheight\":{\"type\":\"XPATH\",\"path\":\"(//table[@class=\\\"vitals-table\\\"])[1]//tr[th[text()=\\\"Height\\\"]]/td/text()\"},\"pokemonweight\":{\"type\":\"XPATH\",\"path\":\"(//table[@class=\\\"vitals-table\\\"])[1]//tr[th[text()=\\\"Weight\\\"]]/td/text()\"},\"pokemonabilities\":{\"type\":\"XPATH\",\"path\":\"(//table[@class=\\\"vitals-table\\\"])[1]//tr[th[text()=\\\"Abilities\\\"]]/td//a/text()\"},\"pokemonhp\":{\"type\":\"XPATH\",\"path\":\"(//table[@class=\\\"vitals-table\\\"])[4]//tr[th[text()=\\\"HP\\\"]]/td[@class=\\\"cell-num\\\"][1]/text()\"},\"pokemonattack\":{\"type\":\"XPATH\",\"path\":\"(//table[@class=\\\"vitals-table\\\"])[4]//tr[th[text()=\\\"Attack\\\"]]/td[@class=\\\"cell-num\\\"][1]/text()\"},\"pokemondefense\":{\"type\":\"XPATH\",\"path\":\"(//table[@class=\\\"vitals-table\\\"])[4]//tr[th[text()=\\\"Defense\\\"]]/td[@class=\\\"cell-num\\\"][1]/text()\"},\"pokemonspatk\":{\"type\":\"XPATH\",\"path\":\"(//table[@class=\\\"vitals-table\\\"])[4]//tr[th[text()=\\\"Sp. Atk\\\"]]/td[@class=\\\"cell-num\\\"][1]/text()\"},\"pokemonspdef\":{\"type\":\"XPATH\",\"path\":\"(//table[@class=\\\"vitals-table\\\"])[4]//tr[th[text()=\\\"Sp. Def\\\"]]/td[@class=\\\"cell-num\\\"][1]/text()\"},\"pokemonspeed\":{\"type\":\"XPATH\",\"path\":\"(//table[@class=\\\"vitals-table\\\"])[4]//tr[th[text()=\\\"Speed\\\"]]/td[@class=\\\"cell-num\\\"][1]/text()\"},\"pokemonstattotal\":{\"type\":\"XPATH\",\"path\":\"(//table[@class=\\\"vitals-table\\\"])[4]//tfoot//td[contains(@class,\\\"cell-total\\\")]/text()\"},\"pokemonevyield\":{\"type\":\"XPATH\",\"path\":\"(//table[@class=\\\"vitals-table\\\"])[2]//tr[th[text()=\\\"EV yield\\\"]]/td/text()\"},\"pokemoncatchrate\":{\"type\":\"XPATH\",\"path\":\"(//table[@class=\\\"vitals-table\\\"])[2]//tr[th[text()=\\\"Catch rate\\\"]]/td/text()[1]\"},\"pokemonbasefriendship\":{\"type\":\"XPATH\",\"path\":\"(//table[@class=\\\"vitals-table\\\"])[2]//tr[th/a[text()=\\\"Friendship\\\"]]/td/text()[1]\"},\"pokemonbaseexp\":{\"type\":\"XPATH\",\"path\":\"(//table[@class=\\\"vitals-table\\\"])[2]//tr[th[text()=\\\"Base Exp.\\\"]]/td/text()\"},\"pokemongrowthrate\":{\"type\":\"XPATH\",\"path\":\"(//table[@class=\\\"vitals-table\\\"])[2]//tr[th[text()=\\\"Growth Rate\\\"]]/td/text()\"},\"pokemonegggroups\":{\"type\":\"XPATH\",\"path\":\"(//table[@class=\\\"vitals-table\\\"])[3]//tr[th[text()=\\\"Egg Groups\\\"]]/td//a/text()\"},\"pokemongenderratio\":{\"type\":\"XPATH\",\"path\":\"(//table[@class=\\\"vitals-table\\\"])[3]//tr[th[text()=\\\"Gender\\\"]]/td//span/text()\"},\"pokemoneggcycles\":{\"type\":\"XPATH\",\"path\":\"(//table[@class=\\\"vitals-table\\\"])[3]//tr[th/a[text()=\\\"Egg cycles\\\"]]/td/text()[1]\"},\"pokemonweaknessesraw\":{\"type\":\"XPATH\",\"path\":\"(//table[contains(@class,\\\"type-table-pokedex\\\")])[position()<=2]//td[contains(@class,\\\"type-fx-200\\\") or contains(@class,\\\"type-fx-400\\\")]/@title\"},\"pokemonresistancesraw\":{\"type\":\"XPATH\",\"path\":\"(//table[contains(@class,\\\"type-table-pokedex\\\")])[position()<=2]//td[contains(@class,\\\"type-fx-50\\\") or contains(@class,\\\"type-fx-0\\\")]/@title\"},\"pokemonevolvesfrom\":{\"type\":\"XPATH\",\"path\":\"(//a[@class=\\\"ent-name\\\"][text()=//h1/text()]/ancestor::div[@class=\\\"infocard \\\"][1]/preceding-sibling::div[@class=\\\"infocard \\\"][1]//a[@class=\\\"ent-name\\\"]/text() | //a[@class=\\\"ent-name\\\"][text()=//h1/text()]/ancestor::div[@class=\\\"infocard \\\"][1]/ancestor::span[@class=\\\"infocard-evo-split\\\"][1]/preceding-sibling::div[@class=\\\"infocard \\\"][1]//a[@class=\\\"ent-name\\\"]/text())[1]\"},\"pokemonevolvesto\":{\"type\":\"XPATH\",\"path\":\"//a[@class=\\\"ent-name\\\"][ancestor::div[@class=\\\"infocard \\\"][1]/preceding-sibling::div[@class=\\\"infocard \\\"][1]//a[@class=\\\"ent-name\\\"]/text()=//h1/text() or ancestor::div[@class=\\\"infocard \\\"][1]/ancestor::span[@class=\\\"infocard-evo-split\\\"][1]/preceding-sibling::div[@class=\\\"infocard \\\"][1]//a[@class=\\\"ent-name\\\"]/text()=//h1/text()]/text()\"},\"pokemonevolvesfromimageurl\":{\"type\":\"XPATH\",\"path\":\"(//a[@class=\\\"ent-name\\\"][text()=//h1/text()]/ancestor::div[@class=\\\"infocard \\\"][1]/preceding-sibling::div[@class=\\\"infocard \\\"][1] | //a[@class=\\\"ent-name\\\"][text()=//h1/text()]/ancestor::div[@class=\\\"infocard \\\"][1]/ancestor::span[@class=\\\"infocard-evo-split\\\"][1]/preceding-sibling::div[@class=\\\"infocard \\\"][1])[1]//img/@src\"},\"pokemonevolvestoimageurl\":{\"type\":\"XPATH\",\"path\":\"//a[@class=\\\"ent-name\\\"][ancestor::div[@class=\\\"infocard \\\"][1]/preceding-sibling::div[@class=\\\"infocard \\\"][1]//a[@class=\\\"ent-name\\\"]/text()=//h1/text() or ancestor::div[@class=\\\"infocard \\\"][1]/ancestor::span[@class=\\\"infocard-evo-split\\\"][1]/preceding-sibling::div[@class=\\\"infocard \\\"][1]//a[@class=\\\"ent-name\\\"]/text()=//h1/text()]/ancestor::div[@class=\\\"infocard \\\"][1]//img/@src\"}}}]"
       },
       "ScrapingMatchingStrategy": {
         "sensitive": false,
@@ -878,441 +873,661 @@
     ],
     "securityProviders": {},
     "sourceSecurityOption": "Specified",
-    "startingAddresses": ["https://pokemondb.net/pokedex/national"],
+    "startingAddresses": [
+      "https://pokemondb.net/pokedex/pikachu",
+      "https://pokemondb.net/pokedex/garchomp",
+      "https://pokemondb.net/pokedex/sprigatito"
+    ],
     "userIdentities": {}
   },
   "mappings": [
     {
-      "content": "%[mobilephone]",
+      "content": "%[pokemonevyield]",
       "extractionMethod": "METADATA",
-      "fieldName": "mobilephone",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-qanh2utwzdqjlej7xya5inkdly",
+      "fieldName": "pokemonevyield",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-q4tnonlfnscuvdqcubleuhcgru",
       "kind": "COMMON",
-      "rules": ["%[mobilephone]"]
-    },
-    {
-      "content": "%[manager]",
-      "extractionMethod": "METADATA",
-      "fieldName": "manager",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-qlfycq6zskatp5ikm3ixvccela",
-      "kind": "COMMON",
-      "rules": ["%[manager]"]
-    },
-    {
-      "content": "%[sourcetype]",
-      "extractionMethod": "METADATA",
-      "fieldName": "sourcetype",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-qqg2rp3lpgewq3oobde5eb2e6i",
-      "kind": "COMMON",
-      "rules": ["%[sourcetype]"]
-    },
-    {
-      "content": "%[month]",
-      "extractionMethod": "METADATA",
-      "fieldName": "month",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-raeaeoqxutcfrxugwhtwh22mcy",
-      "kind": "COMMON",
-      "rules": ["%[month]"]
-    },
-    {
-      "content": "%[coveo_foldingchild]",
-      "extractionMethod": "METADATA",
-      "fieldName": "foldingchild",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-rbfgue7fla3iqlix5l7wshsbta",
-      "kind": "COMMON",
-      "rules": ["%[coveo_foldingchild]"]
-    },
-    {
-      "content": "%[fileextension]",
-      "extractionMethod": "METADATA",
-      "fieldName": "fileextension",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-rfqtz5fm4z332srxqem3woknzu",
-      "kind": "COMMON",
-      "rules": ["%[fileextension]"]
-    },
-    {
-      "content": "%[pokemontype]",
-      "extractionMethod": "METADATA",
-      "fieldName": "pokemontype",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-rxteepzwazsjc3spf5d2562lwu",
-      "kind": "COMMON",
-      "rules": ["%[pokemontype]"]
-    },
-    {
-      "content": "%[lastname]",
-      "extractionMethod": "METADATA",
-      "fieldName": "lastname",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-scvv5cbtbbmjjupffudwoyclna",
-      "kind": "COMMON",
-      "rules": ["%[lastname]"]
-    },
-    {
-      "content": "%[authorloginname]",
-      "extractionMethod": "METADATA",
-      "fieldName": "authorloginname",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-sd3s2xecop4xy5jv3jvwbrkn6i",
-      "kind": "COMMON",
-      "rules": ["%[authorloginname]"]
-    },
-    {
-      "content": "%[pokemonimageurl]",
-      "extractionMethod": "METADATA",
-      "fieldName": "pokemonimageurl",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-sfwuil64ju35aipxtrqy4dsimu",
-      "kind": "COMMON",
-      "rules": ["%[pokemonimageurl]"]
-    },
-    {
-      "content": "%[filetype]",
-      "extractionMethod": "METADATA",
-      "fieldName": "filetype",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-sh276fhpcirnujhshluavvscp4",
-      "kind": "COMMON",
-      "rules": ["%[filetype]"]
-    },
-    {
-      "content": "%[fax]",
-      "extractionMethod": "METADATA",
-      "fieldName": "fax",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-sixfrddo5elaqeq23w5lxrsjje",
-      "kind": "COMMON",
-      "rules": ["%[fax]"]
-    },
-    {
-      "content": "%[cc]",
-      "extractionMethod": "METADATA",
-      "fieldName": "cc",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-snz6hvakyw3stunszsqlyckewi",
-      "kind": "COMMON",
-      "rules": ["%[cc]"]
-    },
-    {
-      "content": "%[year]",
-      "extractionMethod": "METADATA",
-      "fieldName": "year",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-sprhbcwallyhc3g2n3a75fcgxu",
-      "kind": "COMMON",
-      "rules": ["%[year]"]
-    },
-    {
-      "content": "%[connectortype]",
-      "extractionMethod": "METADATA",
-      "fieldName": "connectortype",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-stfcxyiym3wj5b3xdbvoy7cbbe",
-      "kind": "COMMON",
-      "rules": ["%[connectortype]"]
-    },
-    {
-      "content": "%[filename]",
-      "extractionMethod": "METADATA",
-      "fieldName": "filename",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-svmwkbik777r2xcspha7s4sisi",
-      "kind": "COMMON",
-      "rules": ["%[filename]"]
-    },
-    {
-      "content": "%[permanentid]",
-      "extractionMethod": "METADATA",
-      "fieldName": "permanentid",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-svnsgtl4yi2pwfzmobkyv2sata",
-      "kind": "COMMON",
-      "rules": ["%[permanentid]"]
-    },
-    {
-      "content": "%[company]",
-      "extractionMethod": "METADATA",
-      "fieldName": "company",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-sx53mxbcx3ssqgadundnj6khny",
-      "kind": "COMMON",
-      "rules": ["%[company]"]
-    },
-    {
-      "content": "%[coveo_foldingcollection]",
-      "extractionMethod": "METADATA",
-      "fieldName": "foldingcollection",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-t2h7f5uuj4lj7w74mdqejk2jym",
-      "kind": "COMMON",
-      "rules": ["%[coveo_foldingcollection]"]
-    },
-    {
-      "content": "%[language]",
-      "extractionMethod": "METADATA",
-      "fieldName": "language",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-t5drwifrw7td3ly3tkljjdkgh4",
-      "kind": "COMMON",
-      "rules": ["%[language]"]
-    },
-    {
-      "content": "%[mobile]",
-      "extractionMethod": "METADATA",
-      "fieldName": "mobilephone",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-t5pf7ryxykebbkv3gnhj4hkdwy",
-      "kind": "COMMON",
-      "rules": ["%[mobile]"]
+      "rules": ["%[pokemonevyield]"]
     },
     {
       "content": "%[from]",
       "extractionMethod": "METADATA",
       "fieldName": "from",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-t5qjhd2mc66fl67ye7crrdccxq",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-q4uclpfaalqutevltizfle2gfa",
       "kind": "COMMON",
       "rules": ["%[from]"]
-    },
-    {
-      "content": "%[fullname]",
-      "extractionMethod": "METADATA",
-      "fieldName": "fullname",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-t7eobwhpxcv6knp43uqm5fsbhy",
-      "kind": "COMMON",
-      "rules": ["%[fullname]"]
-    },
-    {
-      "content": "%[pokemonname]",
-      "extractionMethod": "METADATA",
-      "fieldName": "title",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-taulf65hxcjfc7q5msirfzspx4",
-      "kind": "COMMON",
-      "rules": ["%[pokemonname]", "%[title:crawler]"]
-    },
-    {
-      "content": "%[workphone]",
-      "extractionMethod": "METADATA",
-      "fieldName": "workphone",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-tkxmrxahknrthgm2gvs7go2liq",
-      "kind": "COMMON",
-      "rules": ["%[workphone]"]
-    },
-    {
-      "content": "%[printableuri]",
-      "extractionMethod": "METADATA",
-      "fieldName": "printableuri",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-tms4ecwllh33qqqfd45ebl2hme",
-      "kind": "COMMON",
-      "rules": ["%[printableuri]"]
-    },
-    {
-      "content": "%[pokemonname]",
-      "extractionMethod": "METADATA",
-      "fieldName": "title",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-tqa3h7nst2hmt2vjfogl22cofa",
-      "kind": "COMMON",
-      "rules": ["%[pokemonname]"]
-    },
-    {
-      "content": "%[pokemondexnumber]",
-      "extractionMethod": "METADATA",
-      "fieldName": "pokemondexnumber",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-tqrxftnhdvhhnzhufsuhzn2feu",
-      "kind": "COMMON",
-      "rules": ["%[pokemondexnumber]"]
-    },
-    {
-      "content": "%[mobileuri]",
-      "extractionMethod": "METADATA",
-      "fieldName": "mobileuri",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-ttqmdpngqgjnxo47cypzwkslqi",
-      "kind": "COMMON",
-      "rules": ["%[mobileuri]"]
-    },
-    {
-      "content": "%[subject]",
-      "extractionMethod": "METADATA",
-      "fieldName": "subject",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-tx635obsqrhte3k64rofhq2psy",
-      "kind": "COMMON",
-      "rules": ["%[subject]"]
-    },
-    {
-      "content": "%[parents]",
-      "extractionMethod": "METADATA",
-      "fieldName": "parents",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-txqjbfndvxudcfq2r2cxlu2kfe",
-      "kind": "COMMON",
-      "rules": ["%[parents]"]
-    },
-    {
-      "content": "%[middlename]",
-      "extractionMethod": "METADATA",
-      "fieldName": "middlename",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-uke6nblq6grkv5agcm7s6lsgky",
-      "kind": "COMMON",
-      "rules": ["%[middlename]"]
-    },
-    {
-      "content": "%[cellphone]",
-      "extractionMethod": "METADATA",
-      "fieldName": "mobilephone",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-v6bz6brviyrcavybqlt7bdslzq",
-      "kind": "COMMON",
-      "rules": ["%[cellphone]"]
-    },
-    {
-      "content": "%[homephone]",
-      "extractionMethod": "METADATA",
-      "fieldName": "homephone",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-v76hnh7tiiomiwl55huntm2aru",
-      "kind": "COMMON",
-      "rules": ["%[homephone]"]
-    },
-    {
-      "content": "%[pokemongeneration]",
-      "extractionMethod": "METADATA",
-      "fieldName": "pokemongeneration",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-vbih5j7yb25hwtzzjblka3sity",
-      "kind": "COMMON",
-      "rules": ["%[pokemongeneration]"]
-    },
-    {
-      "content": "%[date]",
-      "extractionMethod": "METADATA",
-      "fieldName": "date",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-vjahcghai2ogvu4k67gbov2kiu",
-      "kind": "COMMON",
-      "rules": ["%[date]"]
-    },
-    {
-      "content": "%[workemail]",
-      "extractionMethod": "METADATA",
-      "fieldName": "workemail",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-vnr5w2bxxnf257j4d6exbucpna",
-      "kind": "COMMON",
-      "rules": ["%[workemail]"]
-    },
-    {
-      "content": "%[clickableuri]",
-      "extractionMethod": "METADATA",
-      "fieldName": "clickableuri",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-vp7ag64g66jxtoq3e4h755cjne",
-      "kind": "COMMON",
-      "rules": ["%[clickableuri]"]
-    },
-    {
-      "content": "%[location]",
-      "extractionMethod": "METADATA",
-      "fieldName": "location",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-vqgwmaildhkoqgeyhdn2agscgu",
-      "kind": "COMMON",
-      "rules": ["%[location]"]
     },
     {
       "content": "%[pokemonname]",
       "extractionMethod": "METADATA",
       "fieldName": "pokemonname",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-vx3vqk26hwhpul43peizcucdbm",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-qbpm6ct5g4rnzcxh7v2r4isljy",
       "kind": "COMMON",
       "rules": ["%[pokemonname]"]
     },
     {
-      "content": "%[worktitle]",
+      "content": "%[mobileuri]",
       "extractionMethod": "METADATA",
-      "fieldName": "worktitle",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-vyesl4gr7jvbrkbluirsqfscsi",
+      "fieldName": "mobileuri",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-qc2rduxygtcef2bwf4awtpcbqq",
       "kind": "COMMON",
-      "rules": ["%[worktitle]"]
+      "rules": ["%[mobileuri]"]
     },
     {
-      "content": "%[firstname]",
+      "content": "%[pokemongenderratio]",
       "extractionMethod": "METADATA",
-      "fieldName": "firstname",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-w2zinp6q6hlqe4e7owwbtxsbwe",
+      "fieldName": "pokemongenderratio",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-qd474vagc5kc5gntw6hnyjcpja",
       "kind": "COMMON",
-      "rules": ["%[firstname]"]
+      "rules": ["%[pokemongenderratio]"]
     },
     {
-      "content": "%[size]",
+      "content": "%[authorloginname]",
       "extractionMethod": "METADATA",
-      "fieldName": "size",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-w33zpudeyr2l7qsnufbq57ka5m",
+      "fieldName": "authorloginname",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-qdmjil2ghmwi4pfoaabx5jckzm",
       "kind": "COMMON",
-      "rules": ["%[size]"]
-    },
-    {
-      "content": "%[coveo_foldingparent]",
-      "extractionMethod": "METADATA",
-      "fieldName": "foldingparent",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-w34zz6unj3l2riumfjkbzu2ewa",
-      "kind": "COMMON",
-      "rules": ["%[coveo_foldingparent]"]
-    },
-    {
-      "content": "%[author:crawler]",
-      "extractionMethod": "METADATA",
-      "fieldName": "author",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-wbdpagvwh4jlpqm3t6z4n42psi",
-      "kind": "COMMON",
-      "rules": ["%[author:crawler]"]
-    },
-    {
-      "content": "%[datebucket]",
-      "extractionMethod": "METADATA",
-      "fieldName": "datebucket",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-wbpdvwtskpllr3ol5w32tq2fhi",
-      "kind": "COMMON",
-      "rules": ["%[datebucket]"]
-    },
-    {
-      "content": "%[o]",
-      "extractionMethod": "METADATA",
-      "fieldName": "company",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-wcq6kjxuagziokbb4cs27hsb6u",
-      "kind": "COMMON",
-      "rules": ["%[o]"]
+      "rules": ["%[authorloginname]"]
     },
     {
       "content": "%[documenttype]",
       "extractionMethod": "METADATA",
       "fieldName": "documenttype",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-wesxlqnh2bfsxrww32nfhcckhu",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-qdxai35qmapwn4aadwmuoxsmzi",
       "kind": "COMMON",
       "rules": ["%[documenttype]"]
     },
     {
-      "content": "%[bcc]",
+      "content": "%[filename]",
       "extractionMethod": "METADATA",
-      "fieldName": "bcc",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-wsbkrvlbkbdv4zycyzy7ueck34",
+      "fieldName": "filename",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-qlhvs2momr7tsfbrnqsl5fcav4",
       "kind": "COMMON",
-      "rules": ["%[bcc]"]
+      "rules": ["%[filename]"]
     },
     {
-      "content": "%[office]",
+      "content": "%[pokemonname]",
       "extractionMethod": "METADATA",
-      "fieldName": "office",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-wu6lbxhdexgktoovx3km5ykeue",
+      "fieldName": "title",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-qopbtzcujrpgwk3rg3iby4kbem",
       "kind": "COMMON",
-      "rules": ["%[office]"]
+      "rules": ["%[pokemonname]", "%[title:crawler]"]
     },
     {
-      "content": "%[to]",
+      "content": "%[pokemonresistances]",
       "extractionMethod": "METADATA",
-      "fieldName": "to",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-wuo37ldcw36zpy5fws5xgmkkkq",
+      "fieldName": "pokemonresistances",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-qpmt47b2a2y5p5ashl6wr6se4m",
       "kind": "COMMON",
-      "rules": ["%[to]"]
+      "rules": ["%[pokemonresistances]"]
+    },
+    {
+      "content": "%[pokemonweight]",
+      "extractionMethod": "METADATA",
+      "fieldName": "pokemonweight",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-r575lzmeecsd6lwkb5aw4mkgqm",
+      "kind": "COMMON",
+      "rules": ["%[pokemonweight]"]
     },
     {
       "content": "%[coveo_externalurl]",
       "extractionMethod": "METADATA",
       "fieldName": "relatedlink",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-ww2juwytcfcjeydgekml26cp5e",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-r5iehsv57ez4bhkktdneko2dii",
       "kind": "COMMON",
       "rules": ["%[coveo_externalurl]"]
     },
     {
-      "content": "%[site]",
+      "content": "%[firstname]",
       "extractionMethod": "METADATA",
-      "fieldName": "site",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-xb4b3wmaiek2g6bb6g7mn2cmfu",
+      "fieldName": "firstname",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-r6j3kawidbjvptofqmgmcicate",
       "kind": "COMMON",
-      "rules": ["%[site]"]
+      "rules": ["%[firstname]"]
+    },
+    {
+      "content": "%[manager]",
+      "extractionMethod": "METADATA",
+      "fieldName": "manager",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-retpdwobxliv3h5wv5hfkqcm3a",
+      "kind": "COMMON",
+      "rules": ["%[manager]"]
+    },
+    {
+      "content": "%[pokemonevolvesfromimageurl]",
+      "extractionMethod": "METADATA",
+      "fieldName": "pokemonevolvesfromimageurl",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-rigz4u5744ssrw2xzfgowosdtq",
+      "kind": "COMMON",
+      "rules": ["%[pokemonevolvesfromimageurl]"]
+    },
+    {
+      "content": "%[pokemonegggroups]",
+      "extractionMethod": "METADATA",
+      "fieldName": "pokemonegggroups",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-riiq6kcom5ufij3dhgqfi7kd3q",
+      "kind": "COMMON",
+      "rules": ["%[pokemonegggroups]"]
+    },
+    {
+      "content": "%[worktitle]",
+      "extractionMethod": "METADATA",
+      "fieldName": "worktitle",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-rjllncmcuwe2qrdx6weny4kimq",
+      "kind": "COMMON",
+      "rules": ["%[worktitle]"]
+    },
+    {
+      "content": "%[pokemondefense]",
+      "extractionMethod": "METADATA",
+      "fieldName": "pokemondefense",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-rkecdrlseeos42nsysj6uosjpi",
+      "kind": "COMMON",
+      "rules": ["%[pokemondefense]"]
+    },
+    {
+      "content": "%[month]",
+      "extractionMethod": "METADATA",
+      "fieldName": "month",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-rku65t3akugkdwrdwih3xbcd24",
+      "kind": "COMMON",
+      "rules": ["%[month]"]
     },
     {
       "content": "%[folders]",
       "extractionMethod": "METADATA",
       "fieldName": "folders",
-      "id": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu-xd4elibecylxrdwnhduidksl3m",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-rokl4hf5ocb5yqa2rrddra2f6m",
       "kind": "COMMON",
       "rules": ["%[folders]"]
+    },
+    {
+      "content": "%[connectortype]",
+      "extractionMethod": "METADATA",
+      "fieldName": "connectortype",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-rtbiquymte5fmwvaxkrpkfkoua",
+      "kind": "COMMON",
+      "rules": ["%[connectortype]"]
+    },
+    {
+      "content": "%[author:crawler]",
+      "extractionMethod": "METADATA",
+      "fieldName": "author",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-rvdiwybf5jvpjdxcvuqsx6cdxq",
+      "kind": "COMMON",
+      "rules": ["%[author:crawler]"]
+    },
+    {
+      "content": "%[pokemonabilities]",
+      "extractionMethod": "METADATA",
+      "fieldName": "pokemonabilities",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-rytnoovgflexx77taaiekq2ady",
+      "kind": "COMMON",
+      "rules": ["%[pokemonabilities]"]
+    },
+    {
+      "content": "%[mobile]",
+      "extractionMethod": "METADATA",
+      "fieldName": "mobilephone",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-rzgvywj2dy5dycwlfn5nxs2kku",
+      "kind": "COMMON",
+      "rules": ["%[mobile]"]
+    },
+    {
+      "content": "%[pokemongrowthrate]",
+      "extractionMethod": "METADATA",
+      "fieldName": "pokemongrowthrate",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-sc47rcy3m2hlwbwvpg666bsamq",
+      "kind": "COMMON",
+      "rules": ["%[pokemongrowthrate]"]
+    },
+    {
+      "content": "%[language]",
+      "extractionMethod": "METADATA",
+      "fieldName": "language",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-sctq62smmwuyhyikhapoiaci44",
+      "kind": "COMMON",
+      "rules": ["%[language]"]
+    },
+    {
+      "content": "%[mobilephone]",
+      "extractionMethod": "METADATA",
+      "fieldName": "mobilephone",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-skubmney3xwmohgm2kc46z2oym",
+      "kind": "COMMON",
+      "rules": ["%[mobilephone]"]
+    },
+    {
+      "content": "%[homephone]",
+      "extractionMethod": "METADATA",
+      "fieldName": "homephone",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-somqh3kuysxsxoo5eampm2kmpe",
+      "kind": "COMMON",
+      "rules": ["%[homephone]"]
+    },
+    {
+      "content": "%[coveo_foldingchild]",
+      "extractionMethod": "METADATA",
+      "fieldName": "foldingchild",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-stqpbpdit2x7xx6w6ipkyfsdiu",
+      "kind": "COMMON",
+      "rules": ["%[coveo_foldingchild]"]
+    },
+    {
+      "content": "%[fax]",
+      "extractionMethod": "METADATA",
+      "fieldName": "fax",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-str4mrubeokq53wv53m5hqsmky",
+      "kind": "COMMON",
+      "rules": ["%[fax]"]
+    },
+    {
+      "content": "%[coveo_foldingcollection]",
+      "extractionMethod": "METADATA",
+      "fieldName": "foldingcollection",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-str6htd7ity6gy34aowfeicgli",
+      "kind": "COMMON",
+      "rules": ["%[coveo_foldingcollection]"]
+    },
+    {
+      "content": "%[pokemonspeed]",
+      "extractionMethod": "METADATA",
+      "fieldName": "pokemonspeed",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-sziriskseiyafyqfnsbcgncj3u",
+      "kind": "COMMON",
+      "rules": ["%[pokemonspeed]"]
+    },
+    {
+      "content": "%[pokemoneggcycles]",
+      "extractionMethod": "METADATA",
+      "fieldName": "pokemoneggcycles",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-tch2ykcajn7ncz7kdzzbrmkime",
+      "kind": "COMMON",
+      "rules": ["%[pokemoneggcycles]"]
+    },
+    {
+      "content": "%[year]",
+      "extractionMethod": "METADATA",
+      "fieldName": "year",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-tdeggq7nr4zwjpa3mygkga2cuy",
+      "kind": "COMMON",
+      "rules": ["%[year]"]
+    },
+    {
+      "content": "%[date]",
+      "extractionMethod": "METADATA",
+      "fieldName": "date",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-toxijsjsbziea4urw7wzl22mtu",
+      "kind": "COMMON",
+      "rules": ["%[date]"]
+    },
+    {
+      "content": "%[pokemonbaseexp]",
+      "extractionMethod": "METADATA",
+      "fieldName": "pokemonbaseexp",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-toy7tduzv2pevh2rd2pk2ikety",
+      "kind": "COMMON",
+      "rules": ["%[pokemonbaseexp]"]
+    },
+    {
+      "content": "%[pokemonhp]",
+      "extractionMethod": "METADATA",
+      "fieldName": "pokemonhp",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-tr3p7qdgcziwqzuvpfjjorcoc4",
+      "kind": "COMMON",
+      "rules": ["%[pokemonhp]"]
+    },
+    {
+      "content": "%[pokemonbasefriendship]",
+      "extractionMethod": "METADATA",
+      "fieldName": "pokemonbasefriendship",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-tsh2uc56mxbze3yyses7rjkhqi",
+      "kind": "COMMON",
+      "rules": ["%[pokemonbasefriendship]"]
+    },
+    {
+      "content": "%[workphone]",
+      "extractionMethod": "METADATA",
+      "fieldName": "workphone",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-uauu7ajpinwpcwuvtlcc42kntm",
+      "kind": "COMMON",
+      "rules": ["%[workphone]"]
+    },
+    {
+      "content": "%[size]",
+      "extractionMethod": "METADATA",
+      "fieldName": "size",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-ub2xbtr5n7mapcfgitpl25kpme",
+      "kind": "COMMON",
+      "rules": ["%[size]"]
+    },
+    {
+      "content": "%[fileextension]",
+      "extractionMethod": "METADATA",
+      "fieldName": "fileextension",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-uhefahhy6f3qnkd3k5p7ug2iz4",
+      "kind": "COMMON",
+      "rules": ["%[fileextension]"]
+    },
+    {
+      "content": "%[fullname]",
+      "extractionMethod": "METADATA",
+      "fieldName": "fullname",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-ulueirosy7zroje5nkhuwnkhmy",
+      "kind": "COMMON",
+      "rules": ["%[fullname]"]
+    },
+    {
+      "content": "%[pokemondexnumber]",
+      "extractionMethod": "METADATA",
+      "fieldName": "pokemondexnumber",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-ulusugdwfgvwvxvfbldhydcfmq",
+      "kind": "COMMON",
+      "rules": ["%[pokemondexnumber]"]
+    },
+    {
+      "content": "%[datebucket]",
+      "extractionMethod": "METADATA",
+      "fieldName": "datebucket",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-uqccx3swbdkeonoaxahp74cd6i",
+      "kind": "COMMON",
+      "rules": ["%[datebucket]"]
+    },
+    {
+      "content": "%[coveo_foldingparent]",
+      "extractionMethod": "METADATA",
+      "fieldName": "foldingparent",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-uqufckblt365lgrbqyr5etsgkm",
+      "kind": "COMMON",
+      "rules": ["%[coveo_foldingparent]"]
+    },
+    {
+      "content": "%[permanentid]",
+      "extractionMethod": "METADATA",
+      "fieldName": "permanentid",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-us2yoykpu4lgwwncsu5odrcgiy",
+      "kind": "COMMON",
+      "rules": ["%[permanentid]"]
+    },
+    {
+      "content": "%[cc]",
+      "extractionMethod": "METADATA",
+      "fieldName": "cc",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-uuthaufvcwnb25vw6n32h2kmgi",
+      "kind": "COMMON",
+      "rules": ["%[cc]"]
+    },
+    {
+      "content": "%[pokemonname]",
+      "extractionMethod": "METADATA",
+      "fieldName": "title",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-uv2goyspranazkouxlknb6snpm",
+      "kind": "COMMON",
+      "rules": ["%[pokemonname]"]
+    },
+    {
+      "content": "%[pokemongeneration]",
+      "extractionMethod": "METADATA",
+      "fieldName": "pokemongeneration",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-v4ap3fhv5ohymknjxeob46sfq4",
+      "kind": "COMMON",
+      "rules": ["%[pokemongeneration]"]
+    },
+    {
+      "content": "%[pokemonattack]",
+      "extractionMethod": "METADATA",
+      "fieldName": "pokemonattack",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-v4gk23cc2uywvfmvxdlq3kcnxm",
+      "kind": "COMMON",
+      "rules": ["%[pokemonattack]"]
+    },
+    {
+      "content": "%[pokemonspdef]",
+      "extractionMethod": "METADATA",
+      "fieldName": "pokemonspdef",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-v6huyvvguz4tqh3lt3axg52gfu",
+      "kind": "COMMON",
+      "rules": ["%[pokemonspdef]"]
+    },
+    {
+      "content": "%[pokemoncatchrate]",
+      "extractionMethod": "METADATA",
+      "fieldName": "pokemoncatchrate",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-vjnid6eplpbs5nxxtlcroc2mde",
+      "kind": "COMMON",
+      "rules": ["%[pokemoncatchrate]"]
+    },
+    {
+      "content": "%[pokemontype]",
+      "extractionMethod": "METADATA",
+      "fieldName": "pokemontype",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-vm5krfbbfbntztcakp73nvsbem",
+      "kind": "COMMON",
+      "rules": ["%[pokemontype]"]
+    },
+    {
+      "content": "%[parents]",
+      "extractionMethod": "METADATA",
+      "fieldName": "parents",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-vmu7e5xaw3vjypozb3quei2aou",
+      "kind": "COMMON",
+      "rules": ["%[parents]"]
+    },
+    {
+      "content": "%[pokemonimageurl]",
+      "extractionMethod": "METADATA",
+      "fieldName": "pokemonimageurl",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-vrhp4wzsmbjy5fzwrc3u7bkjee",
+      "kind": "COMMON",
+      "rules": ["%[pokemonimageurl]"]
+    },
+    {
+      "content": "%[bcc]",
+      "extractionMethod": "METADATA",
+      "fieldName": "bcc",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-vshutarvaenrz2xve3pjyhsawm",
+      "kind": "COMMON",
+      "rules": ["%[bcc]"]
+    },
+    {
+      "content": "%[pokemonspecies]",
+      "extractionMethod": "METADATA",
+      "fieldName": "pokemonspecies",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-vwxrgtf23bmas7gru6i3atkgla",
+      "kind": "COMMON",
+      "rules": ["%[pokemonspecies]"]
+    },
+    {
+      "content": "%[printableuri]",
+      "extractionMethod": "METADATA",
+      "fieldName": "printableuri",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-vxed6opb3ftgiuhgwc2pet2dli",
+      "kind": "COMMON",
+      "rules": ["%[printableuri]"]
+    },
+    {
+      "content": "%[cellphone]",
+      "extractionMethod": "METADATA",
+      "fieldName": "mobilephone",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-vyy62tngqka3gjawwqzykkscqy",
+      "kind": "COMMON",
+      "rules": ["%[cellphone]"]
+    },
+    {
+      "content": "%[workemail]",
+      "extractionMethod": "METADATA",
+      "fieldName": "workemail",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-w5v7ppdsynu3ifrr7foenfcfwy",
+      "kind": "COMMON",
+      "rules": ["%[workemail]"]
+    },
+    {
+      "content": "%[filetype]",
+      "extractionMethod": "METADATA",
+      "fieldName": "filetype",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-w6ek5zhmwlzsrso63pnfnn2ca4",
+      "kind": "COMMON",
+      "rules": ["%[filetype]"]
+    },
+    {
+      "content": "%[subject]",
+      "extractionMethod": "METADATA",
+      "fieldName": "subject",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-waoju5ni2rnqd4md67lsy42lyy",
+      "kind": "COMMON",
+      "rules": ["%[subject]"]
+    },
+    {
+      "content": "%[middlename]",
+      "extractionMethod": "METADATA",
+      "fieldName": "middlename",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-wlsczyqgzpciomfc5xsdruclwi",
+      "kind": "COMMON",
+      "rules": ["%[middlename]"]
+    },
+    {
+      "content": "%[lastname]",
+      "extractionMethod": "METADATA",
+      "fieldName": "lastname",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-wpm7z7gwr6xbwcam3f3zitsoyy",
+      "kind": "COMMON",
+      "rules": ["%[lastname]"]
+    },
+    {
+      "content": "%[pokemonstattotal]",
+      "extractionMethod": "METADATA",
+      "fieldName": "pokemonstattotal",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-wrl2tbirecnhuwiorctfh42eb4",
+      "kind": "COMMON",
+      "rules": ["%[pokemonstattotal]"]
+    },
+    {
+      "content": "%[sourcetype]",
+      "extractionMethod": "METADATA",
+      "fieldName": "sourcetype",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-wuvqgy5zc4vhopjarlzfckcdfy",
+      "kind": "COMMON",
+      "rules": ["%[sourcetype]"]
+    },
+    {
+      "content": "%[to]",
+      "extractionMethod": "METADATA",
+      "fieldName": "to",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-wv2332cdephxtgtmavxz6u2iy4",
+      "kind": "COMMON",
+      "rules": ["%[to]"]
+    },
+    {
+      "content": "%[clickableuri]",
+      "extractionMethod": "METADATA",
+      "fieldName": "clickableuri",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-wwdewfs6mdv3eh6j3ako7icpty",
+      "kind": "COMMON",
+      "rules": ["%[clickableuri]"]
+    },
+    {
+      "content": "%[pokemonevolvestoimageurl]",
+      "extractionMethod": "METADATA",
+      "fieldName": "pokemonevolvestoimageurl",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-wx6smrkqwh7dcmjeg6f7elkfxm",
+      "kind": "COMMON",
+      "rules": ["%[pokemonevolvestoimageurl]"]
+    },
+    {
+      "content": "%[pokemonheight]",
+      "extractionMethod": "METADATA",
+      "fieldName": "pokemonheight",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-xc6rggjqazziyjz5szpotxko4m",
+      "kind": "COMMON",
+      "rules": ["%[pokemonheight]"]
+    },
+    {
+      "content": "%[site]",
+      "extractionMethod": "METADATA",
+      "fieldName": "site",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-xk6pqaxvwohew646x2lijh2c6m",
+      "kind": "COMMON",
+      "rules": ["%[site]"]
+    },
+    {
+      "content": "%[pokemonspatk]",
+      "extractionMethod": "METADATA",
+      "fieldName": "pokemonspatk",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-xkf2eie5nfjljbtcxy2b4rsdxe",
+      "kind": "COMMON",
+      "rules": ["%[pokemonspatk]"]
+    },
+    {
+      "content": "%[pokemonweaknesses]",
+      "extractionMethod": "METADATA",
+      "fieldName": "pokemonweaknesses",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-xl2pjwhq7s4wmk6v3cdd3e2lyq",
+      "kind": "COMMON",
+      "rules": ["%[pokemonweaknesses]"]
+    },
+    {
+      "content": "%[pokemonresistancesraw]",
+      "extractionMethod": "METADATA",
+      "fieldName": "pokemonresistancesraw",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-xlgzl3o5sohu45zoeiy74ncfxu",
+      "kind": "COMMON",
+      "rules": ["%[pokemonresistancesraw]"]
+    },
+    {
+      "content": "%[location]",
+      "extractionMethod": "METADATA",
+      "fieldName": "location",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-xqxpkaj6hjalohavizizobscxi",
+      "kind": "COMMON",
+      "rules": ["%[location]"]
+    },
+    {
+      "content": "%[pokemonweaknessesraw]",
+      "extractionMethod": "METADATA",
+      "fieldName": "pokemonweaknessesraw",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-xryfbdfoicxioo3wmruokxsnpy",
+      "kind": "COMMON",
+      "rules": ["%[pokemonweaknessesraw]"]
+    },
+    {
+      "content": "%[o]",
+      "extractionMethod": "METADATA",
+      "fieldName": "company",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-xsharpap44xma7jlrfcpqmkbie",
+      "kind": "COMMON",
+      "rules": ["%[o]"]
+    },
+    {
+      "content": "%[pokemonevolvesto]",
+      "extractionMethod": "METADATA",
+      "fieldName": "pokemonevolvesto",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-xx4ip74mityhulodlri7okkdlu",
+      "kind": "COMMON",
+      "rules": ["%[pokemonevolvesto]"]
+    },
+    {
+      "content": "%[office]",
+      "extractionMethod": "METADATA",
+      "fieldName": "office",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-xxnboviuswqhcmvs3kaa54kdmq",
+      "kind": "COMMON",
+      "rules": ["%[office]"]
+    },
+    {
+      "content": "%[company]",
+      "extractionMethod": "METADATA",
+      "fieldName": "company",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-xybbato3zm3amvtycr5nszchmi",
+      "kind": "COMMON",
+      "rules": ["%[company]"]
+    },
+    {
+      "content": "%[pokemonevolvesfrom]",
+      "extractionMethod": "METADATA",
+      "fieldName": "pokemonevolvesfrom",
+      "id": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini-xzenwytokev5z5fnarpaxv2aky",
+      "kind": "COMMON",
+      "rules": ["%[pokemonevolvesfrom]"]
     }
   ],
   "performFieldMappingUsingAllOrigins": false,
@@ -1323,8 +1538,15 @@
       "extensionId": "venkateshpokemonchallenges0qp5rpy-vgoamtj2n3wsduyhdgis4pccsq",
       "parameters": {},
       "versionId": ""
+    },
+    {
+      "actionOnError": "SKIP_EXTENSION",
+      "condition": "",
+      "extensionId": "venkateshpokemonchallenges0qp5rpy-xvsaqw53xspczrvwtzt4o72ani",
+      "parameters": {},
+      "versionId": ""
     }
   ],
   "preConversionExtensions": [],
-  "resourceId": "venkateshpokemonchallenges0qp5rpy-romeudhx44e76uszrvtsyysjeu"
+  "resourceId": "venkateshpokemonchallenges0qp5rpy-ubnz3efi7azirsb2hwpsrhkini"
 }
