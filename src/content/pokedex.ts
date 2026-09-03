@@ -153,6 +153,7 @@ export const CONTENT = {
     // see v4 plan §10.
     notFoundMessage: "We couldn't find any of the selected Pokemon in the index.",
     rowLabels: {
+      image: "Image",
       type: "Type",
       height: "Height",
       weight: "Weight",
