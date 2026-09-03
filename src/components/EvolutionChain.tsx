@@ -1,6 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
 import type { CSSProperties } from "react";
+import { PokemonImage } from "@/components/ui/PokemonImage";
 import { CONTENT } from "@/content/pokedex";
 import type { EvolutionTarget } from "@/coveo/mapPokemonResult";
 import { getTypeColor } from "@/coveo/typeColors";
@@ -38,13 +38,16 @@ export interface EvolutionChainProps {
 }
 
 function EvolutionSprite({ target }: { target: EvolutionTarget }) {
-  if (!target.imageUrl) return null;
   // alt="" deliberately: this sits directly next to the same name as visible
-  // text, so a non-empty alt would announce the name twice to screen readers.
+  // text, so a non-empty alt (or fallback label) would announce the name
+  // twice to screen readers.
   return (
-    <div className="relative size-14 shrink-0">
-      <Image src={target.imageUrl} alt="" fill className="object-contain" />
-    </div>
+    <PokemonImage
+      src={target.imageUrl}
+      alt=""
+      containerClassName="relative size-14 shrink-0"
+      className="object-contain"
+    />
   );
 }
 
@@ -91,11 +94,12 @@ export function EvolutionChain({
           data-current="true"
           style={currentVars}
         >
-          {currentImageUrl && (
-            <div className="relative size-14 shrink-0">
-              <Image src={currentImageUrl} alt="" fill className="object-contain" />
-            </div>
-          )}
+          <PokemonImage
+            src={currentImageUrl}
+            alt=""
+            containerClassName="relative size-14 shrink-0"
+            className="object-contain"
+          />
           {current}
         </div>
       </li>

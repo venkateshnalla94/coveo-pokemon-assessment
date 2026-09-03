@@ -1,7 +1,7 @@
-import Image from "next/image";
 import type { CSSProperties } from "react";
 import { Chip } from "@/components/ui/Chip";
 import { DataList, type DataListRow } from "@/components/ui/DataList";
+import { PokemonImage } from "@/components/ui/PokemonImage";
 import { CONTENT } from "@/content/pokedex";
 import { getTypeColor, getTypeTextColor } from "@/coveo/typeColors";
 
@@ -74,15 +74,15 @@ export function PokemonHero({
             #{dexNumber}
           </span>
         )}
-        {imageUrl && (
-          <Image
-            src={imageUrl}
-            alt={name}
-            fill
-            sizes="(min-width: 640px) 360px, 320px"
-            className="object-contain p-6"
-          />
-        )}
+        <PokemonImage
+          src={imageUrl}
+          alt={name}
+          fallbackLabel={CONTENT.sprite.noImageLabel}
+          sizes="(min-width: 640px) 360px, 320px"
+          containerClassName="absolute inset-0"
+          className="object-contain p-6"
+          priority
+        />
       </div>
 
       <div className="flex flex-col gap-2 text-center sm:pt-2 sm:text-left">

@@ -64,7 +64,7 @@ export default function Home() {
     <main className="mx-auto flex max-w-7xl flex-col items-center px-6 py-12 text-center sm:py-16 md:py-24">
       <h1 className="sr-only">{CONTENT.brand.name}</h1>
       <div className="mb-8 w-full">
-        <ImageSlot name="homeBanner" ratio="16/5" label="Home hero banner" />
+        <ImageSlot name="homeBanner" ratio="16/5" label="Home hero banner" priority />
       </div>
       <p className="mb-8 text-shell-500">
         {CONTENT.home.heroSubtitle}

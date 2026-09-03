@@ -6,11 +6,11 @@ import {
   loadAdvancedSearchQueryActions,
   type ResultListState,
 } from "@coveo/headless";
-import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { Chip } from "@/components/ui/Chip";
+import { PokemonImage } from "@/components/ui/PokemonImage";
 import { CoveoConfigBanner } from "@/components/CoveoConfigBanner";
 import { CONTENT } from "@/content/pokedex";
 import { isCoveoConfigured } from "@/coveo/config";
@@ -147,19 +147,14 @@ function ComparePageContent() {
                 </th>
                 {items.map((item) => (
                   <td key={item.id} className="min-w-27.5 p-2 sm:min-w-35">
-                    {item.imageUrl ? (
-                      <div className="relative aspect-square w-20 sm:w-24">
-                        <Image
-                          src={item.imageUrl}
-                          alt={item.name}
-                          fill
-                          sizes="96px"
-                          className="object-contain object-left"
-                        />
-                      </div>
-                    ) : (
-                      "—"
-                    )}
+                    <PokemonImage
+                      src={item.imageUrl}
+                      alt={item.name}
+                      fallbackLabel={CONTENT.sprite.noImageLabel}
+                      sizes="96px"
+                      containerClassName="relative aspect-square w-20 sm:w-24"
+                      className="object-contain object-left"
+                    />
                   </td>
                 ))}
               </tr>

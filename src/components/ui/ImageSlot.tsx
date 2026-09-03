@@ -10,6 +10,10 @@ export interface ImageSlotProps {
    * when no art is set; also used as the real image's alt text once one
    * is. */
   label: string;
+  /** Pass for the page's LCP candidate only (e.g. the homepage banner) —
+   * forwarded to next/image's `priority`, which sets `fetchpriority="high"`
+   * and skips lazy-loading. */
+  priority?: boolean;
 }
 
 /**
@@ -24,13 +28,13 @@ export interface ImageSlotProps {
  * indexed `imageUrl` values from img.pokemondb.net (see mapPokemonResult.ts)
  * and always render through next/image directly against that host.
  */
-export function ImageSlot({ name, ratio, label }: ImageSlotProps) {
+export function ImageSlot({ name, ratio, label, priority }: ImageSlotProps) {
   const src = CONTENT.art[name];
 
   if (src) {
     return (
       <div className="relative w-full overflow-hidden rounded-md" style={{ aspectRatio: ratio }}>
-        <Image src={src} alt={label} fill className="object-cover" />
+        <Image src={src} alt={label} fill className="object-cover" priority={priority} />
       </div>
     );
   }
