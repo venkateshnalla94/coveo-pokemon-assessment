@@ -131,6 +131,7 @@ export default function PokemonDetailPageClient() {
             types={item.types}
             species={item.species}
             generation={item.generation}
+            overview={item.overview}
             topAbility={item.abilities[0]}
           />
           <PokemonStatPanel stats={item.stats} total={item.statTotal} types={item.types} />

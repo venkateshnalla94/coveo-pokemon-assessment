@@ -28,6 +28,8 @@ export interface PokemonItem {
   generation: string | undefined;
   dexNumber: string | undefined;
   species: string | undefined;
+  /** Intro/overview prose from the top of the pokemondb.net page — see docs/coveo-source-spec.md's `pokemonoverview` entry for the extraction rule. */
+  overview: string | undefined;
   height: string | undefined;
   weight: string | undefined;
   abilities: string[];
@@ -100,6 +102,7 @@ export function mapPokemonResult(result: Result): PokemonItem {
     generation: asString(result.raw[POKEMON_FIELDS.generation]),
     dexNumber: asString(result.raw[POKEMON_FIELDS.dexNumber]),
     species: asString(result.raw[POKEMON_FIELDS.species]),
+    overview: asString(result.raw[POKEMON_FIELDS.overview]),
     height: asString(result.raw[POKEMON_FIELDS.height]),
     weight: asString(result.raw[POKEMON_FIELDS.weight]),
     abilities: toStringArray(result.raw[POKEMON_FIELDS.abilities]),

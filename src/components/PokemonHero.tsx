@@ -21,6 +21,7 @@ export interface PokemonHeroProps {
   types: string[];
   species: string | undefined;
   generation: string | undefined;
+  overview: string | undefined;
   /** `abilities[0]` — source order, not a verified primary ability; see CONTENT.pdp.abilityLabel's comment. */
   topAbility: string | undefined;
 }
@@ -32,6 +33,7 @@ export function PokemonHero({
   types,
   species,
   generation,
+  overview,
   topAbility,
 }: PokemonHeroProps) {
   // Type-driven lighting (v4 plan §5/§2.3, reused here). `types[0]` is not a
@@ -91,6 +93,7 @@ export function PokemonHero({
           {name}
         </h1>
         {species && <p className="text-sm text-shell-500">{species}</p>}
+        {overview && <p className="mt-1 max-w-prose text-sm text-foreground/80">{overview}</p>}
         {types.length > 0 && (
           <p className="mt-1 flex flex-wrap items-center justify-center gap-1.5 sm:justify-start">
             {types.map((type) => (

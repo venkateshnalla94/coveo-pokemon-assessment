@@ -8,7 +8,7 @@ history, look up the session number in `docs/handoff/INDEX.md`.
 ## Org details
 
 - Org name: `venkatesh-pokemon-challenge`, Org ID: `venkateshpokemonchallenges0qp5rpy`
-- Created **2026-08-25** — 14-day trial deletion clock runs from this date. Book the presentation by **2026-09-06** (creation + 12 days). **Still not booked, and the Phase 0 email reply with the Org ID still hasn't been sent** — explicitly deferred by user decision, not forgotten, but now idle across **six** sessions and the deadline is 9 days out as of this writing.
+- Created **2026-08-25** — 14-day trial deletion clock runs from this date, nominally **2026-09-06**. Presentation is now booked for **2026-09-09** (later than the nominal deletion date) — per user, this has been confirmed handled with Coveo as of 2026-09-02, so the org is not expected to be deleted before then. Phase 0 email reply with the Org ID still hasn't been sent as of this writing.
 - License: Enterprise, Demo type, expires 2026-11-24.
 - Two sources: `Pokedex - Test` (3 items — Pikachu/Garchomp/Sprigatito, 26 fields, sandbox/prototyping only) and `Pokedex - Full` (1025 items, the real crawl — **now also on the full 26-field config as of the sixth session's Phase v2.2 work**, see that section above). Both fully verified. `Pokedex - Full` is what the running app actually queries (the pipeline's `filter cq @source==("Pokedex - Full")` rule excludes Test), so the new fields are genuinely live, not just prototyped.
 - `Pokedex` query pipeline: condition `Search Hub is PokedexSearch`, filter rule `filter cq @source==("Pokedex - Full")`. Four ML models associated as of this session: `Pokedex Query Suggestions`, `Pokedex Semantic Encoder`, `Pokedex RGA`, `Pokedex Passage Retrieval` — all Active, all verified working end to end.
@@ -35,14 +35,14 @@ history, look up the session number in `docs/handoff/INDEX.md`.
 
 **As of the thirty-fifth session, the urgent priority is:**
 
-1. **BLOCKING: Coveo ML model rebuild status (deadline 2026-09-06, 5 days away).**
-   User sent the 2026-08-31 off-cycle rebuild request email to Coveo (RGA + Semantic Encoder + CPR), but **Coveo has not yet completed the rebuild as of this session**. CPR still contains stale/raw-table content, RGA's answer rate is only 71.5%. **Immediate escalation needed:** contact Coveo's Account Manager directly (not via email backlog) requesting rebuild ETA and confirming whether it will land before the 2026-09-06 presentation deadline. If not, scope the live demo to RGA-only queries (no CPR/"Ask about this Pokemon") on the known-clean Pokemon (Charizard, Pikachu, Eevee). The `docs/Execution-plan-ML-model-check.md` file (created this session) is the diagnostic reference for any follow-up verification.
+1. **BLOCKING: Coveo ML model rebuild status.**
+   User sent the 2026-08-31 off-cycle rebuild request email to Coveo (RGA + Semantic Encoder + CPR), but **Coveo has not yet completed the rebuild as of this session**. CPR still contains stale/raw-table content, RGA's answer rate is only 71.5%. A follow-up call is booked with Coveo for **2026-09-09, 12:00 PM EST** — same day as the presentation. If the rebuild isn't confirmed complete by then, scope the live demo to RGA-only queries (no CPR/"Ask about this Pokemon") on the known-clean Pokemon (Charizard, Pikachu, Eevee). The `docs/Execution-plan-ML-model-check.md` file (created earlier session) is the diagnostic reference for any follow-up verification.
 
 2. **Both presentation decks** (Advanced tier) — still not started:
    `presentation/topic1-technical-deepdive.md` and
-   `presentation/topic2-escalation-recovery.md`. The stale-content/rebuild-request finding from this session (Chunk Inspector gap, raw Moves tables on Charizard, unpredictable embedding staleness even on the RGA side) is good material for Topic 1's technical deep-dive. See item 4 in the older numbered list below, which still applies.
+   `presentation/topic2-escalation-recovery.md`. The stale-content/rebuild-request finding (Chunk Inspector gap, raw Moves tables on Charizard, unpredictable embedding staleness even on the RGA side) is good material for Topic 1's technical deep-dive. See item 4 in the older numbered list below, which still applies. **Presentation date is 2026-09-09** — decks need to be ready before then.
 
-3. **Phase 0 email + presentation-slot booking** (deadline 2026-09-06) — status confirmed this session: Phase 0 email has NOT been sent, rebuild email was sent but rebuild incomplete. Book the presentation slot before the deadline or the org gets deleted.
+3. **Phase 0 email** with the Org ID still hasn't been sent as of this writing. Presentation slot is booked (2026-09-09); trial-deletion risk around the nominal 2026-09-06 clock has been confirmed handled with Coveo per the user.
 
 4. **Chat agent — future goal, blocked externally, not actionable right now.**
 
