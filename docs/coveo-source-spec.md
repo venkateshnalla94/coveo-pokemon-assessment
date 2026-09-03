@@ -1,6 +1,6 @@
 # Coveo source & field-mapping spec
 
-The live reference for what's actually configured in the Coveo admin console — org access arrived and both `Pokedex - Test` and `Pokedex - Full` are built and indexing (see `docs/HANDOFF.md`). Keep this in sync with whatever is actually configured — this is the contract between the source and `src/coveo/fields.ts`.
+The live reference for what's actually configured in the Coveo admin console — org access arrived and both `Pokedex - Test` and `Pokedex - Full` are built and indexing (see `docs/handoff/`). Keep this in sync with whatever is actually configured — this is the contract between the source and `src/coveo/fields.ts`.
 
 See `docs/archive/EXECUTION-PLAN.md` (Findings that change the build, Adjudicated rulings C1/C2/C3/C6) for the full reasoning behind the fields and rules below — not duplicated at length here.
 
@@ -46,6 +46,7 @@ See `docs/archive/EXECUTION-PLAN.md` (Findings that change the build, Adjudicate
 | `pokemoneggcycles` | `(//table[@class="vitals-table"])[3]//tr[th/a[text()="Egg cycles"]]/td/text()[1]` | Same link-wrapped-`<th>` and two-text-node `<td>` traps as `pokemonbasefriendship`/`pokemoncatchrate` (`<th>` is `<a href="/glossary#def-eggcycle">Egg cycles</a>`; `<td>` holds the number then a `<small>` steps range). |
 | `pokemonweaknessesraw` | `(//table[contains(@class,"type-table-pokedex")])[position()<=2]//td[contains(@class,"type-fx-200") or contains(@class,"type-fx-400")]/@title` | Intermediate field, not consumed by the frontend directly — see IPE below. |
 | `pokemonresistancesraw` | `(//table[contains(@class,"type-table-pokedex")])[position()<=2]//td[contains(@class,"type-fx-50") or contains(@class,"type-fx-0")]/@title` | Intermediate field, not consumed by the frontend directly — see IPE below. |
+| `pokemonoverviewraw` | CSS: `ul.list-nav.panel.panel-nav ~ p::text` | Intermediate field, not consumed by the frontend directly — see the overview-join IPE below. **Not designed/verified live in the console this session — see "Status: `pokemonoverview` (designed, not yet applied)" below.** |
 
 **Type-defense structure, why `weaknessesraw`/`resistancesraw` need position-scoping:** the "Type defenses" section (§6 of `docs/pokemon-data-inventory.md`) renders as two 9-column `<table class="type-table type-table-pokedex">` blocks (18 types total), with the type name in each `<th><a title="...">` header and the multiplier in a same-column `<td class="type-fx-N">` — no direct DOM link between a header and its cell, so extraction reads the cell's own `@title` attribute (e.g. `"Ground → Electric = super-effective"`) instead, and a postConversion IPE below strips it to just the leading type name. Confirmed against the two trap Pokemon, both fetched directly:
 
@@ -84,6 +85,51 @@ except Exception:
 | `pokemonevolvesto` | `//a[@class="ent-name"][ancestor::div[@class="infocard "][1]/preceding-sibling::div[@class="infocard "][1]//a[@class="ent-name"]/text()=//h1/text() or ancestor::div[@class="infocard "][1]/ancestor::span[@class="infocard-evo-split"][1]/preceding-sibling::div[@class="infocard "][1]//a[@class="ent-name"]/text()=//h1/text()]/text()` | **Multi-value** (changed from single-value in the eleventh session). Every real next-evolution branch (e.g. Eevee → all 8 Eeveelutions), or empty for a fully-evolved Pokemon. **Not deduped** — see `pokemonevolvestoimageurl` below and `EvolutionTarget`'s doc comment in `mapPokemonResult.ts`: Pikachu's two branches to regular/Alolan Raichu both render the ent-name text "Raichu", a real duplicate *name*, but the two branches have genuinely different sprites, so the frontend keeps them as separate entries rather than collapsing them. |
 | `pokemonevolvesfromimageurl` | `(//a[@class="ent-name"][text()=//h1/text()]/ancestor::div[@class="infocard "][1]/preceding-sibling::div[@class="infocard "][1] \| //a[@class="ent-name"][text()=//h1/text()]/ancestor::div[@class="infocard "][1]/ancestor::span[@class="infocard-evo-split"][1]/preceding-sibling::div[@class="infocard "][1])[1]//img/@src` | String, single-value. New in the eleventh session. Exact same predicate as `pokemonevolvesfrom`, just resolving to the sibling `<img class="img-fixed img-sprite">`'s `@src` (a small sprite, e.g. `.../sprites/home/normal/2x/pichu.jpg`) instead of the `<a class="ent-name">`'s text — sitting in the same `<div class="infocard ">` as the name. |
 | `pokemonevolvestoimageurl` | `//a[@class="ent-name"][ancestor::div[@class="infocard "][1]/preceding-sibling::div[@class="infocard "][1]//a[@class="ent-name"]/text()=//h1/text() or ancestor::div[@class="infocard "][1]/ancestor::span[@class="infocard-evo-split"][1]/preceding-sibling::div[@class="infocard "][1]//a[@class="ent-name"]/text()=//h1/text()]/ancestor::div[@class="infocard "][1]//img/@src` | **Multi-value.** New in the eleventh session. Exact same predicate as `pokemonevolvesto`, mirrored onto the sprite `@src` inside each matching candidate's own infocard. Deliberately a *second*, independent field rather than folding the image into `pokemonevolvesto` somehow — Coveo's Web Scraping Configuration has no "extract two things per matched node into one field" construct, so this relies on both selectors walking the identical document-order node stream under the identical predicate to stay index-aligned. **This was verified, not assumed** — both arrays were zipped and printed side by side against real fetched HTML for Pikachu, Eevee, Charizard, and Charmander before committing to the design; see the eleventh-session chat log for the full output. Regular vs. Alolan Raichu (Pikachu's two `evolvesto` branches) resolve to genuinely different sprite URLs (`raichu.jpg` vs `raichu-alolan.jpg`) despite sharing a name — the reason `pokemonevolvesto` is left undeduped. |
+
+## `pokemonoverview` (PDP overview/intro prose) — applied and verified live, both sources (42nd session)
+
+**Status: live on both `Pokedex - Test` and `Pokedex - Full`, verified via Content Browser JSON after rebuild.** Designed in the 41st session (no console access that session); applied by hand in the 42nd session following the numbered sequence below. Test verified first — Pikachu 2 paragraphs, Garchomp 4, Sprigatito 3, all matching the predicted counts exactly. `Pokedex - Full` then got the same Web Scraping Configuration entry + mapping additions (not a wholesale exported-config paste — the full-source export carries `startingAddresses`/security settings that a blind paste would have overwritten with Test's 3-URL crawl seed), rebuilt, and spot-checked: post-rebuild Pikachu on `Pokedex - Full` matched Test's Pikachu output byte-for-byte, including the joined `pokemonoverview` string and the underlying `pokemonoverviewraw` array. Frontend (`src/coveo/fields.ts`, `src/coveo/mapPokemonResult.ts`, `src/components/PokemonHero.tsx`, `PokemonDetailPageClient.tsx`) was wired in the same session — see `docs/handoff/LATEST.md`'s 42nd-session entry.
+
+**Source content:** the four (sometimes fewer — see below) intro `<p>` elements sitting directly between the entity-nav `<ul class="list-nav panel panel-nav">` and `<div id="dex-basics">`, siblings of both under `<main class="main-content grid-container">`.
+
+**Selector — CSS, not XPath, and why:** `ul.list-nav.panel.panel-nav ~ p::text`. Two things pushed this off the file's usual XPath-`text()` convention:
+
+1. **XPath `text()` fragments on nested inline tags.** Per `docs.coveo.com/en/mahe0350` ("Web scraping configuration"), an XPath rule ending in `text()` returns each *direct child text node* as a separate array entry — tested against Charizard's real HTML with `lxml`, `(//ul[...]/following-sibling::p[following-sibling::div[@id="dex-basics"]])/text()` returned **15** fragments for 4 paragraphs (e.g. `"Charizard"`, `"Fire"`, `"/"`, `"Flying"` split apart because the paragraph text is threaded with `<a>` links to the name/type/generation). Not usable for prose.
+2. **CSS's `::text` suffix returns each matched element's full inner text as one array entry**, per the same doc page ("Add `::text` at the end of a CSS selector to select the inner text of an HTML element" — matched-element text is not fragmented by nested tags the way XPath `text()` is). Verified with `lxml` against Pikachu/Garchomp/Sprigatito/Charizard: this selector resolves to exactly the paragraph-count list below, one full paragraph per array entry.
+
+**Verified paragraph counts per Pokemon (real fetched HTML, `lxml`, this session):** Pikachu 2, Sprigatito 3, Garchomp 4, Charizard 4 — the section isn't always exactly 4 paragraphs (some Pokemon lack a design-inspiration or notable-facts paragraph), so the selector must not assume a fixed count.
+
+**Why the selector is safe unscoped (no extra boundary needed):** `ul.list-nav.panel.panel-nav` appears **3 times** on Pikachu's/Garchomp's/Charizard's pages (Sprigatito only has 1) — once for the entity nav, twice more for Moves/Sprites tab navs further down. CSS's `~` general-sibling combinator only matches `<p>` elements sharing the *same parent* as a matched `ul`, and checked directly against real fetched HTML: only the first (entity-nav) occurrence has any `<p>` siblings at all — the Moves/Sprites occurrences are followed by `<div>`s, not `<p>`s — so the unscoped selector picks up only the intended paragraphs, no false positives, on every sample page.
+
+**Field-shape mismatch found and resolved — read before creating the field.** A CSS/XPath rule matching multiple nodes always returns a multi-value array by default in Web Scraping Configuration (confirmed via `docs.coveo.com/en/o3ca0547` and `/en/mahe0350` — there is no join operator in the extraction-rule syntax itself). But `src/coveo/mapPokemonResult.ts:105` already reads this field with `asString(result.raw[POKEMON_FIELDS.overview])`, and `asString()` (`mapPokemonResult.ts:171-173`) returns `undefined` for anything that isn't a plain JS `string` — an array would silently blank the PDP's overview section, not throw. `src/coveo/fields.ts` already has `overview: "pokemonoverview"` wired in, confirming the frontend's contract is single-value. So `pokemonoverview` itself must **not** be the raw multi-value extraction field; instead, follow this file's own established two-field pattern (`pokemonweaknessesraw`/`pokemonresistancesraw` → postConversion IPE → `pokemonweaknesses`/`pokemonresistances`):
+
+1. **`pokemonoverviewraw`** — extraction field, CSS `ul.list-nav.panel.panel-nav ~ p::text` (above). Field type: String, **Multi-value facet** (the only mechanism this console offers for storing >1 value in a String field — same reasoning as every other multi-value field in this file). Not consumed by the frontend directly, not surfaced as a UI facet.
+2. **postConversion IPE** (same Content → Extensions location as the `pokemongeneration`/weaknesses-resistances IPEs, attached to the pipeline the same way):
+
+```python
+try:
+    overview_raw = document.get_meta_data_value('pokemonoverviewraw')
+    if overview_raw:
+        parts = overview_raw if isinstance(overview_raw, list) else [overview_raw]
+        joined = "\n\n".join(p.strip() for p in parts if p and p.strip())
+        if joined:
+            document.add_meta_data({'pokemonoverview': joined})
+except Exception:
+    pass
+```
+
+3. **`pokemonoverview`** — the field the frontend already reads. String, **single-value** (no facet, no sort — free-form prose, not a filter dimension; matches `asString()`'s expectation exactly). Paragraphs are joined with `"\n\n"` so the source string still carries paragraph boundaries if a future render wants to split on them — this file does not prescribe how the frontend renders that (out of this task's scope; frontend code wasn't touched).
+
+**Console steps to apply this (not yet executed — no console/API access this session):**
+
+1. Sources → `Pokedex - Test` → Source settings → Web scraping configuration (Edit with JSON, same `ScrapingConfiguration` parameter shown in `docs/pokedex-test_final_config.json`) → add to the `"Pokemon page fields"` config's `"metadata"` object: `"pokemonoverviewraw": {"type": "CSS", "path": "ul.list-nav.panel.panel-nav ~ p::text"}`.
+2. Fields → Add a field → Name `pokemonoverviewraw`, Type `String`, enable Multi-value facet (separator `;`).
+3. Fields → Add a field → Name `pokemonoverview`, Type `String`, no facet/sort.
+4. Content → Extensions → add the postConversion IPE above (or add to the existing weaknesses/resistances IPE's `try` block as a third clause) → attach to `Pokedex - Test`'s pipeline the same way the existing IPEs are attached.
+5. Sources → `Pokedex - Test` → Mappings → add `%[pokemonoverviewraw]` → `pokemonoverviewraw` and `%[pokemonoverview]` → `pokemonoverview` (both METADATA extraction method, matching the existing mapping-entry shape).
+6. Rebuild `Pokedex - Test`. Content Browser → confirm Pikachu/Garchomp/Sprigatito's `pokemonoverview` each hold one joined string with the paragraph counts verified above (2/4/3), not an array.
+7. Repeat steps 1–5 on `Pokedex - Full`, trigger a full rebuild (1025 items).
+8. Update this section's "Status" line once actually verified live, and log the session in `docs/handoff/LATEST.md`.
 
 **Evolution-chart structure, why these selectors are shaped the way they are:** the chart is a sequence of `<a class="ent-name">` links, each wrapped in its own `<div class="infocard ">`, with no explicit "this is the current page's own Pokemon" marker — every stage renders identically. Two real bugs were hit and fixed while first building this (pre-eleventh-session):
 
@@ -125,4 +171,6 @@ After indexing the test source, use the admin console's content browser to confi
 
 ## Status
 
-Both sources exist and are indexing: `Pokedex - Test` (the 3-document prototyping source referenced throughout this file) and `Pokedex - Full` (the real crawl, 24+ fields as of the Phase v2.1/v2.2 migration — see `docs/HANDOFF.md`'s sixth-session section for the live field count and any drift from this file). The `Pokedex` query pipeline's `filter cq @source==("Pokedex - Full")` rule means the app only ever sees `Pokedex - Full` at runtime; `Pokedex - Test` remains for prototyping new extraction rules before promoting them here.
+Both sources exist and are indexing: `Pokedex - Test` (the 3-document prototyping source referenced throughout this file) and `Pokedex - Full` (the real crawl, 24+ fields as of the Phase v2.1/v2.2 migration — see `docs/handoff/archive/sessions-001-006.md`'s sixth-session section for the live field count and any drift from this file). The `Pokedex` query pipeline's `filter cq @source==("Pokedex - Full")` rule means the app only ever sees `Pokedex - Full` at runtime; `Pokedex - Test` remains for prototyping new extraction rules before promoting them here.
+
+**Open item:** `pokemonoverview` (PDP overview/intro prose — see that section above) is designed and content-verified against real fetched HTML but **not yet created in the console on either source** — no console/API access in the session that designed it. Next session with console access: follow the numbered steps in that section.

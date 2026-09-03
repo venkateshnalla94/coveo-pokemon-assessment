@@ -26,6 +26,12 @@ export const CONTENT = {
     gotItLabel: "Got it",
   },
 
+  sprite: {
+    // Shown wherever a Pokemon sprite (imageUrl) is genuinely absent from
+    // the index — see src/components/ui/PokemonImage.tsx.
+    noImageLabel: "No image available",
+  },
+
   home: {
     heroSubtitle: "Search every Pokemon indexed from pokemondb.net, powered by Coveo.",
     indexedCountSuffix: (total: number) => ` ${total.toLocaleString()} Pokemon indexed.`,
@@ -153,6 +159,7 @@ export const CONTENT = {
     // see v4 plan §10.
     notFoundMessage: "We couldn't find any of the selected Pokemon in the index.",
     rowLabels: {
+      image: "Image",
       type: "Type",
       height: "Height",
       weight: "Weight",

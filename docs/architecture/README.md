@@ -13,4 +13,4 @@ Read order:
 
 Each page doc covers, in order: a component-tree diagram, every Headless controller in play and which engine it runs against, the server-vs-client component boundary and why, any Context API usage, and exactly which values are hardcoded constants vs. live Coveo data — with a file/line pointer so nothing here goes stale silently.
 
-For org-side facts (source config, field mappings, ML model status, API key privileges) this doesn't repeat `docs/HANDOFF.md` — that file is the single source of truth for org state and is linked wherever relevant. For *why* a given architectural choice was made, the relevant ADR under `docs/adr/` is linked rather than re-argued here.
+For org-side facts (source config, field mappings, ML model status, API key privileges) this doesn't repeat `docs/handoff/` — that file is the single source of truth for org state and is linked wherever relevant. For *why* a given architectural choice was made, the relevant ADR under `docs/adr/` is linked rather than re-argued here.

@@ -14,7 +14,7 @@ import { useControllerState } from "@/coveo/useControllerState";
  * in the installed @coveo/headless@3.55.2) — explicit ranges, not
  * `generateAutomaticRanges`, per docs/EXECUTION-PLAN-v2.3-frontend.md §5.
  * Depends on `pokemonspeed` being an Integer field with facet support
- * enabled in the org — confirmed already done per docs/HANDOFF.md.
+ * enabled in the org — confirmed already done per docs/handoff/.
  */
 export function FacetSpeed({ collapsible }: { collapsible?: boolean } = {}) {
   const [facet] = useState(() =>

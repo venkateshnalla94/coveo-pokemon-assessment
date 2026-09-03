@@ -10,6 +10,7 @@ export const POKEMON_FIELDS = {
   name: "pokemonname",
   dexNumber: "pokemondexnumber",
   species: "pokemonspecies",
+  overview: "pokemonoverview",
   height: "pokemonheight",
   weight: "pokemonweight",
   abilities: "pokemonabilities",

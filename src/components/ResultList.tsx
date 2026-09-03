@@ -1,7 +1,6 @@
 "use client";
 
 import { buildInteractiveResult, buildResultList, type Result, type SearchEngine } from "@coveo/headless";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import type { CSSProperties } from "react";
@@ -9,6 +8,7 @@ import { useState } from "react";
 import { useCompare } from "@/components/compare/CompareProvider";
 import { Chip } from "@/components/ui/Chip";
 import { ImageSlot } from "@/components/ui/ImageSlot";
+import { PokemonImage } from "@/components/ui/PokemonImage";
 import { CONTENT } from "@/content/pokedex";
 import { getSearchEngine } from "@/coveo/engine";
 import type { PokemonItem } from "@/coveo/mapPokemonResult";
@@ -86,6 +86,7 @@ export function ResultList() {
               result={state.results[index]}
               engine={engine}
               fromHref={fromHref}
+              priority={index === 0}
             />
           ))}
         </ul>
@@ -98,11 +99,13 @@ function ResultCard({
   result,
   engine,
   fromHref,
+  priority,
 }: {
   item: PokemonItem;
   result: Result;
   engine: SearchEngine;
   fromHref: string;
+  priority: boolean;
 }) {
   const [interactiveResult] = useState(() =>
     buildInteractiveResult(engine, { options: { result } }),
@@ -141,21 +144,22 @@ function ResultCard({
       style={glowVars}
     >
       <Link href={detailHref} className="block" onClick={() => interactiveResult.select()}>
-        {item.imageUrl && (
-          // Oversized, overflowing the tile's top edge by ~12% (v4 plan
-          // §5) — a negative top margin greater than the tile's own
-          // padding, on a `<li>` with no `overflow: hidden`, so the sprite
-          // bleeds past the drawn edge instead of being clipped by it.
-          <div className="relative mt-[-12%] mb-2 aspect-square w-full">
-            <Image
-              src={item.imageUrl}
-              alt={item.name}
-              fill
-              sizes="(min-width: 768px) 22vw, (min-width: 640px) 28vw, 42vw"
-              className="object-contain transition-transform duration-200 ease-out group-hover:scale-105 group-focus-within:scale-105"
-            />
-          </div>
-        )}
+        {/* Oversized, overflowing the tile's top edge by ~12% (v4 plan §5)
+            — a negative top margin greater than the tile's own padding, on
+            a `<li>` with no `overflow: hidden`, so the sprite bleeds past
+            the drawn edge instead of being clipped by it. Rendered
+            unconditionally (real sprite or themed placeholder) so every
+            tile keeps this treatment regardless of whether the index has
+            an image for it. */}
+        <PokemonImage
+          src={item.imageUrl}
+          alt={item.name}
+          fallbackLabel={CONTENT.sprite.noImageLabel}
+          sizes="(min-width: 768px) 22vw, (min-width: 640px) 28vw, 42vw"
+          containerClassName="relative mt-[-12%] mb-2 aspect-square w-full"
+          className="object-contain transition-transform duration-200 ease-out group-hover:scale-105 group-focus-within:scale-105"
+          priority={priority}
+        />
         {/* Synchronized hover (v4 plan §5, Appendix A): sprite (scales,
             above), name and dex number (this block) highlight together as
             one path on hover/focus. Type chips below are intentionally

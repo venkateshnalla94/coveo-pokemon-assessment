@@ -1,6 +1,6 @@
 # docs/ index
 
-What's in this folder and why. `HANDOFF.md` is still the single source of truth for current build state — read it first. This file is a map for finding the right doc without re-reading everything cold, useful especially while pulling material for the two panel presentations (`presentation/topic1-technical-deepdive.md`, `presentation/topic2-escalation-recovery.md`).
+What's in this folder and why. `handoff/` is still the single source of truth for current build state — read `handoff/STATE.md` and `handoff/LATEST.md` first. This file is a map for finding the right doc without re-reading everything cold, useful especially while pulling material for the two panel presentations (`presentation/topic1-technical-deepdive.md`, `presentation/topic2-escalation-recovery.md`).
 
 ## Requirements source
 
@@ -9,16 +9,17 @@ What's in this folder and why. `HANDOFF.md` is still the single source of truth 
 
 ## Live reference — current state, keep in sync as the app changes
 
-- `HANDOFF.md` — session-by-session build log and current-state snapshot. Read first, every session.
+- `handoff/` — session-by-session build log, decomposed so a normal session doesn't read the whole history: `STATE.md` (evergreen current state: org details, what's done, what's next, traps, reference docs — read first, every session), `LATEST.md` (the in-progress batch of recent session entries — read every session too), `INDEX.md` (session number → archive file lookup), `archive/sessions-NNN-NNN.md` (closed-out 10-session batches — open only when a task needs that specific history). See `handoff/README.md` for the full mechanics.
 - `plan101.md` — the org-setup build plan, status current through Stage E3.
 - `coveo-source-spec.md` — live selector/field/mapping/IPE spec for both Coveo sources; the contract between the source config and `src/coveo/fields.ts`.
 - `passage-retrieval-pov.md` — the Bonus-tier "point of view on Passage Retrieval vs. RGA" deliverable. Direct source material for Topic 1's GenAI Q&A prep.
 - `standards.md` — a generalized engineering playbook pulled from a prior project.
 - `standards-adoption.md` — what of `standards.md` was adopted/adapted/skipped here, and why. Backing material for Topic 1's "why this architecture" questions.
-- `adr/0001`–`0018` — the decision log. Primary source material for Topic 1: every "why did you choose X" panel question maps to one of these. `0017`/`0018` are new (this cleanup pass): they document two rounds of live-review UI corrections (home hero/PDP hero, search facet UX) that had shipped without an ADR.
+- `adr/0001`–`0022` — the decision log. Primary source material for Topic 1: every "why did you choose X" panel question maps to one of these. `0017`/`0018` are new (this cleanup pass): they document two rounds of live-review UI corrections (home hero/PDP hero, search facet UX) that had shipped without an ADR.
+- `coveo-mcp-analysis.md` — research on Coveo's Hosted MCP Server, evaluated for FE-dev tooling and end-consumer use and not adopted for either (`adr/0022`).
 - `architecture/` — system overview + one doc per page (home/search/detail/compare) + an improvement-opportunities doc. Useful for Topic 1's architecture walkthrough and for anticipating "what would you change" questions.
-- `DEFAULT_QUERIES.csv` — the Query Suggest preload file (1070 rows), committed as a build asset.
-- `temp/stage-d/*.png` — screenshots of D7/D9/D10 verification evidence (Query Suggest 200 response, RGA answer), referenced from `HANDOFF.md`.
+- `query suggestions/DEFAULT_QUERIES.csv` — the Query Suggest preload file (1070 rows), committed as a build asset.
+- `temp/stage-d/*.png` — screenshots of D7/D9/D10 verification evidence (Query Suggest 200 response, RGA answer), referenced from `handoff/`.
 
 ## Completed execution plans — historical, not required reading
 
@@ -48,12 +49,12 @@ What's in this folder and why. `HANDOFF.md` is still the single source of truth 
 ## Presentation prep
 
 - `presentation_guidence.md` — **gitignored, not part of the public repo.** Private rule set for building the two decks (what the panel evaluates, narrative structure, anticipated Q&A). Read this before drafting either deck.
-- `../presentation/topic1-technical-deepdive.md`, `../presentation/topic2-escalation-recovery.md` — the deck drafts themselves. **Known stale as of this cleanup**: Topic 1's draft says "Vercel deploy is still pending," but `HANDOFF.md` records the deploy as live since the eighteenth session — needs a content refresh pass before use, not just a docs/ reorganization.
+- `../presentation/topic1-technical-deepdive.md`, `../presentation/topic2-escalation-recovery.md` — the deck drafts themselves. **Known stale as of this cleanup**: Topic 1's draft says "Vercel deploy is still pending," but `handoff/` records the deploy as live since the eighteenth session — needs a content refresh pass before use, not just a docs/ reorganization.
 
 ## Cleanup notes (this pass)
 
-Removed as pure junk, no content lost: `.DS_Store` files (macOS artifacts, untracked), `temp/insiprations/` (two empty, untracked subdirectories), `input.md` (an unreferenced raw-pasted license/admin snippet). Corrected two stale status headers (`archive/EXECUTION-PLAN-ml-recommendations.md`, `archive/EXECUTION-PLAN-similar-pokemon-carousel.md`) that said "blocked"/"not started" when `HANDOFF.md` already recorded both as resolved/shipped in the twentieth session.
+Removed as pure junk, no content lost: `.DS_Store` files (macOS artifacts, untracked), `temp/insiprations/` (two empty, untracked subdirectories), `input.md` (an unreferenced raw-pasted license/admin snippet). Corrected two stale status headers (`archive/EXECUTION-PLAN-ml-recommendations.md`, `archive/EXECUTION-PLAN-similar-pokemon-carousel.md`) that said "blocked"/"not started" when `handoff/` already recorded both as resolved/shipped in the twentieth session.
 
-A later pass moved all nine `EXECUTION-PLAN*.md` files into `archive/` — the content and every cross-reference are unchanged, only the location, so a first-time reviewer's `ls docs/` isn't 9 plan files deep before reaching `HANDOFF.md`/`adr/`/`architecture/`. `presentation/build/`, `presentation/output/`, and `docs/temp/deck-assets/` (build toolchain, generated `.pptx` output, and deck-prep screenshots, all previously untracked working-tree content) were added to `.gitignore` for the same reason — none of it is part of the app or its evidence trail.
+A later pass moved all nine `EXECUTION-PLAN*.md` files into `archive/` — the content and every cross-reference are unchanged, only the location, so a first-time reviewer's `ls docs/` isn't 9 plan files deep before reaching `handoff/`/`adr/`/`architecture/`. `presentation/build/`, `presentation/output/`, and `docs/temp/deck-assets/` (build toolchain, generated `.pptx` output, and deck-prep screenshots, all previously untracked working-tree content) were added to `.gitignore` for the same reason — none of it is part of the app or its evidence trail.
 
-A follow-up pass audited `adr/` and `architecture/` against `HANDOFF.md`'s eighteenth-through-twenty-third-session entries and found the architecture docs had drifted from the live app, and two shipped UI decisions (home hero reversion, search facet UX fixes) had no ADR at all. Wrote `adr/0017` and `adr/0018` to close those gaps, and updated `architecture/00-system-overview.md`, `01-home-page.md`, `02-search-page.md`, `03-detail-page.md`, and `05-improvement-opportunities.md` to match current behavior (facet order/icons, the `aq` breadcrumb chip, the PDP's `SimilarPokemon` carousel and two-column hero, `/api/similar` as a third no-server-layer exception, and the resolved "Similar Creatures" and Vercel-deployment items). `architecture/04-compare-page.md` was checked and left untouched — no session since the eighteenth touches Compare.
+A follow-up pass audited `adr/` and `architecture/` against `handoff/`'s eighteenth-through-twenty-third-session entries (see `handoff/INDEX.md`) and found the architecture docs had drifted from the live app, and two shipped UI decisions (home hero reversion, search facet UX fixes) had no ADR at all. Wrote `adr/0017` and `adr/0018` to close those gaps, and updated `architecture/00-system-overview.md`, `01-home-page.md`, `02-search-page.md`, `03-detail-page.md`, and `05-improvement-opportunities.md` to match current behavior (facet order/icons, the `aq` breadcrumb chip, the PDP's `SimilarPokemon` carousel and two-column hero, `/api/similar` as a third no-server-layer exception, and the resolved "Similar Creatures" and Vercel-deployment items). `architecture/04-compare-page.md` was checked and left untouched — no session since the eighteenth touches Compare.

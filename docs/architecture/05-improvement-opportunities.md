@@ -1,6 +1,6 @@
 # Improvement opportunities
 
-Every item below was observed directly in the code or `docs/HANDOFF.md` this session — nothing here is invented or speculative. Ordered roughly by cost/impact for a panel audience, not by severity.
+Every item below was observed directly in the code or `docs/handoff/` this session — nothing here is invented or speculative. Ordered roughly by cost/impact for a panel audience, not by severity.
 
 ## 1. Rate limiter on `/api/passages` is per-instance, not shared (real, currently-shipped limitation)
 
@@ -20,7 +20,7 @@ Previously, `src/coveo/sortOptions.ts` had removed "Name A-Z" entirely after liv
 
 ## 4. Deferred features (already scoped, not silent gaps)
 
-Per the v2.3 plan's own §9 and `docs/HANDOFF.md`: the full branching evolution chain (Eevee-style — the source extraction only captures the first branch in document order, a documented crawler-selector limitation, not a frontend gap), an Evolution Stage facet (needs a new Inline Page Extension), and a Habitat facet (no honest small-vocabulary source field exists to back one). All of these were deliberately scoped out rather than overlooked — worth naming to an audience so "why isn't X built" has a real answer on hand.
+Per the v2.3 plan's own §9 and `docs/handoff/`: the full branching evolution chain (Eevee-style — the source extraction only captures the first branch in document order, a documented crawler-selector limitation, not a frontend gap), an Evolution Stage facet (needs a new Inline Page Extension), and a Habitat facet (no honest small-vocabulary source field exists to back one). All of these were deliberately scoped out rather than overlooked — worth naming to an audience so "why isn't X built" has a real answer on hand.
 
 **Resolved, no longer deferred:** the "Similar Creatures"/RelatedPokemon tab this item used to list as deferred shipped in the twentieth session as `SimilarPokemon.tsx`, a carousel backed by a new `/api/similar` route rather than a second query source sharing the page's main engine — exactly the architectural workaround this item predicted would be needed. See ADR-0014 (which ML capability, if any, backs it) and ADR-0015 (why a server route).
 
@@ -32,7 +32,7 @@ Per the v2.3 plan's own §9 and `docs/HANDOFF.md`: the full branching evolution 
 
 ## 6. What's already well-aligned with Coveo's own documented patterns (worth stating, not just gaps)
 
-- Every controller in the app (`buildFacet`, `buildSort`, `buildGeneratedAnswer`, `buildUrlManager`, etc.) is the real, installed `@coveo/headless` controller, confirmed against the package's own `.d.ts` files during the build sessions — no hand-rolled reimplementation of anything Headless already provides. This was an explicit, enforced standing rule mid-project (`docs/HANDOFF.md`'s "Standing instruction" note), not incidental.
+- Every controller in the app (`buildFacet`, `buildSort`, `buildGeneratedAnswer`, `buildUrlManager`, etc.) is the real, installed `@coveo/headless` controller, confirmed against the package's own `.d.ts` files during the build sessions — no hand-rolled reimplementation of anything Headless already provides. This was an explicit, enforced standing rule mid-project (`docs/handoff/archive/sessions-007-016.md`'s "Standing instruction" note), not incidental.
 - `useSyncExternalStore` for controller-state subscription (`src/coveo/useControllerState.ts`) is the React-recommended mechanism for exactly this class of external-store integration — adopted after a real crash surfaced the naive `subscribe()` + `useEffect` pattern's failure mode, not adopted speculatively.
 - The mapper boundary (`mapPokemonResult`) means every component renders a stable local model, never a raw Headless `Result` — if a source field is ever renamed, only one function changes.
 - Discriminated-union render states (`searchRenderState.ts`, `generatedAnswerRenderState.ts`) mean a component structurally cannot render "loading" and stale results simultaneously, or conflate "zero results" with "Coveo errored."
@@ -40,7 +40,7 @@ Per the v2.3 plan's own §9 and `docs/HANDOFF.md`: the full branching evolution 
 
 ## 7. Test coverage gap: controller-ordering sequencing has no dedicated regression test
 
-The `SearchUrlSync`-before-`SearchBox` render-order dependency described in [`02-search-page.md`](02-search-page.md) is currently correct only because of JSX ordering in `SearchPageContent` — there's no automated test that would fail if a future edit reordered those two components. `docs/HANDOFF.md` flags two specific e2e specs as written-but-not-yet-added: compare-selection-survives-navigation, and deep-linked-facet-URL-restores-state on a cold load. Both would exercise this ordering indirectly.
+The `SearchUrlSync`-before-`SearchBox` render-order dependency described in [`02-search-page.md`](02-search-page.md) is currently correct only because of JSX ordering in `SearchPageContent` — there's no automated test that would fail if a future edit reordered those two components. `docs/handoff/STATE.md` flags two specific e2e specs as written-but-not-yet-added: compare-selection-survives-navigation, and deep-linked-facet-URL-restores-state on a cold load. Both would exercise this ordering indirectly.
 
 **Why it matters:** this is exactly the kind of regression that wouldn't show up in a typecheck or unit test — only a live browser e2e run or careful manual QA would catch a reordering that silently breaks deep-linked search URLs.
 
@@ -50,4 +50,4 @@ Every manual `buildFacet`/`buildNumericFacet` call on this persistent, page-life
 
 ## Out of scope for this list
 
-The two presentation decks and confirming the Phase 0 org-enablement email/off-cycle ML-rebuild request were sent are real open items (`docs/HANDOFF.md` "What's next") but are delivery/operations tasks, not architecture gaps — they're intentionally not repeated here. (Vercel deployment, previously listed here as open, has been live since the eighteenth session.)
+The two presentation decks and confirming the Phase 0 org-enablement email/off-cycle ML-rebuild request were sent are real open items (`docs/handoff/STATE.md` "What's next") but are delivery/operations tasks, not architecture gaps — they're intentionally not repeated here. (Vercel deployment, previously listed here as open, has been live since the eighteenth session.)

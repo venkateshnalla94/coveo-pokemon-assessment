@@ -1,14 +1,14 @@
-import Image from "next/image";
 import type { CSSProperties } from "react";
 import { Chip } from "@/components/ui/Chip";
 import { DataList, type DataListRow } from "@/components/ui/DataList";
+import { PokemonImage } from "@/components/ui/PokemonImage";
 import { CONTENT } from "@/content/pokedex";
 import { getTypeColor, getTypeTextColor } from "@/coveo/typeColors";
 
 /**
  * Two-column commerce-PDP layout: a large sprite "packshot" panel on the
  * left, identity + type + quick facts on the right — see
- * docs/HANDOFF.md's PDP redesign entry for why. Supersedes the prior
+ * docs/handoff/archive/sessions-017-027.md's PDP redesign entry for why. Supersedes the prior
  * single-stacked-column version, which existed to let the sprite bleed
  * (via a negative top margin) over a full-bleed photographic backdrop band
  * rendered by the page above this component; that backdrop is gone, so
@@ -21,6 +21,7 @@ export interface PokemonHeroProps {
   types: string[];
   species: string | undefined;
   generation: string | undefined;
+  overview: string | undefined;
   /** `abilities[0]` — source order, not a verified primary ability; see CONTENT.pdp.abilityLabel's comment. */
   topAbility: string | undefined;
 }
@@ -32,6 +33,7 @@ export function PokemonHero({
   types,
   species,
   generation,
+  overview,
   topAbility,
 }: PokemonHeroProps) {
   // Type-driven lighting (v4 plan §5/§2.3, reused here). `types[0]` is not a
@@ -74,15 +76,15 @@ export function PokemonHero({
             #{dexNumber}
           </span>
         )}
-        {imageUrl && (
-          <Image
-            src={imageUrl}
-            alt={name}
-            fill
-            sizes="(min-width: 640px) 360px, 320px"
-            className="object-contain p-6"
-          />
-        )}
+        <PokemonImage
+          src={imageUrl}
+          alt={name}
+          fallbackLabel={CONTENT.sprite.noImageLabel}
+          sizes="(min-width: 640px) 360px, 320px"
+          containerClassName="absolute inset-0"
+          className="object-contain p-6"
+          priority
+        />
       </div>
 
       <div className="flex flex-col gap-2 text-center sm:pt-2 sm:text-left">
@@ -91,6 +93,7 @@ export function PokemonHero({
           {name}
         </h1>
         {species && <p className="text-sm text-shell-500">{species}</p>}
+        {overview && <p className="mt-1 max-w-prose text-sm text-foreground/80">{overview}</p>}
         {types.length > 0 && (
           <p className="mt-1 flex flex-wrap items-center justify-center gap-1.5 sm:justify-start">
             {types.map((type) => (

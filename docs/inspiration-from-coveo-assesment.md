@@ -1,6 +1,6 @@
 # Inspiration from coveo-assesment
 
-A separate, more mature Coveo take-home project at `/Users/venalla/coveo-assesment` (same author, a commerce/catalog search app) has already worked through security hardening, an analytics abstraction, RGA behavior, markdown rendering of generative content, facets, and other standards. This doc mines it for patterns worth bringing into this Pokemon project — each entry names the source file over there, checks it against what this repo actually has today (not assumed), and gives a concrete next step. This is a recommendations list, not a status doc — `docs/HANDOFF.md` and `docs/plan101.md` stay the source of truth for what's actually built.
+A separate, more mature Coveo take-home project at `/Users/venalla/coveo-assesment` (same author, a commerce/catalog search app) has already worked through security hardening, an analytics abstraction, RGA behavior, markdown rendering of generative content, facets, and other standards. This doc mines it for patterns worth bringing into this Pokemon project — each entry names the source file over there, checks it against what this repo actually has today (not assumed), and gives a concrete next step. This is a recommendations list, not a status doc — `docs/handoff/` and `docs/plan101.md` stay the source of truth for what's actually built.
 
 ## Tier 1 — do soon, cheap, no real tradeoff
 

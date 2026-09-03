@@ -2,11 +2,11 @@
 
 Take-home assessment for a Coveo Forward Deployed Engineer role. Next.js + [`@coveo/headless`](https://docs.coveo.com/en/headless/latest/) search frontend over pokemondb.net. Full requirements: `docs/`.
 
-**To evaluate this repo**, this file plus `docs/adr/` (18 short decision records) cover the architecture and the "why" behind it. `docs/HANDOFF.md` and `docs/archive/` are a session-by-session build log and superseded planning docs — real build history, kept for anyone who wants the "problem → iteration → fix" detail, but not required reading to judge the app.
+**To evaluate this repo**, this file plus `docs/adr/` (18 short decision records) cover the architecture and the "why" behind it. `docs/handoff/` and `docs/archive/` are a session-by-session build log and superseded planning docs — real build history, kept for anyone who wants the "problem → iteration → fix" detail, but not required reading to judge the app.
 
 ## Status
 
-Connected to a live Coveo org and deployed on Vercel: search, faceting (Automatic Facet Generation plus manual Speed/Abilities facets), Query Suggest typeahead, Generated Answer (RGA), a Pokemon detail page with a Similar Pokemon carousel, Passage Retrieval ("Ask about this Pokemon"), and a Compare view all work end to end against real indexed data. Open items are the two panel presentation decks — current state and next steps: `docs/HANDOFF.md`.
+Connected to a live Coveo org and deployed on Vercel: search, faceting (Automatic Facet Generation plus manual Speed/Abilities facets), Query Suggest typeahead, Generated Answer (RGA), a Pokemon detail page with a Similar Pokemon carousel, Passage Retrieval ("Ask about this Pokemon"), and a Compare view all work end to end against real indexed data. Open items are the two panel presentation decks — current state and next steps: `docs/handoff/STATE.md`.
 
 ## Structure
 

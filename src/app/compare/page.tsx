@@ -10,6 +10,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { Chip } from "@/components/ui/Chip";
+import { PokemonImage } from "@/components/ui/PokemonImage";
 import { CoveoConfigBanner } from "@/components/CoveoConfigBanner";
 import { CONTENT } from "@/content/pokedex";
 import { isCoveoConfigured } from "@/coveo/config";
@@ -123,16 +124,16 @@ function ComparePageContent() {
 
       {items.length > 0 && (
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[480px] border-collapse text-sm">
+          <table className="w-full border-collapse text-sm">
             <thead>
               <tr>
-                <th className="sticky left-0 z-10 border-b border-shell-100 bg-surface p-2 text-left font-semibold text-foreground dark:border-shell-600">
+                <th className="sticky left-0 z-10 min-w-22.5 border-b border-shell-100 bg-surface p-2 text-left font-semibold text-foreground dark:border-shell-600">
                   &nbsp;
                 </th>
                 {items.map((item) => (
                   <th
                     key={item.id}
-                    className="border-b border-shell-100 p-2 text-left font-semibold text-foreground dark:border-shell-600"
+                    className="min-w-27.5 border-b border-shell-100 p-2 text-left font-semibold text-foreground sm:min-w-35 dark:border-shell-600"
                   >
                     {item.name}
                   </th>
@@ -141,7 +142,24 @@ function ComparePageContent() {
             </thead>
             <tbody>
               <tr>
-                <th className="sticky left-0 z-10 bg-surface p-2 text-left font-normal text-shell-500">
+                <th className="sticky left-0 z-10 min-w-22.5 bg-surface p-2 text-left font-normal text-shell-500">
+                  {CONTENT.compare.rowLabels.image}
+                </th>
+                {items.map((item) => (
+                  <td key={item.id} className="min-w-27.5 p-2 sm:min-w-35">
+                    <PokemonImage
+                      src={item.imageUrl}
+                      alt={item.name}
+                      fallbackLabel={CONTENT.sprite.noImageLabel}
+                      sizes="96px"
+                      containerClassName="relative aspect-square w-20 sm:w-24"
+                      className="object-contain object-left"
+                    />
+                  </td>
+                ))}
+              </tr>
+              <tr>
+                <th className="sticky left-0 z-10 min-w-22.5 bg-surface p-2 text-left font-normal text-shell-500">
                   {CONTENT.compare.rowLabels.type}
                 </th>
                 {items.map((item) => (
