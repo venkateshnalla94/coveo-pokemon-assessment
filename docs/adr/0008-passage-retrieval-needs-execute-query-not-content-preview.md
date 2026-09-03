@@ -6,7 +6,7 @@ Status: Accepted, and the open question below is resolved — see "Update" at th
 
 ADR-0005 stated that `POST /rest/search/v3/passages/retrieve` "requires the *Machine Learning – Allow content preview* privilege," and ADR-0006 built `COVEO_ML_API_KEY` (Custom purpose, `ALLOW_CONTENT_PREVIEW` only) specifically to call it. `/api/passages/route.ts` was written to authenticate with that key.
 
-Investigating Stage E (Passage Retrieval, gated on a licensing question — see `docs/HANDOFF.md`), a direct test against the live org's Passage Retrieval endpoint found this assumption was wrong:
+Investigating Stage E (Passage Retrieval, gated on a licensing question — see `docs/handoff/`), a direct test against the live org's Passage Retrieval endpoint found this assumption was wrong:
 
 - Calling the endpoint with `COVEO_ML_API_KEY` (privileges: `[{"targetDomain":"ALLOW_CONTENT_PREVIEW","owner":"COVEO_ML"}]`, confirmed via the privilege-introspection endpoint) returned `403 Forbidden` immediately — rejected before the request even resolved the pipeline.
 - Calling the same endpoint, same body, with `NEXT_PUBLIC_COVEO_ACCESS_TOKEN` (the "Anonymous search" key, `EXECUTE_QUERY` privilege — same value as `COVEO_API_KEY`) got past authentication and pipeline resolution, returning `422 UNPROCESSABLE_ENTITY: "This API requires a Passage Retrieval model associated to the pipeline."` — a real business-logic error, not a permission error.

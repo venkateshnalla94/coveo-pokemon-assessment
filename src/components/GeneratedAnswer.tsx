@@ -32,7 +32,7 @@ import { useControllerState } from "@/coveo/useControllerState";
  * the request defaults to `text/plain`, which is why this previously
  * rendered raw, unformatted answer text via `whitespace-pre-wrap` even
  * though the RGA model has rich-text formatting enabled
- * (docs/HANDOFF.md D9/D10). Now rendered through the same
+ * (docs/handoff/archive/sessions-001-006.md D9/D10). Now rendered through the same
  * `PokemonMarkdown` pipeline AskAboutPokemon already uses — one markdown
  * pipeline, not two.
  *

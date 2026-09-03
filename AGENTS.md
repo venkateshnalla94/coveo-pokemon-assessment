@@ -48,7 +48,7 @@ npm run test:e2e     # playwright e2e suite
 
 ## Current status
 
-The Coveo org is live; the app returns real, correctly-faceted search results with images. `docs/HANDOFF.md` is the current-state source of truth — read it before touching org config or auth code, since it has state and gotchas not obvious from the plan docs alone.
+The Coveo org is live; the app returns real, correctly-faceted search results with images. `docs/handoff/STATE.md` (current state) and `docs/handoff/LATEST.md` (recent session log) are the source of truth — read both before touching org config or auth code, since they have state and gotchas not obvious from the plan docs alone. See `docs/handoff/README.md` for how the directory is organized.
 
 ## Conventions
 

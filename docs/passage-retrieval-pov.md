@@ -1,6 +1,6 @@
 # Point of view: Passage Retrieval vs. RGA
 
-Written for the Bonus tier's stated floor: "understand the Passage Retrieval API and have a point of view on how you would use it in future use cases." This is the E4 deliverable tracked in `plan101.md` and `docs/HANDOFF.md`.
+Written for the Bonus tier's stated floor: "understand the Passage Retrieval API and have a point of view on how you would use it in future use cases." This is the E4 deliverable tracked in `plan101.md` and `docs/handoff/`.
 
 ## What each API actually does
 

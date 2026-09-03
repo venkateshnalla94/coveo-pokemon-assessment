@@ -1,6 +1,6 @@
 ---
 name: work-resume
-description: Resume pending project work for one bounded task per session — from docs/HANDOFF.md's "What's next," or from a specific execution-plan doc the user names. Plans, researches Coveo docs, implements, tests, updates HANDOFF.md and the plan doc, and hands back a ready-to-paste prompt for the next session. Use when the user says "resume work," "pick up where we left off," or points at a specific execution plan to run.
+description: Resume pending project work for one bounded task per session — from docs/handoff/STATE.md's "What's next," or from a specific execution-plan doc the user names. Plans, researches Coveo docs, implements, tests, updates docs/handoff/LATEST.md and the plan doc, and hands back a ready-to-paste prompt for the next session. Use when the user says "resume work," "pick up where we left off," or points at a specific execution plan to run.
 ---
 
 # Work resume
@@ -15,11 +15,14 @@ time.
 - If the user's invocation names or points at a specific document (an
   execution plan under `docs/`, an ADR, anything under `docs/archive/`), read
   that document in full. Its own "Status"/scope section is the task list.
-- Otherwise, read `docs/HANDOFF.md` top to bottom — the opening paragraph and
-  the most recent session's "What's next" (or equivalent) are the source of
-  truth for pending work. Do not go rummaging through git log or old plan
-  docs for "other" pending work instead — HANDOFF.md is authoritative per
-  `AGENTS.md`.
+- Otherwise, read `docs/handoff/STATE.md` (Org details, What's done, What's
+  next) and `docs/handoff/LATEST.md` (the most recent sessions' narrative) —
+  these are the source of truth for pending work. Do not go rummaging
+  through git log, old plan docs, or `docs/handoff/archive/` for "other"
+  pending work instead — `STATE.md`/`LATEST.md` are authoritative per
+  `AGENTS.md`. Only open an `archive/*.md` file when the task at hand
+  explicitly needs older history, and look it up via `docs/handoff/INDEX.md`
+  first rather than scanning archives.
 - Also read `CLAUDE.md` and `AGENTS.md` if this is a fresh session context —
   their process rules (no server layer, ADR-on-architectural-change, no
   fabricated data, docs-first for console actions) apply to whatever gets
@@ -29,8 +32,8 @@ time.
 
 State plainly what pending item(s) you found and propose exactly **one** task
 (or, if the user already named a batch, that batch — don't silently expand
-it) to execute this session. If HANDOFF.md lists several unrelated pending
-items, pick the smallest coherent one and say why, rather than asking the
+it) to execute this session. If STATE.md/LATEST.md list several unrelated
+pending items, pick the smallest coherent one and say why, rather than asking the
 user to prioritize from scratch. Then ask, via AskUserQuestion, whether to
 enter Plan Mode for this task before any research or code changes — this
 mirrors `CLAUDE.md`'s "Working style" rule (reasoning on the table before
@@ -50,8 +53,8 @@ In Plan Mode (or inline if the user declined plan mode for a small task):
   rule. Do not answer from training-data memory of the console.
 - Keep a running list as you go: each doc page read, why, and whether it
   matched or diverged from what you found live in the console. This becomes
-  the HANDOFF.md log entry in step 5 — capture it now, don't reconstruct it
-  from memory at the end.
+  the `docs/handoff/LATEST.md` log entry in step 5 — capture it now, don't
+  reconstruct it from memory at the end.
 
 ## 3. Implement
 
@@ -87,29 +90,34 @@ Do all three, in order, before ending the session:
 1. **Update the execution plan doc** (the one from step 0, or create one if
    none existed) with what fraction of its scope is now done, and the doc
    pages read in step 2 (page, why, matched/diverged — same format as
-   HANDOFF.md's existing "External docs.coveo.com pages read this session"
-   sections). If the plan's scope is now fully shipped: update its Status
-   header to "complete" with a note on what shipped and any deviations, move
-   it to `docs/archive/`, and add one line to `docs/README.md`'s "Completed
-   execution plans" list.
-2. **Update `docs/HANDOFF.md`** with a new session entry, per `CLAUDE.md`'s
-   process rule — this applies whenever org config, auth, or app-visible
-   behavior changed, which most tasks from this skill will trigger. Match the
-   existing file's voice: what was found, root cause (for bugs), what
-   shipped, what was NOT verified (be honest about gaps — that's the file's
-   established convention, not optional politeness).
-3. **Log docs read** in HANDOFF.md's docs-read section for the session, even
-   if step 5.2's entry already mentions some inline — keep the dedicated log
-   section current so a future session can grep it.
+   `docs/handoff/LATEST.md`'s existing "External docs.coveo.com pages read
+   this session" entries). If the plan's scope is now fully shipped: update
+   its Status header to "complete" with a note on what shipped and any
+   deviations, move it to `docs/archive/`, and add one line to
+   `docs/README.md`'s "Completed execution plans" list.
+2. **Append a new session entry to `docs/handoff/LATEST.md`**, per
+   `CLAUDE.md`'s process rule — this applies whenever org config, auth, or
+   app-visible behavior changed, which most tasks from this skill will
+   trigger. Match the existing entries' voice: what was found, root cause
+   (for bugs), what shipped, what was NOT verified (be honest about gaps —
+   that's the established convention, not optional politeness). Update
+   `docs/handoff/STATE.md` in place for anything that changed (Org details,
+   What's done, What's next, Traps, Reference docs). If this session's entry
+   brings `LATEST.md` to 10 entries, rotate it per `docs/handoff/README.md`
+   before ending the session.
+3. **Log docs read** in `docs/handoff/LATEST.md`'s entry for the session,
+   even if step 5.2's entry already mentions some inline — keep the
+   dedicated log current so a future session can grep it.
 
 Then, in the chat response itself (not a file), give the user a ready-to-paste
-prompt for the next session: what to read first (HANDOFF.md's new entry, and
-the plan doc if one exists), a pasteable block naming the next single task
-(or the next user-approved batch) — not the whole remaining backlog — stating
+prompt for the next session: what to read first (`docs/handoff/STATE.md`,
+`docs/handoff/LATEST.md`'s new entry, and the plan doc if one exists), a
+pasteable block naming the next single task (or the next user-approved batch)
+— not the whole remaining backlog — stating
 what's already decided (don't re-litigate) and what "done" looks like. This
 is the mechanism that keeps each future session scoped to one task's worth of
 context instead of re-deriving everything from a sprawling backlog. Don't
-write this to a `docs/PROMPT-*.md` file — HANDOFF.md and the plan doc are
+write this to a `docs/PROMPT-*.md` file — docs/handoff/ and the plan doc are
 already the durable record; the prompt itself is disposable and belongs in
 the conversation, not as a new file to maintain each session.
 
@@ -117,7 +125,7 @@ the conversation, not as a new file to maintain each session.
 
 The point isn't process for its own sake — it's that a session which tries
 to "just finish the whole backlog" burns its context window re-reading
-things, loses precision on later tasks, and produces a HANDOFF.md entry
-nobody can trust. One scoped task, closed out completely with its own
+things, loses precision on later tasks, and produces a `docs/handoff/LATEST.md`
+entry nobody can trust. One scoped task, closed out completely with its own
 paperwork and its own next-prompt, is cheaper end to end than a big session
 that runs out of room halfway through.

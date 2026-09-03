@@ -22,14 +22,14 @@ Not a commercial product — a working proof of a Coveo-powered search integrati
 
 - Presented live to a Coveo panel (25 min incl. Q&A) as part of a two-topic presentation: a technical deep dive and an "Escalation & Recovery" operational scenario (unrelated to this app's UI).
 - Also publicly hosted (Vercel) so reviewers can use it outside the live session.
-- Connected to a live Coveo org: search, Type/Generation facets, and Pokemon images all return real results end to end. Current state and open items: `docs/HANDOFF.md`.
+- Connected to a live Coveo org: search, Type/Generation facets, and Pokemon images all return real results end to end. Current state and open items: `docs/handoff/STATE.md`.
 - Home page (`/`) hosts only the search box + Query Suggest typeahead; the actual results (facets, results grid, pagination, RGA) render on `/search?q=<term>` after a query is submitted or a suggestion is clicked. See `src/app/page.tsx` and `src/app/search/page.tsx`.
 - A Pokemon detail page exists at `/pokemon/[name]`.
 
 ## Capabilities and Constraints
 
 - Essential: index pokemondb.net (Pokemon pages only), Type facet, Generation facet, Pokemon image in each result — all verified working end to end against the live org.
-- Intermediate/Advanced: the Pokemon detail page, Query Suggest-powered typeahead, and Coveo RGA (Generated Answer) are all built and verified against the live org — see `docs/HANDOFF.md` for build history.
+- Intermediate/Advanced: the Pokemon detail page, Query Suggest-powered typeahead, and Coveo RGA (Generated Answer) are all built and verified against the live org — see `docs/handoff/` for build history.
 - Bonus: Passage Retrieval ("Ask about this Pokemon" on the PDP) and a Similar Pokemon carousel are also built and verified.
 - No server-side proxy or rate-limiting layer exists by design — Headless calls the Coveo Search API directly from the browser with a public, privilege-scoped search token (see docs/adr/0004-no-server-layer.md).
 - Images: only `img.pokemondb.net` is allow-listed in CSP/`next.config.ts` `images.remotePatterns` — any other image source needs that allow-list extended.

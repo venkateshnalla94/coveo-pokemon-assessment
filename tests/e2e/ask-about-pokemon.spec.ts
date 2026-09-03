@@ -10,7 +10,7 @@ import { CONTENT } from "@/content/pokedex";
  * variant to cover here the way unconfigured.spec.ts covers the rest of the
  * app. The question text and expected passage count ("how does this evolve"
  * on Eevee returning exactly 3 scoped passages) match already-verified live
- * behavior — see the Stage E section of docs/HANDOFF.md — not a guess at a
+ * behavior — see the Stage E section of docs/handoff/archive/sessions-001-006.md — not a guess at a
  * new query.
  */
 test.describe("ask about this Pokemon (configured)", () => {

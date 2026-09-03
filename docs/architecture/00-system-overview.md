@@ -59,7 +59,7 @@ Two separate resolvers in `src/coveo/config.ts`, deliberately not one:
 | Called by | `getSearchEngine()`, every page's `isCoveoConfigured()` check | `/api/token`, `/api/passages` only |
 | Ships to the browser | Yes — by design, these are client-safe values | Never |
 
-The client resolver has a load-bearing quirk worth knowing before touching it: its parameter default is written as the **literal** expression `process.env.NEXT_PUBLIC_COVEO_ORGANIZATION_ID` (repeated for each field), not `environment = process.env` with dynamic indexing. Next.js's build-time `NEXT_PUBLIC_*` inlining (webpack's `DefinePlugin`) only recognizes that exact literal syntactic pattern wherever it appears verbatim in source — a variable alias defeats it silently, with no build error, just `undefined` forever in the browser regardless of `.env.local`. This was a real, previously-shipped bug (see `docs/HANDOFF.md`'s D5 section) — any new `NEXT_PUBLIC_*` field added to this resolver must repeat the same literal form.
+The client resolver has a load-bearing quirk worth knowing before touching it: its parameter default is written as the **literal** expression `process.env.NEXT_PUBLIC_COVEO_ORGANIZATION_ID` (repeated for each field), not `environment = process.env` with dynamic indexing. Next.js's build-time `NEXT_PUBLIC_*` inlining (webpack's `DefinePlugin`) only recognizes that exact literal syntactic pattern wherever it appears verbatim in source — a variable alias defeats it silently, with no build error, just `undefined` forever in the browser regardless of `.env.local`. This was a real, previously-shipped bug (see `docs/handoff/STATE.md`'s D5 note, under What's done) — any new `NEXT_PUBLIC_*` field added to this resolver must repeat the same literal form.
 
 **Two auth modes** (`NEXT_PUBLIC_COVEO_AUTH_MODE`, see ADR-0007):
 
@@ -100,7 +100,7 @@ This is also the answer to "why is everything client-side": Headless's `SearchEn
 
 ## `useControllerState` — the one hand-rolled piece of infrastructure
 
-Every controller (`Facet`, `Pager`, `ResultList`, `SearchBox`, ...) exposes `.state` and `.subscribe(listener)`. The naive React pattern — `subscribe()` inside a `useEffect`, calling `setState` in the listener — has a real, previously-shipped failure mode: a Headless controller's *constructor* can dispatch synchronously (e.g. `buildUrlManager`'s constructor synchronously dispatches `restoreSearchParameters`), and if that happens while another component is mid-render, React throws "Cannot update a component while rendering a different component." This actually happened once `SearchBox` was duplicated into the persistent `AppHeader` layout alongside `/search`'s `SearchUrlSync` (see `docs/HANDOFF.md`, 8th session).
+Every controller (`Facet`, `Pager`, `ResultList`, `SearchBox`, ...) exposes `.state` and `.subscribe(listener)`. The naive React pattern — `subscribe()` inside a `useEffect`, calling `setState` in the listener — has a real, previously-shipped failure mode: a Headless controller's *constructor* can dispatch synchronously (e.g. `buildUrlManager`'s constructor synchronously dispatches `restoreSearchParameters`), and if that happens while another component is mid-render, React throws "Cannot update a component while rendering a different component." This actually happened once `SearchBox` was duplicated into the persistent `AppHeader` layout alongside `/search`'s `SearchUrlSync` (see `docs/handoff/archive/sessions-007-016.md`, 8th session).
 
 The fix, and the reason `src/coveo/useControllerState.ts` exists, is `useSyncExternalStore` — React's own mechanism for exactly this class of external-store synchronization hazard. Three non-obvious things the hook gets right so no call site has to re-derive them:
 
@@ -110,7 +110,7 @@ The fix, and the reason `src/coveo/useControllerState.ts` exists, is `useSyncExt
 
 Every component that feeds Headless controller state into React render state goes through this one hook — confirmed directly (`grep` across `src/components`) rather than assumed: the only file still using raw `.subscribe()` + `useEffect` is `SearchUrlSync.tsx`, and correctly so — it drives `router.replace()` (a side effect, not React state), so it was never in the vulnerable class described above.
 
-This hook is the *only* hand-rolled piece of "framework" code in the app. Every controller itself (`buildFacet`, `buildSort`, `buildGeneratedAnswer`, etc.) is stock `@coveo/headless`, not a custom reimplementation — a standing project rule (see `docs/HANDOFF.md`'s "Standing instruction" note) is to check Coveo's own docs/installed `.d.ts` files before hand-rolling anything, and every new controller usage was verified against the installed package types rather than assumed from prose.
+This hook is the *only* hand-rolled piece of "framework" code in the app. Every controller itself (`buildFacet`, `buildSort`, `buildGeneratedAnswer`, etc.) is stock `@coveo/headless`, not a custom reimplementation — a standing project rule (see `docs/handoff/archive/sessions-007-016.md`'s "Standing instruction" note) is to check Coveo's own docs/installed `.d.ts` files before hand-rolling anything, and every new controller usage was verified against the installed package types rather than assumed from prose.
 
 ## Context API usage
 
@@ -130,7 +130,7 @@ All three routes share `resolveServerCoveoConfig()` and the same `SEARCH_HUB`/`P
 
 ## How the app evolved (brief timeline)
 
-Full detail in `docs/HANDOFF.md` — this is only the shape of it, so the "why does this look the way it does" question has an answer without re-reading nine sessions of history:
+Full detail in `docs/handoff/` — this is only the shape of it, so the "why does this look the way it does" question has an answer without re-reading nine sessions of history:
 
 1. **v2.1 → v2.2** — Coveo org field expansion: 21 new Pokemon fields (stats, training, breeding, defenses, evolution) added to the `Pokedex - Test` source, then ported to `Pokedex - Full` (1025 items).
 2. **v2.3** — this frontend, built in 7 sequential steps: data contract (`PokemonItem` reshaped into grouped sub-objects), shared UI primitives (`Chip`/`StatBar`/`DataList`/`Tabs`), PDP rebuild, Compare feature, `/search` (facets/sort/RGA), home + `AppHeader`, docs sync.

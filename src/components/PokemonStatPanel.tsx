@@ -9,7 +9,7 @@ import { getTypeColor } from "@/coveo/typeColors";
  * Six StatBars in STAT_ORDER plus the total — see
  * docs/EXECUTION-PLAN-v4-design-system.md §9. Returns null when every stat is
  * undefined, so the panel simply isn't there rather than showing six empty
- * bars — kept even though the stats are live per docs/HANDOFF.md, since the
+ * bars — kept even though the stats are live per docs/handoff/, since the
  * defensive behavior is correct regardless of today's index state.
  *
  * `types` sets `--type-primary` (decorative only, per §2.3 — `types[0]`

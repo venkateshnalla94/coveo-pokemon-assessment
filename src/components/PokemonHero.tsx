@@ -8,7 +8,7 @@ import { getTypeColor, getTypeTextColor } from "@/coveo/typeColors";
 /**
  * Two-column commerce-PDP layout: a large sprite "packshot" panel on the
  * left, identity + type + quick facts on the right — see
- * docs/HANDOFF.md's PDP redesign entry for why. Supersedes the prior
+ * docs/handoff/archive/sessions-017-027.md's PDP redesign entry for why. Supersedes the prior
  * single-stacked-column version, which existed to let the sprite bleed
  * (via a negative top margin) over a full-bleed photographic backdrop band
  * rendered by the page above this component; that backdrop is gone, so
