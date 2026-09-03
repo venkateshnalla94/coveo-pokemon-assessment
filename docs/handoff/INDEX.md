@@ -45,6 +45,11 @@ skipped in the source numbering (session log jumps from 25 to 27).
 | 35 | ML model health check: CPR still stale, Coveo rebuild not yet completed | `archive/sessions-028-037.md` |
 | 36 | Scoped a second body-content exclusion (Cap Pikachu alternate-form flavor text) | `archive/sessions-028-037.md` |
 | 37 | Researched Coveo MCP Server, decided not to adopt | `archive/sessions-028-037.md` |
+| 38 | Compare page: added missing image row, responsive column widths | `LATEST.md` |
+| 39 | Themed placeholder for Pokemon missing an indexed sprite | `LATEST.md` |
+| 40 | LCP fix: `priority` on three above-the-fold images | `LATEST.md` |
+| 41 | `pokemonoverview` field designed (PDP intro prose), NOT applied | `LATEST.md` |
+| 42 | `pokemonoverview` applied live to both sources, PDP renders it | `LATEST.md` |
 
 ## When a new session closes
 
