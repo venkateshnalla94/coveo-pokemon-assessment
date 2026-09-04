@@ -63,14 +63,41 @@ describe("AskAboutPokemon", () => {
     );
   });
 
-  it("shows a distinct error message on a network error", async () => {
+  it("shows the generic ask error message on a network error", async () => {
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("network down")));
 
     render(<AskAboutPokemon pokemonName="Eevee" pokemonTypes={["Normal"]} />);
     askQuestion("How does it evolve?");
 
     await waitFor(() =>
-      expect(screen.getByText("Network error — could not reach the server.")).toBeInTheDocument(),
+      expect(
+        screen.getByText("Couldn't get an answer right now. Please try again."),
+      ).toBeInTheDocument(),
     );
+  });
+
+  it("shows the generic ask error message on an API error response, never the raw error body", async () => {
+    // /api/passages returns { error: { code, message } } — an object, not a
+    // string. Regression guard for the bug where this component typed it as
+    // a string and rendered it directly, which crashes React ("Objects are
+    // not valid as a React child") on any real API failure.
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: false,
+        status: 400,
+        json: async () => ({ error: { code: "INVALID_BODY", message: "`query` must be a non-empty string." } }),
+      }),
+    );
+
+    render(<AskAboutPokemon pokemonName="Eevee" pokemonTypes={["Normal"]} />);
+    askQuestion("How does it evolve?");
+
+    await waitFor(() =>
+      expect(
+        screen.getByText("Couldn't get an answer right now. Please try again."),
+      ).toBeInTheDocument(),
+    );
+    expect(screen.queryByText(/must be a non-empty string/)).not.toBeInTheDocument();
   });
 });

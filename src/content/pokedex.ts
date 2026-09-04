@@ -44,7 +44,7 @@ export const CONTENT = {
     placeholder: "Search for a Pokemon...",
     loadingLabel: "Loading...",
     emptyTitle: "No results.",
-    emptyBody: "This is expected until a Coveo source is indexing pokemondb.net — see the project README.",
+    emptyBody: "Try a different search term or adjust your filters.",
     facetNoMatches: "No matches.",
     facetSearchPlaceholder: (label: string) => `Search ${label.toLowerCase()}...`,
     facetLabels: {
@@ -116,6 +116,7 @@ export const CONTENT = {
     askButtonLabel: "Ask",
     askButtonLoadingLabel: "Asking...",
     noPassagesFound: "No relevant passages found for that question.",
+    askErrorMessage: "Couldn't get an answer right now. Please try again.",
     passageLabel: (index: number) => `Passage ${index}`,
     relevanceLabel: (percent: string) => `Relevance: ${percent}%`,
     similarHeading: (name: string) => `Similar to ${name}`,

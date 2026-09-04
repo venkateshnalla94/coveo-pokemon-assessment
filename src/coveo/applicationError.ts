@@ -47,7 +47,7 @@ export function toApplicationError(error: CoveoSearchApiError): ApplicationError
     return {
       code: "AUTHENTICATION",
       message: `Coveo returned ${error.statusCode}: ${error.message}`,
-      userMessage: "Search is temporarily unavailable (authentication issue with the search token).",
+      userMessage: "Search is temporarily unavailable. Please try again shortly.",
       recoverable: false,
     };
   }
