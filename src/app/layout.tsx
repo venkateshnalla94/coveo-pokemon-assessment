@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { AppHeader } from "@/components/AppHeader";
 import { CompareProvider } from "@/components/compare/CompareProvider";
 import { CompareTray } from "@/components/compare/CompareTray";
+import { Footer } from "@/components/Footer";
 import { CONTENT } from "@/content/pokedex";
 import { typeCssVariables } from "@/coveo/typeColors";
 import { SITE_URL } from "@/siteUrl";
@@ -88,8 +89,17 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               overflow-hidden) forces the *whole page* wider than the
               viewport instead of just clipping that row — found via 375px
               screenshot verification of the home page,
-              docs/EXECUTION-PLAN-responsive-ui.md §9. */}
-          <div className="min-w-0">{children}</div>
+              docs/EXECUTION-PLAN-responsive-ui.md §9.
+
+              flex-1: the classic sticky-footer flex pattern — this item
+              grows to fill any leftover vertical space so Footer lands at
+              the true bottom of the viewport on a short page (e.g. a PDP
+              with little content) instead of floating right below the
+              content with a gap of blank space beneath it. On a page
+              taller than the viewport this is a no-op; Footer just follows
+              the content as it scrolls, same as before. */}
+          <div className="min-w-0 flex-1">{children}</div>
+          <Footer />
           <CompareTray />
         </CompareProvider>
       </body>

@@ -32,6 +32,11 @@ export const CONTENT = {
     noImageLabel: "No image available",
   },
 
+  footer: {
+    poweredByPrefix: "Powered by",
+    coveoLogoAlt: "Coveo",
+  },
+
   home: {
     heroSubtitle: "Search every Pokemon indexed from pokemondb.net, powered by Coveo.",
     indexedCountSuffix: (total: number) => ` ${total.toLocaleString()} Pokemon indexed.`,
