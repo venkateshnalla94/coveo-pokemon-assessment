@@ -10,6 +10,20 @@ Current org/app state (Org details, What's done, What's next, Traps,
 Reference docs) lives in `docs/handoff/STATE.md`, not here — update that file
 in place when those facts change, don't re-log them as a session entry.
 
+## Forty-fourth session — session-43 loose ends closed: RGA hallucination root-caused and resolved, ADR-0023/0024 written, spec doc updated, off-cycle rebuild confirmed complete
+
+All five items left open at session 43's close are now done.
+
+**RGA hallucination (Bug/Ghost weaknesses fabricated for Electric-type).** Root-caused via Chunk Inspector against the actual search ID that produced the bad answer: a retrieval miss against the stale, pre-rebuild embedding pool — the grounded "Type effectiveness" sentence existed in `body` (session 43's fix) but the embedding store hadn't picked it up yet, so RGA fell back to ungrounded pretrained knowledge for the rest of the answer. Not a flaw in the grounded sentence or the bucketing logic. Resolved once the off-cycle rebuild (below) completed; re-verified via Chunk Inspector that the cited chunk is now the "Type effectiveness" sentence and the answer contains no fabricated types.
+
+**ADRs written.** `docs/adr/0023-type-effectiveness-extension-for-rga-grounding.md` documents the new postConversion extension (refines ADR-0012) and the hallucination root cause/fix above. `docs/adr/0024-dex-flavor-exclusion-regression-and-sr-only-exclude.md` documents the consolidated single-rule fix for ADR-0020's regressed exclusion and the new `sr-only` exclude.
+
+**`docs/coveo-source-spec.md` updated.** New paragraph after the weaknesses/resistances IPE section documenting the `Pokemon Type Effectiveness` extension, its bucketing (weak/resist/immune), and why it's only verifiable via keyword search rather than Content Browser.
+
+**Off-cycle ML rebuild (RGA + Semantic Encoder + CPR) confirmed complete.** `docs/handoff/STATE.md`'s Org details section updated to drop the "completion not yet independently confirmed" caveat — embeddings are caught up with sessions 11–12/43/44's content changes.
+
+**Still open, unchanged from session 43:** `AskAboutPokemon.tsx`'s raw passage display still shows unrelated table-rendering artifacts (ASCII dashes from the legitimately-kept `vitals-table`) — user deliberately deferred this FE cleanup; would reverse the component's documented "verbatim" intent if pursued, needs an ADR note if it is.
+
 ## Forty-third session — RGA weakness-question root cause found and fixed on `Pokedex - Test` (not yet applied to `Pokedex - Full`); ADR-0020's `dex-flavor` exclusion found regressed, fix in progress; RGA hallucination on top of correct citation, unresolved
 
 **In progress — do not treat as done.** Everything below is confirmed live only on `Pokedex - Test`. `Pokedex - Full` (the source the running app actually queries) has not been touched. Two threads open at session end: (1) the `dex-flavor` exclude-rule fix needs one more rebuild+verify round before it's confirmed working, (2) RGA fabricating extra weaknesses beyond what's grounded is unresolved and unexplained.
