@@ -8,9 +8,9 @@ history, look up the session number in `docs/handoff/INDEX.md`.
 ## Org details
 
 - Org name: `venkatesh-pokemon-challenge`, Org ID: `venkateshpokemonchallenges0qp5rpy`
-- Created **2026-08-25** — Trial deletion risk cleared. Presentation booked for **2026-09-09**.
+- Created **2026-08-25** — Trial deletion risk cleared.
   - ✅ **Phase 0 email sent and confirmed** (Org ID, all features verified available)
-  - ✅ **ML model rebuild scheduled for 2026-09-04** (RGA + Semantic Encoder + CPR; follow-up call 2026-09-09 at 12:00 PM EST to verify completion)
+  - **Off-cycle rebuild of RGA + Semantic Encoder + CPR requested and scheduled**, to catch up embeddings that predate the sessions 11–12/43 content-exclusion and body-text fixes. Completion not yet independently confirmed — see "What's next" below before trusting any RGA/CPR answer as reflecting current content.
 - License: Enterprise, Demo type, expires 2026-11-24.
 - Two sources: `Pokedex - Test` (3 items — Pikachu/Garchomp/Sprigatito, 26 fields, sandbox/prototyping only) and `Pokedex - Full` (1025 items, the real crawl — **now also on the full 26-field config as of the sixth session's Phase v2.2 work**, see that section above). Both fully verified. `Pokedex - Full` is what the running app actually queries (the pipeline's `filter cq @source==("Pokedex - Full")` rule excludes Test), so the new fields are genuinely live, not just prototyped.
 - `Pokedex` query pipeline: condition `Search Hub is PokedexSearch`, filter rule `filter cq @source==("Pokedex - Full")`. Four ML models associated as of this session: `Pokedex Query Suggestions`, `Pokedex Semantic Encoder`, `Pokedex RGA`, `Pokedex Passage Retrieval` — all Active, all verified working end to end.
@@ -38,15 +38,9 @@ history, look up the session number in `docs/handoff/INDEX.md`.
 **As of session 43 (current), the priority is:**
 
 0. **Session 43 — RGA weakness-answer fix, DONE on both `Pokedex - Test` and `Pokedex - Full`, confirmed live on both.** Full detail in `docs/handoff/LATEST.md`'s forty-third-session entry — read it before continuing, don't re-derive. Three fixes shipped and verified via search-API keyword checks (not console views — Fields JSON and Quick View don't show `body_text`, see Traps below): (a) new post-conversion extension `Pokemon Type Effectiveness` appends a grounded, immune/resist/weak-bucketed type-effectiveness sentence to `body_text`; (b) ADR-0020's `dex-flavor` exclusion, found regressed live, fixed with a single consolidated range-based XPath rule; (c) a new `sr-only` exclude rule removing an accessibility skip-link that was never caught by the existing header/nav excludes. **Still open, not yet done:** (1) a live RGA answer fabricated two weaknesses (Bug, Ghost) that don't exist for Electric-type — root cause not investigated, needs a Chunk Inspector pass; (2) no ADRs written yet for these changes (real architectural decisions per `CLAUDE.md` — a new extension and a body-content exclude-rule fix); (3) `docs/coveo-source-spec.md` not yet updated to reflect what's actually live; (4) `AskAboutPokemon.tsx`'s raw passage display still shows unrelated table-rendering artifacts (ASCII dashes from a legitimately-kept table) — user deliberately deferred a FE cleanup for this, see LATEST.md.
-1. **ML model rebuild completion — on track for 2026-09-04 (tomorrow)**
-   Scheduled rebuild of RGA + Semantic Encoder + CPR. Follow-up call 2026-09-09, 12:00 PM EST to confirm completion before presentation. Once complete, all three models will reflect the body-content exclusion rules added in sessions 11–12 (Moves/Sprites/Type-defenses/Locations/PokéBase blocks removed from indexed content).
+1. **ML model rebuild completion — status unconfirmed.** An off-cycle rebuild of RGA + Semantic Encoder + CPR was requested and scheduled to catch up embeddings that predate the body-content exclusion rules added in sessions 11–12 and the body-text fix from session 43. Whether it actually completed hasn't been independently verified — check directly against the org (model status panel, or a live keyword-search spot-check per the Traps section below) before trusting an RGA/CPR answer as reflecting current content.
 
-2. **Presentation decks — drafted and substantive**
-   - `presentation/topic1-technical-deepdive.md` — 73 lines, covers what was built, why this architecture, Advanced/Bonus status, what was learned (RGA/CPR staleness diagnosis), and anticipated Q&A
-   - `presentation/topic2-escalation-recovery.md` — 56 lines, covers root-cause analysis method, short-term remediation, executive comms, and prevention planning
-   - Both ready for live panel delivery 2026-09-09
-
-3. **Chat agent — future goal, blocked externally, not actionable right now.**
+2. **Chat agent — future goal, blocked externally, not actionable right now.**
 
 All four nineteenth-session follow-up execution docs are now closed:
 Doc 1 (ML recommendations, Branch B + ART) and Doc 2 (Similar Pokemon
@@ -56,9 +50,8 @@ carousel) in the twentieth session; Doc 3 (marketing assets, including its
 
 The numbered list immediately below predates the nineteenth/twentieth/
 twenty-first sessions and is largely historical (most of its own items are
-marked done/superseded inline) — kept for the operational detail in items
-0/4/5 (the ML-rebuild trail and the Phase 0 email context), not as the live
-priority order.
+marked done/superseded inline) — kept for the operational detail in item 0
+(the ML-rebuild finding trail), not as the live priority order.
 
 Phase v2.3 is done as of the seventh session — the v2 roadmap (`docs/archive/EXECUTION-PLAN-v2.md`) is now fully closed. **New this session: `docs/archive/EXECUTION-PLAN-v3.md`** — a separate, independent track opened by live usage, four phases, pick any one:
 
@@ -69,12 +62,12 @@ Phase v2.3 is done as of the seventh session — the v2 roadmap (`docs/archive/E
 
 What's left from the original assessment, all pre-existing and unrelated to v2/v3:
 
-0. **New, most urgent as of the twelfth session: contact Coveo (Account Manager/support) to request an off-cycle rebuild of all three ML models — RGA, Semantic Encoder, and Passage Retrieval (CPR).** The v3.4 content-exclusion rules are confirmed correctly indexed org-wide, but the embedding stores backing RGA (`/search`'s generated answer) and CPR (`Ask about this Pokemon` on the PDP) are both stale (pre-exclusion) for most of the 1025-item corpus, and RGA's own status shows its next scheduled rebuild 7 days out — landing in the same window as item 5's booking deadline below. CPR looks even more stale than RGA (confirmed live on Charizard, where RGA is otherwise clean but CPR still returns full Moves/Type-defenses-grid passages), since nothing this session forced even a partial CPR rebuild the way saving RGA's Prompt instruction did for RGA. Until this lands, live demos should stick to Pokemon already confirmed clean via RGA this session (Charizard, Pikachu, Eevee, Charjabug) and avoid `Ask about this Pokemon` (CPR) entirely except possibly on Charizard. Full trail in the twelfth-session section above.
-1. **A manual end-to-end browser walkthrough of the new v2.3 surfaces together**, and the two e2e specs the plan's §8 flagged as ready to add "once v2.2 lands" (it now has): compare-selection-survives-navigation, and deep-linked facet URLs restoring state on a cold load. Cheap, and worth doing before treating the app as demo-ready for the panel.
+0. ~~**Contact Coveo to request an off-cycle rebuild of all three ML models — RGA, Semantic Encoder, and Passage Retrieval (CPR).**~~ — **requested and scheduled**, current status tracked in "What's next" above (top of this document), not repeated here. Original finding (twelfth session): the v3.4 content-exclusion rules are correctly indexed org-wide, but the embedding stores backing RGA and CPR were stale (pre-exclusion) for most of the 1025-item corpus. Until rebuild completion is confirmed, live demos should stick to Pokemon already confirmed clean via keyword-search spot-check (Charizard, Pikachu, Eevee, Charjabug) and treat `Ask about this Pokemon` (CPR) results with caution. Full trail in the twelfth-session section above.
+1. **A manual end-to-end browser walkthrough of the new v2.3 surfaces together**, and the two e2e specs the plan's §8 flagged as ready to add "once v2.2 lands" (it now has): compare-selection-survives-navigation, and deep-linked facet URLs restoring state on a cold load. Cheap, and worth doing.
 2. ~~`pokemonname` needs "Use for sorting" enabled~~ — **done**, tenth session (see that section above); `name-asc` is back in `sortOptions.ts` and live-verified.
 3. ~~**Vercel deploy** (Intermediate tier — "host your search app to make it accessible").~~ — **done**, same day following the eighteenth session (see that section above). Live at https://coveo-pokemon-assessment.vercel.app/, connected via GitHub import, `COVEO_API_KEY` env var issue found and fixed live.
-4. **Both presentation decks** (Advanced tier). Not started — `presentation/topic1-technical-deepdive.md` and `presentation/topic2-escalation-recovery.md` are still unfilled outline checklists. Deliberately sequenced after Vercel, per user decision (predates the v2 work, may be worth revisiting given the v2 field-extraction debugging — the XPath axis bugs, the duplicate-DOM-block traps, the unmapped-metadata trap resurfacing on the Full migration — is genuinely good Topic 1 material). The twelfth session's stale-embedding/off-cycle-rebuild-request finding is also good material for either deck (real production-style operational issue, found and diagnosed live, not staged).
-5. **Phase 0 email reply (Org ID) and presentation-slot booking (deadline 2026-09-06, 7 days out as of this writing).** Explicitly deferred by user decision, not forgotten. Turned out **not to be a real blocker for anything built so far** — both RGA and CPR were available and buildable in this org despite the email being unsent (see ADR-0008 for CPR). Still worth sending regardless — it's zero-dependency and the deadline is real, and now shares its window with item 0's rebuild request above. Now idle across **twelve** sessions.
+4. ~~**Both presentation decks** (Advanced tier).~~ — drafted and substantive; status and content tracked in `presentation/` itself (`topic1-technical-deepdive.md`, `topic2-escalation-recovery.md`, `MASTER-PANEL-DECK-BRIEF.md`, `DECK-ACTION-PLAN.md`), not duplicated here.
+5. ~~**Phase 0 email reply (Org ID)**~~ — **done**, see Org details above. Turned out **not to be a real blocker for anything built so far** — both RGA and CPR were available and buildable in this org despite the email being unsent (see ADR-0008 for CPR).
 6. **Lower priority, from the cross-repo inspiration pass** (`docs/inspiration-from-coveo-assesment.md`): a git-hook secret scan (item 1), and an explicit decision on whether `GeneratedAnswer.tsx` should regenerate on facet clicks (item 4) — investigated but not resolved, see that doc's Tier 2.
 
 
