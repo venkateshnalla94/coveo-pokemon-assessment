@@ -1,6 +1,12 @@
 "use client";
 
-import { buildInteractiveResult, buildResultList, type Result, type SearchEngine } from "@coveo/headless";
+import {
+  buildInteractiveResult,
+  buildResultList,
+  buildResultsPerPage,
+  type Result,
+  type SearchEngine,
+} from "@coveo/headless";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import type { CSSProperties } from "react";
@@ -26,6 +32,12 @@ const MAX_STAT_TOTAL = MAX_BASE_STAT * 6;
 export function ResultList() {
   const [engine] = useState(() => getSearchEngine());
   const [resultList] = useState(() => buildResultList(engine));
+  // Fixed page size, no UI control for it — 18 divides evenly into full rows
+  // at both the 2-col (mobile) and 3-col (sm+) grid layouts below. Must be
+  // constructed during render (not an effect) so it registers its default
+  // before SearchUrlSync's useLayoutEffect restores search params from the
+  // URL — same ordering constraint as loadAdvancedSearchQueryActions there.
+  useState(() => buildResultsPerPage(engine, { initialState: { numberOfResults: 18 } }));
   const state = useControllerState(resultList) ?? resultList.state;
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -49,9 +61,9 @@ export function ResultList() {
           <span className="sr-only">{CONTENT.search.loadingLabel}</span>
           <ul
             aria-hidden="true"
-            className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 md:grid-cols-4 xl:grid-cols-5"
+            className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 md:gap-8"
           >
-            {Array.from({ length: 8 }).map((_, index) => (
+            {Array.from({ length: 18 }).map((_, index) => (
               <ResultCardSkeleton key={index} />
             ))}
           </ul>
@@ -74,7 +86,7 @@ export function ResultList() {
       );
     case "success":
       return (
-        <ul aria-label="Search results" className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 md:grid-cols-4 xl:grid-cols-5">
+        <ul aria-label="Search results" className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 md:gap-8">
           {/* deriveSearchRenderState maps state.results 1:1, in order, into
               renderState.items — zipping by index here to recover the raw
               Result (needed for buildInteractiveResult) without changing the
@@ -139,7 +151,7 @@ function ResultCard({
 
   return (
     <li
-      className="result-tile group bg-surface p-3"
+      className="result-tile group bg-surface p-4"
       data-glow={primaryColor ? (isDualGlow ? "dual" : "single") : undefined}
       style={glowVars}
     >
@@ -150,16 +162,35 @@ function ResultCard({
             the drawn edge instead of being clipped by it. Rendered
             unconditionally (real sprite or themed placeholder) so every
             tile keeps this treatment regardless of whether the index has
-            an image for it. */}
-        <PokemonImage
-          src={item.imageUrl}
-          alt={item.name}
-          fallbackLabel={CONTENT.sprite.noImageLabel}
-          sizes="(min-width: 768px) 22vw, (min-width: 640px) 28vw, 42vw"
-          containerClassName="relative mt-[-12%] mb-2 aspect-square w-full"
-          className="object-contain transition-transform duration-200 ease-out group-hover:scale-105 group-focus-within:scale-105"
-          priority={priority}
-        />
+            an image for it.
+
+            The inner `inset-[8%]` wrapper is a second box, not just padding
+            on this one: next/image's `fill` mode positions the `<img>`
+            against its positioned ancestor's *padding box*, so padding here
+            wouldn't reserve any space for it — a genuinely smaller inner box
+            is required. Needed because pokemondb's own source images aren't
+            uniform: some are square canvases with an opaque white
+            background that already has generous built-in padding, others
+            are transparent PNGs cropped tight to the character. Without
+            this inset, `object-contain` still keeps every sprite inside its
+            box correctly, but a tightly-cropped one has none of the white
+            canvas's natural buffer, so the same -12% bleed above visibly
+            pushes its character past the card's top edge while a padded
+            one stays put — inconsistent card-to-card for reasons invisible
+            in this code (they trace back to which source image pokemondb
+            happened to have). This inset gives every sprite the same
+            buffer regardless of its source composition. */}
+        <div className="relative mt-[-12%] mb-2 aspect-square w-full">
+          <PokemonImage
+            src={item.imageUrl}
+            alt={item.name}
+            fallbackLabel={CONTENT.sprite.noImageLabel}
+            sizes="(min-width: 640px) 30vw, 42vw"
+            containerClassName="absolute inset-[8%]"
+            className="object-contain transition-transform duration-200 ease-out group-hover:scale-105 group-focus-within:scale-105"
+            priority={priority}
+          />
+        </div>
         {/* Synchronized hover (v4 plan §5, Appendix A): sprite (scales,
             above), name and dex number (this block) highlight together as
             one path on hover/focus. Type chips below are intentionally
@@ -233,7 +264,7 @@ function ResultCard({
 /** Sprite-square + two text lines, roughly ResultCard's box (plan §3). */
 function ResultCardSkeleton() {
   return (
-    <li className="bg-surface p-3" aria-hidden="true">
+    <li className="bg-surface p-4" aria-hidden="true">
       <div className="aspect-square w-full animate-pulse rounded-md bg-shell-100 dark:bg-shell-600/40" />
       <div className="mt-3 h-3 w-3/4 animate-pulse rounded bg-shell-100 dark:bg-shell-600/40" />
       <div className="mt-2 h-3 w-1/2 animate-pulse rounded bg-shell-100 dark:bg-shell-600/40" />
