@@ -10,6 +10,8 @@ Next.js + [`@coveo/headless`](https://docs.coveo.com/en/headless/latest/) search
 
 Connected to a live Coveo org and deployed on Vercel: search, faceting (Automatic Facet Generation plus manual Speed/Abilities facets), Query Suggest typeahead, Generated Answer (RGA), a Pokemon detail page with a Similar Pokemon carousel, Passage Retrieval ("Ask about this Pokemon"), and a Compare view all work end to end against real indexed data. Open items and current state: `docs/handoff/STATE.md`.
 
+**Live app**: [coveo-pokemon-assessment.vercel.app](https://coveo-pokemon-assessment.vercel.app/)
+
 ## Structure
 
 - `src/` — Next.js + Coveo Headless SDK search frontend
