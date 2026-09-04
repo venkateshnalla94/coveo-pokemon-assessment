@@ -35,11 +35,13 @@ history, look up the session number in `docs/handoff/INDEX.md`.
 
 ## What's next (in priority order)
 
-**As of session 44 (current), the priority is:**
+**As of session 45 (current), the priority is:**
 
-0. **Session 44 — session-43 loose ends closed out.** (1) The Bug/Ghost RGA hallucination on Electric-type weakness is resolved: root-caused via Chunk Inspector as a retrieval miss against the stale (pre-rebuild) embedding pool, not a flaw in the grounded sentence — the correct chunk existed in `body` but hadn't been picked up yet. Resolved once the off-cycle rebuild (below) completed; re-verified the new sentence is the cited chunk with no fabricated types in the answer. (2) `docs/adr/0023-type-effectiveness-extension-for-rga-grounding.md` (the new extension) and `docs/adr/0024-dex-flavor-exclusion-regression-and-sr-only-exclude.md` (the exclude-rule fixes) written. (3) `docs/coveo-source-spec.md`'s weaknesses/resistances section updated with the `Pokemon Type Effectiveness` extension. (4) Off-cycle RGA + Semantic Encoder + CPR rebuild confirmed complete — see Org details above. **Still open:** `AskAboutPokemon.tsx`'s raw passage display still shows unrelated table-rendering artifacts (ASCII dashes from a legitimately-kept table) — user deliberately deferred this FE cleanup, see LATEST.md's session-43 entry.
+0. **Session 45 — push the three local commits.** All of this session's work landed as three commits on `develop` (`71cd3a1` grid/sprite-bleed, `0dd30e6` error-copy + `AskAboutPokemon` crash fix, `f37f1e0` sticky header/footer/search-box routing) — none pushed to `origin/develop` yet as of session close. Check `git status`/`git log` first thing; if still unpushed, push before starting new work.
 
-1. **Chat agent — future goal, blocked externally, not actionable right now.**
+1. **Session 44 — session-43 loose ends closed out.** (1) The Bug/Ghost RGA hallucination on Electric-type weakness is resolved: root-caused via Chunk Inspector as a retrieval miss against the stale (pre-rebuild) embedding pool, not a flaw in the grounded sentence — the correct chunk existed in `body` but hadn't been picked up yet. Resolved once the off-cycle rebuild (below) completed; re-verified the new sentence is the cited chunk with no fabricated types in the answer. (2) `docs/adr/0023-type-effectiveness-extension-for-rga-grounding.md` (the new extension) and `docs/adr/0024-dex-flavor-exclusion-regression-and-sr-only-exclude.md` (the exclude-rule fixes) written. (3) `docs/coveo-source-spec.md`'s weaknesses/resistances section updated with the `Pokemon Type Effectiveness` extension. (4) Off-cycle RGA + Semantic Encoder + CPR rebuild confirmed complete — see Org details above. **Still open:** `AskAboutPokemon.tsx`'s raw passage display still shows unrelated table-rendering artifacts (ASCII dashes from a legitimately-kept table) — user deliberately deferred this FE cleanup, see LATEST.md's session-43 entry.
+
+2. **Chat agent — future goal, blocked externally, not actionable right now.**
 
 All four nineteenth-session follow-up execution docs are now closed:
 Doc 1 (ML recommendations, Branch B + ART) and Doc 2 (Similar Pokemon

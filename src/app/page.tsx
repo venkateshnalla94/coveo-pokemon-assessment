@@ -72,11 +72,19 @@ export default function Home() {
           summaryState.hasResults &&
           CONTENT.home.indexedCountSuffix(summaryState.total)}
       </p>
-      <SearchBox
-        onNavigate={(query) =>
-          router.push(`/search?q=${encodeURIComponent(query)}`)
-        }
-      />
+      {/* Sticky at the same top-11.25 (45px) offset as /search's own box —
+          AppHeader is wordmark-only on this route too (see AppHeader.tsx),
+          so once a user scrolls past the hero into Browse-by-type, the box
+          itself (not the whole hero banner) stays pinned under the header
+          rather than scrolling away entirely. bg-background so content
+          scrolling up from underneath doesn't show through once stuck. */}
+      <div className="sticky top-11.25 z-40 w-full max-w-xl bg-background py-2">
+        <SearchBox
+          onNavigate={(query) =>
+            router.push(`/search?q=${encodeURIComponent(query)}`)
+          }
+        />
+      </div>
       <div className="mt-12 w-full">
         <BrowseByType />
       </div>

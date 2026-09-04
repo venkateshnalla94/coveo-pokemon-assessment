@@ -69,17 +69,16 @@ export function AskAboutPokemon({ pokemonName, pokemonTypes }: AskAboutPokemonPr
         body: JSON.stringify({ query: trimmed, pokemonName }),
       });
       if (!response.ok) {
-        const body = (await response.json().catch(() => null)) as { error?: string } | null;
-        setState({
-          status: "error",
-          message: body?.error ?? `Request failed (${response.status}).`,
-        });
+        // Never surface the API's raw error (validation text, upstream
+        // status, config detail) to the customer — one generic message for
+        // every failure mode, same posture as SimilarPokemon.tsx's fetch.
+        setState({ status: "error", message: CONTENT.pdp.askErrorMessage });
         return;
       }
       const data = (await response.json()) as PassagesResponse;
       setState({ status: "success", passages: data.items ?? [] });
     } catch {
-      setState({ status: "error", message: "Network error — could not reach the server." });
+      setState({ status: "error", message: CONTENT.pdp.askErrorMessage });
     }
   }
 
